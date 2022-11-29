@@ -6,32 +6,33 @@ type TileSet = HashMap<String, HashSet<String>>;
 
 use serde_json;
 
+use colours;
 use constants;
 
 #[allow(dead_code)]
 pub struct Board {
-    board: [BoardTile; 1],
-    pub board_graphical_coords: [[usize; 2]; constants::BOARD_TOTAL_NUMBER_OF_TILES],
+    board: Vec<BoardTile>,
     sets: TileSet,
+    display_board_coords: constants::BoardCoordsArray,
 }
 
 impl Board {
-    pub fn new(board: [BoardTile; 1]) -> Self {
+    pub fn new(board: Vec<BoardTile>) -> Self {
         let tile_sets: TileSet = Self::organize_sets(&board);
         Self {
             board: board,
-            board_graphical_coords: constants::BOARD_DISPLAY_COORDS,
             sets: tile_sets,
+            display_board_coords: constants::DISPLAY_BOARD_COORDS,
         }
     }
 
-    fn organize_sets(board: &[BoardTile; 1]) -> TileSet {
+    fn organize_sets(board: &Vec<BoardTile>) -> TileSet {
         // Create map to collect all the tiles of the same set into one set
         // Ex: { "Blue": {"Park Place", "BoardWalk"} } or { "Chance": {"Chance1", ...} }
         // This collection makes it easy to look for other tiles of the same set/type
-        let mut tile_sets = TileSet::new();
+        let mut tile_sets: TileSet = TileSet::new();
         for tile in board {
-            let tile_set_name = tile.get_set_name();
+            let tile_set_name: String = tile.get_set_name();
             if tile_sets.contains_key(&tile_set_name) {
                 tile_sets
                     .get_mut(&tile_set_name)
@@ -106,6 +107,20 @@ impl Board {
         println!(" ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ");
         println!("  VISIT   CONN   VERMONT CHANCE?  ORNTL  READING INCOME  BALTIC   CHEST   MEDIT    GO    ");
         println!("  JAIL     AVE     AVE             AVE     RR      TAX     AVE             AVE           ");
+        self.colour_display_board_tiles();
+    }
+
+    fn colour_display_board_tiles(&self) {
+        self.reset_cursor_to_start();
+        for [char_col, line_num] in self.display_board_coords {
+            print!("\x1B[{line_num};{char_col}H");
+            print!(
+                "{}",
+                colours::SET_NAME_TO_BACKGROUND_COLOUR.get("Red").unwrap()
+            );
+            self.reset_cursor_to_start();
+        }
+        print!("\x1B[40;1H");
     }
 }
 

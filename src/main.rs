@@ -2,14 +2,12 @@
 #![allow(unused_variables)]
 
 extern crate const_format;
+extern crate phf;
 extern crate serde_json;
 
-use std::collections::HashMap;
-type JsonMap = HashMap<String, serde_json::Value>;
-
 mod board;
+mod colours;
 mod constants;
-use board::{BoardTile, PropertyTile};
 
 // println!("\x1B[10;5f2ADSSSSSSSSSSSSSSS");
 // println!("\x1B[42;0f");
@@ -22,12 +20,11 @@ fn main() {
     // Skip first JSON object because it is documentation, create board with the rest of it
     // JSON is array of objects so it should preserve order; it should define all the board tiles
     // from GO (start) to Boardwalk (last tile before GO) in order
-    for i in json.as_array().unwrap().iter().skip(1) {
-        println!("{}", i["name"]);
-        // create board from this array but skip first one
+    let mut board_tiles: Vec<board::BoardTile> = Vec::<board::BoardTile>::new();
+    for tile_data in json.as_array().unwrap().iter().skip(1) {
+        board_tiles.push(board::PropertyTile::new(tile_data.clone()));
     }
-    let mediterranean_ave: BoardTile = PropertyTile::new(json["Mediterranean Avenue"].clone());
 
-    //let board: board::Board = board::Board::new([mediterranean_ave]);
-    // board.display_board();
+    let board: board::Board = board::Board::new(board_tiles);
+    board.display_board();
 }
