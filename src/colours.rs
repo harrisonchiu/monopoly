@@ -11,11 +11,18 @@ use constants;
 const COLOUR_TEXT: &'static str = const_format::str_repeat!("▔", constants::TILE_LENGTH_BY_CHAR);
 const END_COLOR: &'static str = "\x1b[0m";
 
+// As the logic iterates through all the tiles and colours it based on that tile's set,
+// some of those tile's set may not be defined in the association below (no colour).
+// We are not going to define the map for every possible set name for scalability,
+// so we are going to use this default value: ▔ (top border char) with no colour
+pub const DEFAULT_COLOUR_STRING: &'static str =
+    const_format::str_repeat!("▔", constants::TILE_LENGTH_BY_CHAR);
+
 // We use our own str instead of a external crate (e.g. ansi_term). Those usually uses
 // a variety of structs and cannot be used inside static functions. By creating our own
 // barebones ANSI background colour codes, we can create this string lookup table at compile time
 // As mentioned in above NOTE, this may be a problem if we need to ensure white foreground colour
-pub static SET_NAME_TO_BACKGROUND_COLOUR: phf::Map<&'static str, &'static str> = phf::phf_map! {
+pub static SET_NAME_TO_COLOUR_STRING: phf::Map<&'static str, &'static str> = phf::phf_map! {
     "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, END_COLOR),
     "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, END_COLOR),
     "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, END_COLOR),

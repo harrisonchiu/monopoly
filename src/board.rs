@@ -2,7 +2,7 @@
 #![allow(unused_variables)]
 
 use std::collections::{HashMap, HashSet};
-type TileSet = HashMap<String, HashSet<String>>;
+type TileSetContainer = HashMap<String, HashSet<String>>;
 
 use serde_json;
 
@@ -12,13 +12,13 @@ use constants;
 #[allow(dead_code)]
 pub struct Board {
     board: Vec<BoardTile>,
-    sets: TileSet,
+    sets: TileSetContainer,
     display_board_coords: constants::BoardCoordsArray,
 }
 
 impl Board {
     pub fn new(board: Vec<BoardTile>) -> Self {
-        let tile_sets: TileSet = Self::organize_sets(&board);
+        let tile_sets: TileSetContainer = Self::organize_sets(&board);
         Self {
             board: board,
             sets: tile_sets,
@@ -26,23 +26,35 @@ impl Board {
         }
     }
 
-    fn organize_sets(board: &Vec<BoardTile>) -> TileSet {
+    fn organize_sets(board: &Vec<BoardTile>) -> TileSetContainer {
         // Create map to collect all the tiles of the same set into one set
         // Ex: { "Blue": {"Park Place", "BoardWalk"} } or { "Chance": {"Chance1", ...} }
         // This collection makes it easy to look for other tiles of the same set/type
-        let mut tile_sets: TileSet = TileSet::new();
+        let mut tile_sets: TileSetContainer = TileSetContainer::new();
         for tile in board {
-            let tile_set_name: String = tile.get_set_name();
-            if tile_sets.contains_key(&tile_set_name) {
-                tile_sets
-                    .get_mut(&tile_set_name)
-                    .unwrap()
-                    .insert(tile.get_tile_name());
-            } else {
-                tile_sets.insert(
-                    tile_set_name,
-                    HashSet::<String>::from([tile.get_tile_name()]),
-                );
+            let tile_set_name: String;
+            match tile {
+                BoardTile::PropertyTile(property) => {
+                    tile_set_name = property.get_tile_name();
+                }
+                BoardTile::EventTile(event) => {
+                    tile_set_name = event.get_tile_name();
+                }
+            }
+
+            match tile_sets.contains_key(&tile_set_name) {
+                true => {
+                    tile_sets
+                        .get_mut(&tile_set_name)
+                        .unwrap()
+                        .insert(tile_set_name.clone());
+                }
+                false => {
+                    tile_sets.insert(
+                        tile_set_name.clone(),
+                        HashSet::<String>::from([tile_set_name.clone()]),
+                    );
+                }
             }
         }
 
@@ -112,31 +124,79 @@ impl Board {
 
     fn colour_display_board_tiles(&self) {
         self.reset_cursor_to_start();
-        for [char_col, line_num] in self.display_board_coords {
-            print!("\x1B[{line_num};{char_col}H");
+        for (i, tile) in self.board.iter().enumerate() {
             print!(
-                "{}",
-                colours::SET_NAME_TO_BACKGROUND_COLOUR.get("Red").unwrap()
+                "\x1B[{1};{0}H", // {line_number};{character_col} in the terminal
+                self.display_board_coords[i][0], self.display_board_coords[i][1]
             );
+            match tile {
+                BoardTile::PropertyTile(property) => {
+                    print!("{}", property.get_set_colour_string());
+                }
+                BoardTile::EventTile(event) => {
+                    print!("{}", event.get_set_colour_string());
+                }
+            }
             self.reset_cursor_to_start();
         }
         print!("\x1B[40;1H");
     }
 }
 
-#[derive(Debug)]
-pub struct BoardTile {
-    tile_data: serde_json::Value,
+pub enum BoardTile {
+    PropertyTile(PropertyTile),
+    EventTile(EventTile),
 }
 
-pub trait PropertyTile {
-    fn new(tile_data: serde_json::Value) -> Self;
-    fn get_tile_name(&self) -> String;
-    fn get_set_name(&self) -> String;
+pub struct PropertyTile {
+    pub tile_data: serde_json::Value,
+    // houses, hotel, current rent,
+    // these are things that can change throughout its life
+    // we can also add metadata like number of times landed on
 }
 
-impl PropertyTile for BoardTile {
-    fn new(tile_data: serde_json::Value) -> Self {
+pub struct EventTile {
+    pub tile_data: serde_json::Value,
+}
+
+impl PropertyTile {
+    pub fn new(tile_data: serde_json::Value) -> Self {
+        Self {
+            tile_data: tile_data,
+        }
+    }
+    fn get_tile_name(&self) -> String {
+        return self.tile_data["name"].to_string();
+    }
+
+    fn is_property_tile(&self) -> bool {
+        return true;
+    }
+
+    fn is_event_tile(&self) -> bool {
+        return false;
+    }
+
+    fn get_set_name(&self) -> String {
+        return self.tile_data["set"].to_string();
+    }
+
+    fn get_set_colour_string(&self) -> String {
+        // The top row (same row as ▔ top border) with background colour of the tile's set
+        // or no background colour. It does not affect foreground colour of ▔
+        return colours::SET_NAME_TO_COLOUR_STRING
+            .get(&self.get_set_name().as_str())
+            .unwrap_or(&colours::DEFAULT_COLOUR_STRING)
+            .to_string();
+    }
+
+    // fn get_property_information_string(&self) -> String {
+    //     // Within <TILE_LENGTH_BY_CHAR> length, display current cost of tile and its buildings
+    // }
+}
+
+impl EventTile {
+    pub fn new(tile_data: serde_json::Value) -> Self {
         Self {
             tile_data: tile_data,
         }
@@ -146,7 +206,24 @@ impl PropertyTile for BoardTile {
         return self.tile_data["name"].to_string();
     }
 
+    fn is_property_tile(&self) -> bool {
+        return false;
+    }
+
+    fn is_event_tile(&self) -> bool {
+        return true;
+    }
+
     fn get_set_name(&self) -> String {
         return self.tile_data["set"].to_string();
+    }
+
+    fn get_set_colour_string(&self) -> String {
+        // The top row (same row as ▔ top border) with background colour of the tile's set
+        // or no background colour. It does not affect foreground colour of ▔
+        return colours::SET_NAME_TO_COLOUR_STRING
+            .get(&self.get_set_name().as_str())
+            .unwrap_or(&colours::DEFAULT_COLOUR_STRING)
+            .to_string();
     }
 }

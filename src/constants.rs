@@ -8,7 +8,7 @@ pub const TILE_LENGTH_BY_CHAR: usize = 7; // See Board::display_board() for use
 pub type BoardCoordsArray = [[i16; 2]; BOARD_TOTAL_NUMBER_OF_TILES];
 
 #[rustfmt::skip]
-pub const DISPLAY_BOARD_COORDS: BoardCoordsArray = [
+pub static DISPLAY_BOARD_COORDS: BoardCoordsArray = [
     // Coordinates are based on board tiles being 7 characters in length and 3 characters tall
     // The sides (excluding the corner) are grouped starting from the bottom going clockwise
     // The coordinates (col, row) are for where to place cursors to update the tile

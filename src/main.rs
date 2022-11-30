@@ -22,7 +22,20 @@ fn main() {
     // from GO (start) to Boardwalk (last tile before GO) in order
     let mut board_tiles: Vec<board::BoardTile> = Vec::<board::BoardTile>::new();
     for tile_data in json.as_array().unwrap().iter().skip(1) {
-        board_tiles.push(board::PropertyTile::new(tile_data.clone()));
+        match tile_data
+            .get("type")
+            .expect("Every tile defined the JSON must have a type field")
+            .as_str()
+            .unwrap_or("s")
+        {
+            "property" => board_tiles.push(board::BoardTile::PropertyTile(board::PropertyTile {
+                tile_data: tile_data.clone(),
+            })),
+            "event" => board_tiles.push(board::BoardTile::EventTile(board::EventTile {
+                tile_data: tile_data.clone(),
+            })),
+            _ => continue,
+        }
     }
 
     let board: board::Board = board::Board::new(board_tiles);
