@@ -1,0 +1,541 @@
+[
+    {
+        "__documentation": [
+            "This JSON file uses array of objects to preserve order during deserialization",
+            "X types of objects should be defined: Street, Railroad, Utility, Event",
+            "Each type must follow its template documented here, using all fields-no more no less",
+            "[Street] name: str, type: str, set: str, mortgage_value: int, property_cost: int",
+            "  rent: {basic: int, 1_house: int, 2_house: int, 3_house: int, 4_house: int, hotel: int}",
+            "  house_cost: int, hotel_cost: int",
+            "[Railroad] name: str, type: str, set: str, mortgage_value: int, property_cost: int",
+            "  rent: {basic: int, 2_railroad: int, 3_railroad: int, 4_railroad: int}",
+            "[Utility] name: str, type: str, set: str, mortgage_value: int, property_cost: int",
+            "  rent_multiplier: {basic: int, 2_utility: int}",
+            "[Event] name: str, type: str, set: str",
+            "  money_event: int",
+            "Differences in property definitions: rent, rent_multiplier, house_cost, hotel_cost",
+            "Same between property definitions: name, type, set, mortgage_value, property_cost",
+            "Same between all tile definitions: name, type, set"
+        ]
+    },
+    {
+        "name": "Go",
+        "type": "Event",
+        "set": "Corner",
+        "money_event": 200
+    },
+    {
+        "name": "Mediterranean Avenue",
+        "type": "Street",
+        "set": "Brown",
+        "mortgage_value": 30,
+        "rent": {
+            "basic": 2,
+            "1_house": 10,
+            "2_house": 30,
+            "3_house": 90,
+            "4_house": 160,
+            "hotel": 250
+        },
+        "property_cost": 60,
+        "house_cost": 50,
+        "hotel_cost": 50
+    },
+    {
+        "name": "Community Chest 1",
+        "type": "Event",
+        "set": "Chest",
+        "money_event": 0
+    },
+    {
+        "name": "Baltic Avenue",
+        "type": "Street",
+        "set": "Brown",
+        "mortgage_value": 30,
+        "rent": {
+            "basic": 4,
+            "1_house": 20,
+            "2_house": 60,
+            "3_house": 180,
+            "4_house": 320,
+            "hotel": 450
+        },
+        "property_cost": 60,
+        "house_cost": 50,
+        "hotel_cost": 50
+    },
+    {
+        "name": "Income Tax",
+        "type": "Event",
+        "set": "Tax",
+        "money_event": -200
+    },
+    {
+        "name": "Reading Railroad",
+        "type": "Railroad",
+        "set": "Railroad",
+        "mortgage_value": 100,
+        "rent": {
+            "basic": 25,
+            "2_railroad": 50,
+            "3_railroad": 100,
+            "4_railroad": 200
+        },
+        "property_cost": 200
+    },
+    {
+        "name": "Oriental Avenue",
+        "type": "Street",
+        "set": "Cyan",
+        "mortgage_value": 50,
+        "rent": {
+            "basic": 6,
+            "1_house": 30,
+            "2_house": 90,
+            "3_house": 270,
+            "4_house": 400,
+            "hotel": 550
+        },
+        "property_cost": 100,
+        "house_cost": 50,
+        "hotel_cost": 50
+    },
+    {
+        "name": "Chance 1",
+        "type": "Event",
+        "set": "Chance",
+        "money_event": 0
+    },
+    {
+        "name": "Vermont Avenue",
+        "type": "Street",
+        "set": "Cyan",
+        "mortgage_value": 50,
+        "rent": {
+            "basic": 6,
+            "1_house": 30,
+            "2_house": 90,
+            "3_house": 270,
+            "4_house": 400,
+            "hotel": 550
+        },
+        "property_cost": 100,
+        "house_cost": 50,
+        "hotel_cost": 50
+    },
+    {
+        "name": "Connecticut Avenue",
+        "type": "Street",
+        "set": "Cyan",
+        "mortgage_value": 60,
+        "rent": {
+            "basic": 8,
+            "1_house": 40,
+            "2_house": 100,
+            "3_house": 300,
+            "4_house": 450,
+            "hotel": 600
+        },
+        "property_cost": 120,
+        "house_cost": 50,
+        "hotel_cost": 50
+    },
+    {
+        "name": "Visiting Jail",
+        "type": "Event",
+        "set": "Corner",
+        "money_event": 0
+    },
+    {
+        "name": "St. Charles Place",
+        "type": "Street",
+        "set": "Magenta",
+        "mortgage_value": 70,
+        "rent": {
+            "basic": 10,
+            "1_house": 50,
+            "2_house": 150,
+            "3_house": 450,
+            "4_house": 625,
+            "hotel": 750
+        },
+        "property_cost": 140,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "Electric Company",
+        "type": "Utility",
+        "set": "Utility",
+        "mortgage_value": 75,
+        "rent_multiplier": {
+            "basic": 4,
+            "2_utility": 10
+        },
+        "property_cost": 150
+    },
+    {
+        "name": "States Avenue",
+        "type": "Street",
+        "set": "Magenta",
+        "mortgage_value": 70,
+        "rent": {
+            "basic": 10,
+            "1_house": 50,
+            "2_house": 150,
+            "3_house": 450,
+            "4_house": 625,
+            "hotel": 750
+        },
+        "property_cost": 140,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "Virginia Avenue",
+        "type": "Street",
+        "set": "Magenta",
+        "mortgage_value": 80,
+        "rent": {
+            "basic": 12,
+            "1_house": 60,
+            "2_house": 180,
+            "3_house": 500,
+            "4_house": 700,
+            "hotel": 900
+        },
+        "property_cost": 160,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "Pennsylvania Railroad",
+        "type": "Railroad",
+        "set": "Railroad",
+        "mortgage_value": 100,
+        "rent": {
+            "basic": 25,
+            "2_railroad": 50,
+            "3_railroad": 100,
+            "4_railroad": 200
+        },
+        "property_cost": 200
+    },
+    {
+        "name": "St. James Place",
+        "type": "Street",
+        "set": "Orange",
+        "mortgage_value": 90,
+        "rent": {
+            "basic": 14,
+            "1_house": 70,
+            "2_house": 200,
+            "3_house": 550,
+            "4_house": 750,
+            "hotel": 950
+        },
+        "property_cost": 180,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "Community Chest 2",
+        "type": "Event",
+        "set": "Chest",
+        "money_event": 0
+    },
+    {
+        "name": "Tennessee Avenue",
+        "type": "Street",
+        "set": "Orange",
+        "mortgage_value": 90,
+        "rent": {
+            "basic": 14,
+            "1_house": 70,
+            "2_house": 200,
+            "3_house": 550,
+            "4_house": 750,
+            "hotel": 950
+        },
+        "property_cost": 180,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "New York Avenue",
+        "type": "Street",
+        "set": "Orange",
+        "mortgage_value": 100,
+        "rent": {
+            "basic": 16,
+            "1_house": 80,
+            "2_house": 220,
+            "3_house": 600,
+            "4_house": 800,
+            "hotel": 1000
+        },
+        "property_cost": 200,
+        "house_cost": 100,
+        "hotel_cost": 100
+    },
+    {
+        "name": "Free Parking",
+        "type": "Event",
+        "set": "Corner",
+        "money_event": 0
+    },
+    {
+        "name": "Kentucky Avenue",
+        "type": "Street",
+        "set": "Red",
+        "mortgage_value": 110,
+        "rent": {
+            "basic": 18,
+            "1_house": 90,
+            "2_house": 250,
+            "3_house": 700,
+            "4_house": 875,
+            "hotel": 1050
+        },
+        "property_cost": 220,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "Chance 2",
+        "type": "Event",
+        "set": "Chance",
+        "money_event": 0
+    },
+    {
+        "name": "Indiana Avenue",
+        "type": "Street",
+        "set": "Red",
+        "mortgage_value": 110,
+        "rent": {
+            "basic": 18,
+            "1_house": 90,
+            "2_house": 250,
+            "3_house": 700,
+            "4_house": 875,
+            "hotel": 1050
+        },
+        "property_cost": 220,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "Illinois Avenue",
+        "type": "Street",
+        "set": "Red",
+        "mortgage_value": 120,
+        "rent": {
+            "basic": 20,
+            "1_house": 100,
+            "2_house": 300,
+            "3_house": 750,
+            "4_house": 925,
+            "hotel": 1100
+        },
+        "property_cost": 240,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "B. & O. Railroad",
+        "type": "Railroad",
+        "set": "Railroad",
+        "mortgage_value": 100,
+        "rent": {
+            "basic": 25,
+            "2_railroad": 50,
+            "3_railroad": 100,
+            "4_railroad": 200
+        },
+        "property_cost": 200
+    },
+    {
+        "name": "Atlantic Avenue",
+        "type": "Street",
+        "set": "Yellow",
+        "mortgage_value": 130,
+        "rent": {
+            "basic": 22,
+            "1_house": 110,
+            "2_house": 330,
+            "3_house": 800,
+            "4_house": 975,
+            "hotel": 1150
+        },
+        "property_cost": 260,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "Ventnor Avenue",
+        "type": "Street",
+        "set": "Yellow",
+        "mortgage_value": 130,
+        "rent": {
+            "basic": 22,
+            "1_house": 110,
+            "2_house": 330,
+            "3_house": 800,
+            "4_house": 975,
+            "hotel": 1150
+        },
+        "property_cost": 260,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "Water Works",
+        "type": "Utility",
+        "set": "Utility",
+        "mortgage_value": 75,
+        "rent_multiplier": {
+            "basic": 4,
+            "2_utility": 10
+        },
+        "property_cost": 150
+    },
+    {
+        "name": "Marvin Gardens",
+        "type": "Street",
+        "set": "Yellow",
+        "mortgage_value": 140,
+        "rent": {
+            "basic": 24,
+            "1_house": 120,
+            "2_house": 360,
+            "3_house": 850,
+            "4_house": 1025,
+            "hotel": 1200
+        },
+        "property_cost": 280,
+        "house_cost": 150,
+        "hotel_cost": 150
+    },
+    {
+        "name": "Go To Jail",
+        "type": "Event",
+        "set": "Corner",
+        "money_event": 0
+    },
+    {
+        "name": "Pacific Avenue",
+        "type": "Street",
+        "set": "Green",
+        "mortgage_value": 150,
+        "rent": {
+            "basic": 26,
+            "1_house": 130,
+            "2_house": 390,
+            "3_house": 900,
+            "4_house": 1100,
+            "hotel": 1275
+        },
+        "property_cost": 300,
+        "house_cost": 200,
+        "hotel_cost": 200
+    },
+    {
+        "name": "North Carolina Avenue",
+        "type": "Street",
+        "set": "Green",
+        "mortgage_value": 150,
+        "rent": {
+            "basic": 26,
+            "1_house": 130,
+            "2_house": 390,
+            "3_house": 900,
+            "4_house": 1100,
+            "hotel": 1275
+        },
+        "property_cost": 300,
+        "house_cost": 200,
+        "hotel_cost": 200
+    },
+    {
+        "name": "Community Chest 3",
+        "type": "Event",
+        "set": "Chest",
+        "money_event": 0
+    },
+    {
+        "name": "Pennsylvania Avenue",
+        "type": "Street",
+        "set": "Green",
+        "mortgage_value": 160,
+        "rent": {
+            "basic": 28,
+            "1_house": 150,
+            "2_house": 450,
+            "3_house": 1000,
+            "4_house": 1200,
+            "hotel": 1400
+        },
+        "property_cost": 320,
+        "house_cost": 200,
+        "hotel_cost": 200
+    },
+    {
+        "name": "Short Line Railroad",
+        "type": "Railroad",
+        "set": "Railroad",
+        "mortgage_value": 100,
+        "rent": {
+            "basic": 25,
+            "2_railroad": 50,
+            "3_railroad": 100,
+            "4_railroad": 200
+        },
+        "property_cost": 200
+    },
+    {
+        "name": "Chance 1",
+        "type": "Event",
+        "set": "Chance",
+        "money_event": 0
+    },
+    {
+        "name": "Park Place",
+        "type": "Street",
+        "set": "Blue",
+        "mortgage_value": 175,
+        "rent": {
+            "basic": 35,
+            "1_house": 175,
+            "2_house": 500,
+            "3_house": 1100,
+            "4_house": 1300,
+            "hotel": 1500
+        },
+        "property_cost": 350,
+        "house_cost": 200,
+        "hotel_cost": 200
+    },
+    {
+        "name": "Luxury Tax",
+        "type": "Event",
+        "set": "Tax",
+        "money_event": -100
+    },
+    {
+        "name": "Boardwalk",
+        "type": "Street",
+        "set": "Blue",
+        "mortgage_value": 175,
+        "rent": {
+            "basic": 50,
+            "1_house": 200,
+            "2_house": 600,
+            "3_house": 1400,
+            "4_house": 1700,
+            "hotel": 2000
+        },
+        "property_cost": 400,
+        "house_cost": 200,
+        "hotel_cost": 200
+    }
+]
