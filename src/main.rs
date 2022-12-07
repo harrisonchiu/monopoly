@@ -19,9 +19,11 @@ use std::io;
 use rand::distributions::Uniform;
 use rand::{rngs::StdRng, SeedableRng};
 
-fn prompt() -> i32 {
+use tiles::board_tile::BoardTile;
+
+fn prompt(avatar: &String) -> i32 {
     display::move_cursor_to_input();
-    print!(">>> "); // the input prompt
+    print!("[Player {}] >>> ", avatar); // the input prompt
     display::flush_buffer();
 
     let mut input_text = String::new();
@@ -33,13 +35,14 @@ fn prompt() -> i32 {
 }
 
 fn main() {
+    // Set up the game: dice, players, board
     let die_range: Uniform<u8> = Uniform::new_inclusive(1, 6);
     let mut die_1: StdRng = StdRng::from_entropy();
     let mut die_2: StdRng = StdRng::from_entropy();
 
     let mut players: Vec<player::Player> = Vec::<player::Player>::with_capacity(4);
-    for (id, avatar) in ['A', 'B', 'C', 'D'].iter().enumerate() {
-        players.push(player::Player::new(id as u8, *avatar));
+    for (id, avatar) in constants::PLAYER_PIECES {
+        players.push(player::Player::new(id, avatar.to_string()));
     }
 
     let mut board: board::Board = game::create_board();
@@ -50,37 +53,58 @@ fn main() {
     players.iter().for_each(|player| player.display_at_start(0));
 
     // Assume players::Vec will not remove any items, so players[i] is guaranteed to succeed
+    let mut player: &mut player::Player;
     let mut is_player_finished_rolling: bool = false;
     for i in (0..players.len()).cycle() {
         display::flush_buffer();
         display::inform(constants::INSTRUCTIONS_MAIN_MENU_ROLL);
+        player = &mut players[i];
         loop {
-            match prompt() {
+            match prompt(&player.avatar) {
                 1 if !is_player_finished_rolling => {
                     // Roll and Move
                     let dice: [u8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
-                    players[i].move_forwards(dice[0] + dice[1]);
-                    display::output(format!(
-                        "Rolled {0} (dice 1: {1}, dice 2: {2})",
-                        dice[0] + dice[1],
-                        dice[0],
-                        dice[1]
-                    ));
+                    display::flush_buffer();
+                    player.move_forwards(dice[0] + dice[1]);
+                    display::flush_buffer();
 
                     is_player_finished_rolling = !game::is_doubles(&dice);
-                    if !is_player_finished_rolling {
+                    if is_player_finished_rolling {
                         display::inform(constants::INSTRUCTIONS_MAIN_MENU_END_TURN);
+                        display::output(format!(
+                            "[*] You rolled {0} ({1} and {2}) onto {3}.",
+                            dice[0] + dice[1],
+                            dice[0],
+                            dice[1],
+                            board.get_tile_name_from_position(player.position)
+                        ));
+                    } else {
+                        display::output(format!(
+                            "[*] DOUBLES! You rolled {0} ({1} and {2}) onto {3}.",
+                            dice[0] + dice[1],
+                            dice[0],
+                            dice[1],
+                            board.get_tile_name_from_position(player.position)
+                        ));
                     }
                 }
                 1 if is_player_finished_rolling => {
                     // End Turn - current player is finished and next player goes
+                    display::output("[*] You have ended your turn");
                     is_player_finished_rolling = false;
                     break;
                 }
                 2 => {
                     // Buy Property
-                    game::purchase_tile(players[i], board.get_tile(players[i].position));
-                    // board.get_tile(players[i].position);
+                    let tile: &mut BoardTile = board.get_tile(player.position);
+                    if let Some(price) = game::purchase_tile(&mut player, tile) {
+                        display::output(format!(
+                            "[*] Purchased tile for ${}. Amount of money remaining ${}.",
+                            price, player.money
+                        ));
+                    } else {
+                        display::output("[!] Cannot purchase tile!");
+                    }
                 }
                 _ => todo!(),
             }

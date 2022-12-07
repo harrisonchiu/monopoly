@@ -14,14 +14,14 @@ pub fn reset_cursor_to_end() {
     print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 2);
 }
 
-pub fn inform(info: &str) {
+pub fn inform<S: AsRef<str>>(info: S) {
     // Info is a 1 lined help text of some kind of advice/tips/instructions
     // that is below the board and above the input prompt space.
     // Count how many println!() in display_board(). It should be at least one more than it
     print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 2);
 
     // Erase the line, we want to clear any previous info so the user can see the new info
-    print!("\x1B[2K{info}");
+    print!("\x1B[2K{}", info.as_ref());
 }
 
 pub fn move_cursor_to_input() {
@@ -32,14 +32,14 @@ pub fn move_cursor_to_input() {
     print!("\x1B[2K");
 }
 
-pub fn output(output: String) {
+pub fn output<S: AsRef<str>>(output: S) {
     // Output shows if previous user command input was successful or not or any other info
     // Use this over other print() because this clears previous output.
     // Should be at least one more below than the constant used in move_cursor_to_input()
     print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 4);
 
     // Erase the line, we want to clear any previous output so the user can see the new output
-    print!("\x1B[2K{output}");
+    print!("\x1B[2K{}", output.as_ref());
 }
 
 pub fn clear_display() {

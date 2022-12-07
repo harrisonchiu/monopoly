@@ -52,6 +52,13 @@ impl Board {
             .expect("Could not get tile at the given position; position out of bounds")
     }
 
+    pub fn get_tile_name_from_position(&self, position: usize) -> String {
+        self.board
+            .get(position)
+            .expect("Could not get tile at the given position; position out of bounds")
+            .get_tile_name()
+    }
+
     pub fn display_board(&self) {
         // Fixed and unchanging board in terms of tile names, tile locations, and dimensions
         // Please do NOT change the width and length dimensions of the board or individual tiles

@@ -1,9 +1,8 @@
 use error;
-use player;
 use tiles::board_tile::PropertyStatus;
 
 pub struct UtilityTile {
-    owner: Option<player::Player>,
+    owner: Option<u8>,
     property_status: PropertyStatus,
     rent_multiplier: i64,
     pub property_cost: i64,
@@ -31,9 +30,13 @@ impl UtilityTile {
         }
     }
 
-    pub fn acquired_by(&mut self, owner: player::Player) {
-        self.owner = Some(owner);
+    pub fn acquired_by(&mut self, owner_id: u8) {
+        self.owner = Some(owner_id);
         self.property_status = PropertyStatus::Owned;
+    }
+
+    pub fn is_owned(&self) -> bool {
+        self.owner.is_some()
     }
 
     fn get_rent(&self, level: &str) -> i64 {

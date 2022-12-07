@@ -57,10 +57,20 @@ pub static SET_NAME_TO_COLOUR_STRING: phf::Map<&'static str, &'static str> = phf
     "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, END_COLOUR),
     "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, END_COLOUR),
     "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, END_COLOUR), // Gray
-    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // Whit
+    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // White
 };
 
+// Maximmum of 4 players. Format of (UNIQUE_PLAYER_ID, PLAYER_AVATAR)
+// Each player avatar is differently coloured with a different symbol
+// ID MUST be in range [0, 3] because player drawing is based on id incrementing by 1 from 0
+pub const PLAYER_PIECES: [(u8, &'static str); 4] = [
+    (0, const_format::concatcp!("\x1b[96m", "A", END_COLOUR)), // Light blue
+    (1, const_format::concatcp!("\x1b[92m", "B", END_COLOUR)), // Light green
+    (2, const_format::concatcp!("\x1b[91m", "C", END_COLOUR)), // Light red
+    (3, const_format::concatcp!("\x1b[95m", "D", END_COLOUR)), // Light magenta
+];
+
 pub const INSTRUCTIONS_MAIN_MENU_ROLL: &'static str =
-    "| [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+    "    | [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
 pub const INSTRUCTIONS_MAIN_MENU_END_TURN: &'static str =
-    "| [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+    "    | [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";

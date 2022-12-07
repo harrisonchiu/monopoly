@@ -1,36 +1,38 @@
 use constants;
 
-// This also includes AI
-#[derive(Clone, Copy, Debug)]
 pub struct Player {
     // ID is unique int identifier of range [0, 3] (max 3 because a maximum of 4 players)
     // Also used to determined the position within the tile that it will be drawn onto.
-    id: u8,
-    avatar: char,
+    pub id: u8,
+    pub avatar: String,
     // Could create a safely bounded custom integer type with a set range [0, N], but
     // position var is going to be used in index anyways, so it needs to be in usize type
     // Seems like unnecessary overhead to create type of small bounds only to cast to usize
     // Position on the board in terms of board indices [0, BOARD_TOTAL_NUMBER_OF_TILES]
     pub position: usize,
-    money: i64,
+    pub money: i64,
 }
 
 impl Player {
-    pub fn new(id: u8, character: char) -> Self {
+    pub fn new(id: u8, avatar: String) -> Self {
         Self {
             id: id,
-            avatar: character,
+            avatar: avatar,
             position: 0,
-            money: 1000,
+            money: 10000,
         }
     }
 
     pub fn pay(&mut self, amount: i64) {
-        self.money += amount;
+        self.money -= amount;
     }
 
     pub fn collect(&mut self, amount: i64) {
-        self.money -= amount;
+        self.money += amount;
+    }
+
+    pub fn get_money(&self) -> i64 {
+        self.money
     }
 
     pub fn move_forwards(&mut self, steps: u8) {
