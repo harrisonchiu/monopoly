@@ -1,36 +1,95 @@
-use event_tile;
-use railroad_tile;
-use street_tile;
-use utility_tile;
+use super::event_tile;
+use super::railroad_tile;
+use super::street_tile;
+use super::utility_tile;
+use constants;
+use error;
 
 pub enum BoardTile {
-    StreetTile(street_tile::StreetTile),
-    RailroadTile(railroad_tile::RailroadTile),
-    UtilityTile(utility_tile::UtilityTile),
-    EventTile(event_tile::EventTile),
+    Street(street_tile::StreetTile),
+    Railroad(railroad_tile::RailroadTile),
+    Utility(utility_tile::UtilityTile),
+    Event(event_tile::EventTile),
+}
+
+impl BoardTile {
+    /// This is like a parent class, apply methods to all child classes
+    /// All tile structs that is grouped in the `enum BoardTile` should
+    /// be able to run and return the code within the closures of each `match`
+    /// i.e. the structs should run the equivalent of the inherited methods
+    pub fn get_tile_name(&self) -> String {
+        match self {
+            BoardTile::Street(tile) => tile
+                .info
+                .get("name")
+                .expect(error::JSON_MISSING_NAME)
+                .to_string(),
+            BoardTile::Railroad(tile) => tile
+                .info
+                .get("name")
+                .expect(error::JSON_MISSING_NAME)
+                .to_string(),
+            BoardTile::Utility(tile) => tile
+                .info
+                .get("name")
+                .expect(error::JSON_MISSING_NAME)
+                .to_string(),
+            BoardTile::Event(tile) => tile
+                .info
+                .get("name")
+                .expect(error::JSON_MISSING_NAME)
+                .to_string(),
+        }
+    }
+
+    pub fn get_set_name(&self) -> &str {
+        // Must return &str to easily fetch from Map<&str, &str>. Conversion seems to
+        // keep quotes in the str which the keys obviously do not have so it fails to fetch.
+        // All JSON definitions must have a set field, so this should return str without fail
+        match self {
+            BoardTile::Street(tile) => tile
+                .info
+                .get("set")
+                .expect(error::JSON_MISSING_NAME)
+                .as_str()
+                .expect(error::JSON_DESERIALIZE_TO_STR),
+            BoardTile::Railroad(tile) => tile
+                .info
+                .get("set")
+                .expect(error::JSON_MISSING_NAME)
+                .as_str()
+                .expect(error::JSON_DESERIALIZE_TO_STR),
+            BoardTile::Utility(tile) => tile
+                .info
+                .get("set")
+                .expect(error::JSON_MISSING_NAME)
+                .as_str()
+                .expect(error::JSON_DESERIALIZE_TO_STR),
+            BoardTile::Event(tile) => tile
+                .info
+                .get("set")
+                .expect(error::JSON_MISSING_NAME)
+                .as_str()
+                .expect(error::JSON_DESERIALIZE_TO_STR),
+        }
+    }
+
+    pub fn get_set_colour_string(&self) -> &str {
+        // The top row (same row as ▔ top border) with background colour of the tile's set
+        // or no background colour. It does not affect foreground colour of ▔
+        constants::SET_NAME_TO_COLOUR_STRING
+            .get(self.get_set_name())
+            .unwrap_or(&constants::DEFAULT_COLOUR_STRING)
+    }
 }
 
 pub enum PropertyStatus {
-    // Keeps track of: whether the tile is owned, the buildings, and mortgage
-    // Implement rent and building rules within each tile struct
-    // Ex: Utilities should not have Tier3 and above
-    // Ex: If property is Tier1 and below, the property is tradable
-    Mortgage = -1,
-    Unowned = 0,
-    Tier1 = 1, // Basic
-    Tier2 = 2, // 1 house | 2 of the set owned
-    Tier3 = 3, // 2 houses | 3 of the set owned
-    Tier4 = 4, // 3 houses | 4 of the set owned
-    Tier5 = 5, // 4 houses | 5 of the set owned
-    Tier6 = 6, // Hotel | 6 of the set owned
-}
-
-impl PropertyStatus {
-    fn is_status_x_less_than_status_y(status_x: PropertyStatus, status_y: PropertyStatus) -> bool {
-        if (status_x as i8) < (status_y as i8) {
-            true
-        } else {
-            false
-        }
-    }
+    Mortgaged = -2,
+    Unowned = -1,
+    Owned = 0, // Basic rent | 1 owned of the set
+    Tier1 = 1, // 1 house | 2 owned of the set
+    Tier2 = 2, // 2 house | 3 owned of the set
+    Tier3 = 3, // 3 house | 4 owned of the set
+    Tier4 = 4, // 4 house | 5 owned of the set
+    Tier5 = 5, // 5 house | 6 owned of the set
 }

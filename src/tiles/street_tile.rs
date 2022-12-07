@@ -1,16 +1,19 @@
-use board_tile::PropertyStatus;
-use constants;
 use error;
+use player;
+use tiles::board_tile::PropertyStatus;
 
 pub struct StreetTile {
-    info: serde_json::Value,
+    pub info: serde_json::Value,
+    owner: Option<player::Player>,
     property_status: PropertyStatus,
+    property_cost: i64,
     rent: i64,
 }
 
 impl StreetTile {
     pub fn new(tile_data: serde_json::Value) -> Self {
         Self {
+            owner: None,
             property_status: PropertyStatus::Unowned,
             rent: tile_data
                 .get("rent")
@@ -19,76 +22,59 @@ impl StreetTile {
                 .expect(error::JSON_MISSING_RENT_OBJECT_FIELDS)
                 .as_i64()
                 .expect(error::JSON_DESERIALIZE_TO_I64),
+            property_cost: tile_data
+                .get("property_cost")
+                .expect(error::JSON_MISSING_PROPERTY_COST)
+                .as_i64()
+                .expect(error::JSON_DESERIALIZE_TO_I64),
             info: tile_data,
         }
     }
 
-    pub fn get_tile_name(&self) -> String {
-        self.info
-            .get("name")
-            .expect(error::JSON_MISSING_NAME)
-            .to_string()
+    pub fn acquired_by(&mut self, owner: player::Player) {
+        self.owner = Some(owner);
+        self.property_status = PropertyStatus::Owned;
     }
 
-    fn get_set_name(&self) -> &str {
-        // Must return &str to easily fetch from Map<&str, &str>. Conversion seems to
-        // keep quotes in the str? which the keys obviously do not have so it fails to fetch.
-        // All JSON definitions must have a set field, so this should return str without fail
+    fn get_rent(&self, level: &str) -> i64 {
         self.info
-            .get("set")
-            .expect(error::JSON_MISSING_SET)
-            .as_str()
-            .expect(error::JSON_DESERIALIZE_TO_STR)
-    }
-
-    pub fn get_set_colour_string(&self) -> &str {
-        // The top row (same row as ▔ top border) with background colour of the tile's set
-        // or no background colour. It does not affect foreground colour of ▔
-        constants::SET_NAME_TO_COLOUR_STRING
-            .get(self.get_set_name())
-            .unwrap_or(&constants::DEFAULT_COLOUR_STRING)
+            .get("rent")
+            .expect(error::JSON_MISSING_RENT)
+            .get(level)
+            .expect(error::JSON_MISSING_RENT_OBJECT_FIELDS)
+            .as_i64()
+            .expect(error::JSON_DESERIALIZE_TO_I64)
     }
 
     fn update_current_rent(&mut self) {
         // Mortgaging the property or buying and selling buildings affect the rent.
         // Info for these actions are based on the <property_status> field
-        fn get_rent_level(info: &serde_json::Value, level: &str) -> i64 {
-            info.get("rent")
-                .expect(error::JSON_MISSING_RENT)
-                .get(level)
-                .expect(error::JSON_MISSING_RENT_OBJECT_FIELDS)
-                .as_i64()
-                .expect(error::JSON_DESERIALIZE_TO_I64)
-        }
+        // We could implement this with fields for number of houses and hotels, but
+        // there would be more edge cases on which combinations would be rule breaking.
+        // It is easier to work with buildings as a tier: see board_tile::PropertyStatus
 
         match self.property_status {
-            PropertyStatus::Mortgage => self.rent = 0,
+            PropertyStatus::Mortgaged => self.rent = 0,
             PropertyStatus::Unowned => self.rent = 0,
-            PropertyStatus::Tier1 => self.rent = get_rent_level(&self.info, "basic"),
-            PropertyStatus::Tier2 => self.rent = get_rent_level(&self.info, "1_house"),
-            PropertyStatus::Tier3 => self.rent = get_rent_level(&self.info, "2_house"),
-            PropertyStatus::Tier4 => self.rent = get_rent_level(&self.info, "3_house"),
-            PropertyStatus::Tier5 => self.rent = get_rent_level(&self.info, "4_house"),
-            PropertyStatus::Tier6 => self.rent = get_rent_level(&self.info, "hotel"),
+            PropertyStatus::Owned => self.rent = self.get_rent("basic"),
+            PropertyStatus::Tier1 => self.rent = self.get_rent("1_house"),
+            PropertyStatus::Tier2 => self.rent = self.get_rent("2_house"),
+            PropertyStatus::Tier3 => self.rent = self.get_rent("3_house"),
+            PropertyStatus::Tier4 => self.rent = self.get_rent("4_house"),
+            PropertyStatus::Tier5 => self.rent = self.get_rent("hotel"),
         }
     }
 
     pub fn get_property_information_string(&self) -> String {
         match self.property_status {
-            PropertyStatus::Mortgage => format!("|MRTGAGE|"),
-            PropertyStatus::Unowned => format!(
-                "${}",
-                self.info
-                    .get("property_cost")
-                    .expect(error::JSON_MISSING_PROPERTY_COST)
-                    .to_string(),
-            ),
-            PropertyStatus::Tier1 => format!("${} X", self.rent),
-            PropertyStatus::Tier2 => format!("${} 1", self.rent),
-            PropertyStatus::Tier3 => format!("${} 2", self.rent),
-            PropertyStatus::Tier4 => format!("${} 3", self.rent),
-            PropertyStatus::Tier5 => format!("${} 4", self.rent),
-            PropertyStatus::Tier6 => format!("${} H", self.rent),
+            PropertyStatus::Mortgaged => format!("|MRTGAGE|"),
+            PropertyStatus::Unowned => format!("${}", self.property_cost.to_string()),
+            PropertyStatus::Owned => format!("${} X", self.rent),
+            PropertyStatus::Tier1 => format!("${} 1", self.rent),
+            PropertyStatus::Tier2 => format!("${} 2", self.rent),
+            PropertyStatus::Tier3 => format!("${} 3", self.rent),
+            PropertyStatus::Tier4 => format!("${} 4", self.rent),
+            PropertyStatus::Tier5 => format!("${} H", self.rent),
         }
     }
 }

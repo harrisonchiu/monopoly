@@ -480,7 +480,7 @@
         "hotel_cost": 200
     },
     {
-        "name": "Short Line Railroad",
+        "name": "Short Railroad",
         "type": "Railroad",
         "set": "Railroad",
         "mortgage_value": 100,

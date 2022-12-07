@@ -7,10 +7,11 @@ use phf;
 // These constants are only for being easily called multiple times for other uses
 pub const BOARD_LENGTH_BY_TILES: usize = 11;
 pub const BOARD_TOTAL_NUMBER_OF_TILES: usize = BOARD_LENGTH_BY_TILES * 4 - 4;
+pub const BOARD_HEIGHT_BY_CHAR: usize = 38;
 pub const TILE_LENGTH_BY_CHAR: usize = 7; // See Board::display_board() for use
 
 #[rustfmt::skip]
-pub static DISPLAY_BOARD_COORDS: [[i16; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
+pub static DISPLAY_BOARD_COORDS: [[u8; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
     // Coordinates are based on board tiles being 7 characters in length and 3 characters tall
     // The sides (excluding the corner) are grouped starting from the bottom going clockwise
     // The coordinates (col, row) are for where to place cursors to update the tile
@@ -33,7 +34,7 @@ pub static DISPLAY_BOARD_COORDS: [[i16; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
 // foreground colours. We assume white (or similar) foreground for contrast.
 // This may be a problem in the future.
 const COLOUR_TEXT: &'static str = const_format::str_repeat!("▔", TILE_LENGTH_BY_CHAR);
-const END_COLOR: &'static str = "\x1b[0m";
+const END_COLOUR: &'static str = "\x1b[0m";
 
 // As the logic iterates through all the tiles and colours it based on that tile's set,
 // some of those tile's set may not be defined in the association below (no colour).
@@ -47,14 +48,19 @@ pub const DEFAULT_COLOUR_STRING: &'static str = const_format::str_repeat!("▔",
 // As mentioned in above NOTE, this may be a problem if we need to ensure white foreground colour
 // Currently, only colours for Streets (denoted by their set names), Railroad, and Utility
 pub static SET_NAME_TO_COLOUR_STRING: phf::Map<&'static str, &'static str> = phf::phf_map! {
-    "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, END_COLOR),
-    "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, END_COLOR),
-    "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, END_COLOR),
-    "Green" => const_format::concatcp!("\x1b[42m", COLOUR_TEXT, END_COLOR),
-    "Cyan" => const_format::concatcp!("\x1b[46m", COLOUR_TEXT, END_COLOR),
-    "Blue" => const_format::concatcp!("\x1b[44m", COLOUR_TEXT, END_COLOR),
-    "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, END_COLOR),
-    "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, END_COLOR),
-    "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, END_COLOR), // Gray
-    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOR), // Whit
+    "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, END_COLOUR),
+    "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, END_COLOUR),
+    "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, END_COLOUR),
+    "Green" => const_format::concatcp!("\x1b[42m", COLOUR_TEXT, END_COLOUR),
+    "Cyan" => const_format::concatcp!("\x1b[46m", COLOUR_TEXT, END_COLOUR),
+    "Blue" => const_format::concatcp!("\x1b[44m", COLOUR_TEXT, END_COLOUR),
+    "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, END_COLOUR),
+    "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, END_COLOUR),
+    "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, END_COLOUR), // Gray
+    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // Whit
 };
+
+pub const INSTRUCTIONS_MAIN_MENU_ROLL: &'static str =
+    "| [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+pub const INSTRUCTIONS_MAIN_MENU_END_TURN: &'static str =
+    "| [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
