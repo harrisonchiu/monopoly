@@ -1,3 +1,15 @@
+/*!
+ * The following are a cumulation of error messages that may occur throughout the
+ * lifetime of the program. They are all here to easily see all possible errors and
+ * to easily write consistent error messages. The majority of these are JSON attribute errors.
+ * The errors are usually used inside `.expect()` as this program does not usually handle
+ * errors by defaulting to a value, but rather panicking and terminating the program with
+ * an error message. This is because the majority of errors will occur from reading JSON files
+ * containing data for tiles, cards, and settings. Implicitly, this means the program NEEDS
+ * to have those JSON files written correctly as per documentation and assumes it to be so.
+ * These are only here to help the user fix the errors.
+ */
+
 // Differences in property definitions: rent, rent_multiplier, house_cost, hotel_cost
 // Same between property definitions: name, type, set, mortgage_value, property_cost
 // Same between all tile definitions: name, type, set
