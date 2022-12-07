@@ -60,14 +60,15 @@ pub static SET_NAME_TO_COLOUR_STRING: phf::Map<&'static str, &'static str> = phf
     "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // White
 };
 
-// Maximmum of 4 players. Format of (UNIQUE_PLAYER_ID, PLAYER_AVATAR)
-// Each player avatar is differently coloured with a different symbol
+// Maximmum of 4 players. Format of "FOREGROUND_COLOR AVATAR END_COLOUR"
+// Each player avatar is differently coloured (foreground) with a different symbol
 // ID MUST be in range [0, 3] because player drawing is based on id incrementing by 1 from 0
-pub const PLAYER_PIECES: [(u8, &'static str); 4] = [
-    (0, const_format::concatcp!("\x1b[96m", "A", END_COLOUR)), // Light blue
-    (1, const_format::concatcp!("\x1b[92m", "B", END_COLOUR)), // Light green
-    (2, const_format::concatcp!("\x1b[91m", "C", END_COLOUR)), // Light red
-    (3, const_format::concatcp!("\x1b[95m", "D", END_COLOUR)), // Light magenta
+// Leave ID as index of this array in the main game loop where the players are created
+pub const PLAYER_PIECES: [&'static str; 4] = [
+    const_format::concatcp!("\x1b[96m", "A", END_COLOUR), // Light blue
+    const_format::concatcp!("\x1b[92m", "B", END_COLOUR), // Light green
+    const_format::concatcp!("\x1b[91m", "C", END_COLOUR), // Light red
+    const_format::concatcp!("\x1b[95m", "D", END_COLOUR), // Light magenta
 ];
 
 pub const INSTRUCTIONS_MAIN_MENU_ROLL: &'static str =

@@ -41,8 +41,8 @@ fn main() {
     let mut die_2: StdRng = StdRng::from_entropy();
 
     let mut players: Vec<player::Player> = Vec::<player::Player>::with_capacity(4);
-    for (id, avatar) in constants::PLAYER_PIECES {
-        players.push(player::Player::new(id, avatar.to_string()));
+    for (id, avatar) in constants::PLAYER_PIECES.iter().enumerate() {
+        players.push(player::Player::new(id as u8, avatar.to_string()));
     }
 
     let mut board: board::Board = game::create_board();
