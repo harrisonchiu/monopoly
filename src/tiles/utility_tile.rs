@@ -1,16 +1,19 @@
 use error;
+use player;
 use tiles::board_tile::PropertyStatus;
 
 pub struct UtilityTile {
-    pub info: serde_json::Value,
+    owner: Option<player::Player>,
     property_status: PropertyStatus,
-    property_cost: i64,
     rent_multiplier: i64,
+    pub property_cost: i64,
+    pub info: serde_json::Value,
 }
 
 impl UtilityTile {
     pub fn new(tile_data: serde_json::Value) -> Self {
         Self {
+            owner: None,
             property_status: PropertyStatus::Unowned,
             rent_multiplier: tile_data
                 .get("rent_multiplier")
@@ -28,11 +31,9 @@ impl UtilityTile {
         }
     }
 
-    pub fn get_tile_name(&self) -> String {
-        self.info
-            .get("name")
-            .expect(error::JSON_MISSING_NAME)
-            .to_string()
+    pub fn acquired_by(&mut self, owner: player::Player) {
+        self.owner = Some(owner);
+        self.property_status = PropertyStatus::Owned;
     }
 
     fn get_rent(&self, level: &str) -> i64 {

@@ -1,6 +1,6 @@
-// "Differences in property definitions: rent, rent_multiplier, house_cost, hotel_cost"
-// "Same between property definitions: name, type, set, mortgage_value, property_cost"
-// "Same between all tile definitions: name, type, set"
+// Differences in property definitions: rent, rent_multiplier, house_cost, hotel_cost
+// Same between property definitions: name, type, set, mortgage_value, property_cost
+// Same between all tile definitions: name, type, set
 // Missing fields for ALL tiles
 pub const JSON_MISSING_NAME: &str = "All JSON tile definitions must have a \
     <name> field with a string value";

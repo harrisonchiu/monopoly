@@ -44,10 +44,12 @@ impl Board {
         return tile_sets;
     }
 
-    pub fn get_tile(&self, position: usize) -> &BoardTile {
+    pub fn get_tile(&mut self, position: usize) -> &mut BoardTile {
+        // Use the returned BoardTile to modify it (purchase, trade, build, etc.)
+        // Assume position is in bounds and thus, no error in getting the BoardTile
         self.board
-            .get(position)
-            .expect("Could not get tile at the given position")
+            .get_mut(position)
+            .expect("Could not get tile at the given position; position out of bounds")
     }
 
     pub fn display_board(&self) {

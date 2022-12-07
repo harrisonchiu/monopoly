@@ -10,18 +10,14 @@ mod board;
 mod constants;
 mod display;
 mod error;
+mod game;
 mod player;
 mod tiles;
 
 use std::io;
 
-use rand::distributions::{Distribution, Uniform};
+use rand::distributions::Uniform;
 use rand::{rngs::StdRng, SeedableRng};
-
-use tiles::{
-    board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
-    street_tile::StreetTile, utility_tile::UtilityTile,
-};
 
 fn prompt() -> i32 {
     display::move_cursor_to_input();
@@ -36,45 +32,6 @@ fn prompt() -> i32 {
     input_text.trim().parse::<i32>().unwrap_or(0)
 }
 
-fn create_board() -> board::Board {
-    let tile_data_json: &str = include_str!("./tiles/board_tile_data.json");
-    let json: serde_json::Value = serde_json::from_str::<serde_json::Value>(&tile_data_json)
-        .expect("JSON could not be deserialized because of an error, likely has bad format");
-
-    // Skip first JSON object because it is documentation and metadata, create board
-    // with the rest of it. JSON is array of objects so it should preserve order; it should
-    // define all the board tiles from GO (start) to Boardwalk (last tile before GO) in order
-    let mut tiles: Vec<BoardTile> = Vec::<BoardTile>::new();
-    for tile_data in json.as_array().unwrap().iter().skip(1) {
-        match tile_data
-            .get("type")
-            .expect(error::JSON_MISSING_TYPE)
-            .as_str()
-            .expect(error::JSON_DESERIALIZE_TO_STR)
-        {
-            "Street" => tiles.push(BoardTile::Street(StreetTile::new(tile_data.clone()))),
-            "Railroad" => tiles.push(BoardTile::Railroad(RailroadTile::new(tile_data.clone()))),
-            "Utility" => tiles.push(BoardTile::Utility(UtilityTile::new(tile_data.clone()))),
-            "Event" => tiles.push(BoardTile::Event(EventTile::new(tile_data.clone()))),
-            _ => continue,
-        }
-    }
-
-    board::Board::new(tiles)
-}
-
-fn roll_dice(die_range: &Uniform<u8>, die_1: &mut StdRng, die_2: &mut StdRng) -> [u8; 2] {
-    // We split it up to make it more extendible in the future
-    // That is we could have an option to use a singular die [0, 12] for an equal
-    // distribution (which would change the game a lot) and make it easier to
-    // display the value of each die (draw each die value instead of just printing the sum)
-    [die_range.sample(die_1), die_range.sample(die_2)]
-}
-
-fn is_doubles(dice: [u8; 2]) -> bool {
-    dice[0] == dice[1]
-}
-
 fn main() {
     let die_range: Uniform<u8> = Uniform::new_inclusive(1, 6);
     let mut die_1: StdRng = StdRng::from_entropy();
@@ -85,7 +42,7 @@ fn main() {
         players.push(player::Player::new(id as u8, *avatar));
     }
 
-    let board: board::Board = create_board();
+    let mut board: board::Board = game::create_board();
 
     // Display the game in the terminal
     // Show board before the players - display_board() makes the basis of where to display
@@ -101,18 +58,18 @@ fn main() {
             match prompt() {
                 1 if !is_player_finished_rolling => {
                     // Roll and Move
-                    let dice: [u8; 2] = roll_dice(&die_range, &mut die_1, &mut die_2);
-                    let dice_total: u8 = dice[0] + dice[1];
-                    players[i].move_forwards(dice_total);
-                    display::output(format!("Rolled {dice_total} ({}, {})", dice[0], dice[1]));
+                    let dice: [u8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
+                    players[i].move_forwards(dice[0] + dice[1]);
+                    display::output(format!(
+                        "Rolled {0} (dice 1: {1}, dice 2: {2})",
+                        dice[0] + dice[1],
+                        dice[0],
+                        dice[1]
+                    ));
 
-                    match is_doubles(dice) {
-                        true => is_player_finished_rolling = false,
-                        false => {
-                            // Player cannot roll anymore
-                            display::inform(constants::INSTRUCTIONS_MAIN_MENU_END_TURN);
-                            is_player_finished_rolling = true;
-                        }
+                    is_player_finished_rolling = !game::is_doubles(&dice);
+                    if !is_player_finished_rolling {
+                        display::inform(constants::INSTRUCTIONS_MAIN_MENU_END_TURN);
                     }
                 }
                 1 if is_player_finished_rolling => {
@@ -122,7 +79,8 @@ fn main() {
                 }
                 2 => {
                     // Buy Property
-                    //board.get_tile(players[i].position)
+                    game::purchase_tile(players[i], board.get_tile(players[i].position));
+                    // board.get_tile(players[i].position);
                 }
                 _ => todo!(),
             }

@@ -3,11 +3,11 @@ use player;
 use tiles::board_tile::PropertyStatus;
 
 pub struct StreetTile {
-    pub info: serde_json::Value,
     owner: Option<player::Player>,
     property_status: PropertyStatus,
-    property_cost: i64,
     rent: i64,
+    pub property_cost: i64,
+    pub info: serde_json::Value,
 }
 
 impl StreetTile {

@@ -1,9 +1,9 @@
-use super::event_tile;
-use super::railroad_tile;
-use super::street_tile;
-use super::utility_tile;
 use constants;
 use error;
+use tiles::event_tile;
+use tiles::railroad_tile;
+use tiles::street_tile;
+use tiles::utility_tile;
 
 pub enum BoardTile {
     Street(street_tile::StreetTile),
@@ -13,10 +13,10 @@ pub enum BoardTile {
 }
 
 impl BoardTile {
-    /// This is like a parent class, apply methods to all child classes
-    /// All tile structs that is grouped in the `enum BoardTile` should
-    /// be able to run and return the code within the closures of each `match`
-    /// i.e. the structs should run the equivalent of the inherited methods
+    //! This is like a parent class, apply methods to all child classes
+    //! All tile structs that is grouped in the `enum BoardTile` should
+    //! be able to run and return the code within the closures of each `match`
+    //! i.e. the structs should run the equivalent of the inherited methods
     pub fn get_tile_name(&self) -> String {
         match self {
             BoardTile::Street(tile) => tile

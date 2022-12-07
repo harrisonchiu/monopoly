@@ -12,6 +12,7 @@ pub struct Player {
     // Seems like unnecessary overhead to create type of small bounds only to cast to usize
     // Position on the board in terms of board indices [0, BOARD_TOTAL_NUMBER_OF_TILES]
     pub position: usize,
+    money: i64,
 }
 
 impl Player {
@@ -20,7 +21,16 @@ impl Player {
             id: id,
             avatar: character,
             position: 0,
+            money: 1000,
         }
+    }
+
+    pub fn pay(&mut self, amount: i64) {
+        self.money += amount;
+    }
+
+    pub fn collect(&mut self, amount: i64) {
+        self.money -= amount;
     }
 
     pub fn move_forwards(&mut self, steps: u8) {
@@ -55,17 +65,6 @@ impl Player {
         self.position = new_position;
     }
 
-    pub fn display_at_start(&self, start_position: usize) {
-        print!(
-            // {line};{col} in terminal; space (at end after H) erases previous avatar
-            "\x1B[{1};{0}H{2}",
-            // Display players as |0 1 2 3| based on id, assuming 7 character wide tiles
-            constants::DISPLAY_BOARD_COORDS[start_position][0] + (2 * self.id as u8),
-            constants::DISPLAY_BOARD_COORDS[start_position][1] + 2, // 3rd row of tile
-            self.avatar
-        );
-    }
-
     fn update_display_position(&self, new_position: usize) {
         // This fn must be used BEFORE updating position because it needs to know the previous
         // position to erase the previous avatar, showing a "move" and stopping duplicate avatars
@@ -82,6 +81,17 @@ impl Player {
             constants::DISPLAY_BOARD_COORDS[new_position][0] + (2 * self.id as u8),
             constants::DISPLAY_BOARD_COORDS[new_position][1] + 2, // 3rd row of tile
             self.avatar // Draw avatar in new location to illustrate players moving
+        );
+    }
+
+    pub fn display_at_start(&self, start_position: usize) {
+        print!(
+            // {line};{col} in terminal; space (at end after H) erases previous avatar
+            "\x1B[{1};{0}H{2}",
+            // Display players as |0 1 2 3| based on id, assuming 7 character wide tiles
+            constants::DISPLAY_BOARD_COORDS[start_position][0] + (2 * self.id as u8),
+            constants::DISPLAY_BOARD_COORDS[start_position][1] + 2, // 3rd row of tile
+            self.avatar
         );
     }
 }
