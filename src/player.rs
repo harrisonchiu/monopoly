@@ -1,4 +1,4 @@
-use constants;
+use board;
 
 pub struct Player {
     // ID is unique int identifier of range [0, 3] (max 3 because a maximum of 4 players)
@@ -42,8 +42,8 @@ impl Player {
         // @steps: unsigned int [0, N], assumes value is at least 0
         let new_position: usize;
         let sum: usize = self.position + (steps as usize);
-        if sum >= constants::BOARD_TOTAL_NUMBER_OF_TILES {
-            new_position = sum - constants::BOARD_TOTAL_NUMBER_OF_TILES;
+        if sum >= board::BOARD_TOTAL_NUMBER_OF_TILES {
+            new_position = sum - board::BOARD_TOTAL_NUMBER_OF_TILES;
         } else {
             new_position = sum;
         }
@@ -58,8 +58,8 @@ impl Player {
         // @steps: unsigned int [0, N], assumes value is at least 0
         let new_position: usize;
         let difference: usize = self.position - (steps as usize);
-        if difference < constants::BOARD_TOTAL_NUMBER_OF_TILES {
-            new_position = difference + constants::BOARD_TOTAL_NUMBER_OF_TILES;
+        if difference < board::BOARD_TOTAL_NUMBER_OF_TILES {
+            new_position = difference + board::BOARD_TOTAL_NUMBER_OF_TILES;
         } else {
             new_position = difference;
         }
@@ -73,15 +73,15 @@ impl Player {
         print!(
             // {line};{col} in terminal; space (at end after H) erases previous avatar
             "\x1B[{1};{0}H ",
-            constants::DISPLAY_BOARD_COORDS[self.position][0] + (2 * self.id as u8),
-            constants::DISPLAY_BOARD_COORDS[self.position][1] + 2 // 3rd row of tile
+            board::DISPLAY_BOARD_COORDS[self.position][0] + (2 * self.id as u8),
+            board::DISPLAY_BOARD_COORDS[self.position][1] + 2 // 3rd row of tile
         );
         print!(
             // {line};{col} in terminal
             "\x1B[{1};{0}H{2}",
             // Display players as |0 1 2 3| based on id, assuming 7 character wide tiles
-            constants::DISPLAY_BOARD_COORDS[new_position][0] + (2 * self.id as u8),
-            constants::DISPLAY_BOARD_COORDS[new_position][1] + 2, // 3rd row of tile
+            board::DISPLAY_BOARD_COORDS[new_position][0] + (2 * self.id as u8),
+            board::DISPLAY_BOARD_COORDS[new_position][1] + 2, // 3rd row of tile
             self.avatar // Draw avatar in new location to illustrate players moving
         );
     }
@@ -91,8 +91,8 @@ impl Player {
             // {line};{col} in terminal; space (at end after H) erases previous avatar
             "\x1B[{1};{0}H{2}",
             // Display players as |0 1 2 3| based on id, assuming 7 character wide tiles
-            constants::DISPLAY_BOARD_COORDS[start_position][0] + (2 * self.id as u8),
-            constants::DISPLAY_BOARD_COORDS[start_position][1] + 2, // 3rd row of tile
+            board::DISPLAY_BOARD_COORDS[start_position][0] + (2 * self.id as u8),
+            board::DISPLAY_BOARD_COORDS[start_position][1] + 2, // 3rd row of tile
             self.avatar
         );
     }

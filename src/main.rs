@@ -7,7 +7,6 @@ extern crate rand;
 extern crate serde_json;
 
 mod board;
-mod constants;
 mod display;
 mod error;
 mod game;
@@ -21,7 +20,7 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use tiles::board_tile::BoardTile;
 
-fn prompt(avatar: &String) -> i32 {
+fn prompt(avatar: &String) -> Option<i32> {
     display::move_cursor_to_input();
     print!("[Player {}] >>> ", avatar); // the input prompt
     display::flush_buffer();
@@ -31,7 +30,7 @@ fn prompt(avatar: &String) -> i32 {
         .read_line(&mut input_text)
         .expect("failed to read from stdin");
 
-    input_text.trim().parse::<i32>().unwrap_or(0)
+    input_text.trim().parse::<i32>().ok()
 }
 
 fn main() {
@@ -41,7 +40,7 @@ fn main() {
     let mut die_2: StdRng = StdRng::from_entropy();
 
     let mut players: Vec<player::Player> = Vec::<player::Player>::with_capacity(4);
-    for (id, avatar) in constants::PLAYER_PIECES.iter().enumerate() {
+    for (id, avatar) in game::PLAYER_PIECES.iter().enumerate() {
         players.push(player::Player::new(id as u8, avatar.to_string()));
     }
 
@@ -54,59 +53,57 @@ fn main() {
 
     // Assume players::Vec will not remove any items, so players[i] is guaranteed to succeed
     let mut player: &mut player::Player;
-    let mut is_player_finished_rolling: bool = false;
+    let mut is_dice_rollable: bool = true;
     for i in (0..players.len()).cycle() {
+        display::terminal_bell();
         display::flush_buffer();
-        display::inform(constants::INSTRUCTIONS_MAIN_MENU_ROLL);
-        player = &mut players[i];
-        loop {
-            match prompt(&player.avatar) {
-                1 if !is_player_finished_rolling => {
-                    // Roll and Move
-                    let dice: [u8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
-                    display::flush_buffer();
-                    player.move_forwards(dice[0] + dice[1]);
-                    display::flush_buffer();
+        display::inform(game::INSTRUCTIONS_MAIN_MENU_ROLL);
+        player = players.get_mut(i).unwrap();
 
-                    is_player_finished_rolling = !game::is_doubles(&dice);
-                    if is_player_finished_rolling {
-                        display::inform(constants::INSTRUCTIONS_MAIN_MENU_END_TURN);
-                        display::output(format!(
-                            "[*] You rolled {0} ({1} and {2}) onto {3}.",
-                            dice[0] + dice[1],
-                            dice[0],
-                            dice[1],
-                            board.get_tile_name_from_position(player.position)
-                        ));
-                    } else {
-                        display::output(format!(
-                            "[*] DOUBLES! You rolled {0} ({1} and {2}) onto {3}.",
-                            dice[0] + dice[1],
-                            dice[0],
-                            dice[1],
-                            board.get_tile_name_from_position(player.position)
-                        ));
-                    }
+        while let Some(command) = prompt(&player.avatar) {
+            if command == 1 && is_dice_rollable {
+                // Roll and Move
+                let dice: [u8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
+                is_dice_rollable = game::is_doubles(&dice);
+
+                player.move_forwards(dice[0] + dice[1]);
+
+                if is_dice_rollable {
+                    display::output(format!(
+                        "[*] DOUBLES! You rolled {0} ({1} and {2}) onto {3}.",
+                        dice[0] + dice[1],
+                        dice[0],
+                        dice[1],
+                        board.get_tile_name_from_position(player.position)
+                    ));
+                } else {
+                    display::inform(game::INSTRUCTIONS_MAIN_MENU_END_TURN);
+                    display::output(format!(
+                        "[*] You rolled {0} ({1} and {2}) onto {3}.",
+                        dice[0] + dice[1],
+                        dice[0],
+                        dice[1],
+                        board.get_tile_name_from_position(player.position)
+                    ));
                 }
-                1 if is_player_finished_rolling => {
-                    // End Turn - current player is finished and next player goes
-                    display::output("[*] You have ended your turn");
-                    is_player_finished_rolling = false;
-                    break;
+            } else if command == 1 && !is_dice_rollable {
+                // End Turn - current player is finished and next player goes
+                display::output("");
+                is_dice_rollable = true;
+                break;
+            } else if command == 2 {
+                // Buy Property
+                let tile: &mut BoardTile = board.get_tile(player.position);
+                if let Some(price) = game::purchase_tile(&mut player, tile) {
+                    display::output(format!(
+                        "[*] Purchased tile for ${}. Amount of money remaining ${}.",
+                        price, player.money
+                    ));
+                } else {
+                    display::output("[!] Cannot purchase tile!");
                 }
-                2 => {
-                    // Buy Property
-                    let tile: &mut BoardTile = board.get_tile(player.position);
-                    if let Some(price) = game::purchase_tile(&mut player, tile) {
-                        display::output(format!(
-                            "[*] Purchased tile for ${}. Amount of money remaining ${}.",
-                            price, player.money
-                        ));
-                    } else {
-                        display::output("[!] Cannot purchase tile!");
-                    }
-                }
-                _ => todo!(),
+            } else {
+                display::output("")
             }
         }
     }

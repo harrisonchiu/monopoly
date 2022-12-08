@@ -2,6 +2,7 @@ use board;
 use error;
 use player;
 
+use const_format;
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::StdRng;
 
@@ -9,6 +10,22 @@ use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
 };
+
+// Maximmum of 4 players. Format of "FOREGROUND_COLOR AVATAR END_COLOUR"
+// Each player avatar is differently coloured (foreground) with a different symbol
+// ID MUST be in range [0, 3] because player drawing is based on id incrementing by 1 from 0
+// Leave ID as index of this array in the main game loop where the players are created
+pub const PLAYER_PIECES: [&'static str; 4] = [
+    const_format::concatcp!("\x1b[96m", "A", "\x1b[0m"), // Light blue
+    const_format::concatcp!("\x1b[92m", "B", "\x1b[0m"), // Light green
+    const_format::concatcp!("\x1b[91m", "C", "\x1b[0m"), // Light red
+    const_format::concatcp!("\x1b[95m", "D", "\x1b[0m"), // Light magenta
+];
+
+pub const INSTRUCTIONS_MAIN_MENU_ROLL: &'static str =
+    "    | [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+pub const INSTRUCTIONS_MAIN_MENU_END_TURN: &'static str =
+    "    | [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
 
 pub fn create_board() -> board::Board {
     let tile_data_json: &str = include_str!("./tiles/board_tile_data.json");

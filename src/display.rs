@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use constants;
+use board;
 
 pub fn reset_cursor_to_start() {
     // Moves to the cursor to the very top left (1st row and 1st col)
@@ -11,14 +11,14 @@ pub fn reset_cursor_to_start() {
 
 pub fn reset_cursor_to_end() {
     // Count how many println!() in display_board(). It should be at least one more than it
-    print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 2);
+    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 2);
 }
 
 pub fn inform<S: AsRef<str>>(info: S) {
     // Info is a 1 lined help text of some kind of advice/tips/instructions
     // that is below the board and above the input prompt space.
     // Count how many println!() in display_board(). It should be at least one more than it
-    print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 2);
+    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 2);
 
     // Erase the line, we want to clear any previous info so the user can see the new info
     print!("\x1B[2K{}", info.as_ref());
@@ -26,7 +26,7 @@ pub fn inform<S: AsRef<str>>(info: S) {
 
 pub fn move_cursor_to_input() {
     // Should be at least one more below than the constant used in print_info()
-    print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 3);
+    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 3);
 
     // Erase the line, we want to clear any previous input so the user can see his new input
     print!("\x1B[2K");
@@ -36,10 +36,14 @@ pub fn output<S: AsRef<str>>(output: S) {
     // Output shows if previous user command input was successful or not or any other info
     // Use this over other print() because this clears previous output.
     // Should be at least one more below than the constant used in move_cursor_to_input()
-    print!("\x1B[{};1H", constants::BOARD_HEIGHT_BY_CHAR + 4);
+    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 4);
 
     // Erase the line, we want to clear any previous output so the user can see the new output
     print!("\x1B[2K{}", output.as_ref());
+}
+
+pub fn terminal_bell() {
+    print!("\x07");
 }
 
 pub fn clear_display() {

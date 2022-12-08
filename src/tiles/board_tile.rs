@@ -1,9 +1,6 @@
-use constants;
+use board;
 use error;
-use tiles::event_tile;
-use tiles::railroad_tile;
-use tiles::street_tile;
-use tiles::utility_tile;
+use tiles::{event_tile, railroad_tile, street_tile, utility_tile};
 
 pub enum BoardTile {
     Street(street_tile::StreetTile),
@@ -77,9 +74,9 @@ impl BoardTile {
     pub fn get_set_colour_string(&self) -> &str {
         // The top row (same row as ▔ top border) with background colour of the tile's set
         // or no background colour. It does not affect foreground colour of ▔
-        constants::SET_NAME_TO_COLOUR_STRING
+        board::COLOURED_REGION_OF_EACH_SET
             .get(self.get_set_name())
-            .unwrap_or(&constants::DEFAULT_COLOUR_STRING)
+            .unwrap_or(&board::UNCOLOURED_REGION)
     }
 }
 
