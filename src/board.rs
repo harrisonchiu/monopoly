@@ -40,16 +40,16 @@ pub const UNCOLOURED_REGION: &'static str = const_format::str_repeat!("▔", TIL
 const COLOUR_TEXT: &'static str = const_format::str_repeat!("▔", TILE_LENGTH_BY_CHAR);
 const END_COLOUR: &'static str = "\x1b[0m";
 pub static COLOURED_REGION_OF_EACH_SET: phf::Map<&'static str, &'static str> = phf::phf_map! {
-    "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, "\x1b[0m"),
-    "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, "\x1b[0m"),
-    "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, "\x1b[0m"),
-    "Green" => const_format::concatcp!("\x1b[42m", COLOUR_TEXT, "\x1b[0m"),
-    "Cyan" => const_format::concatcp!("\x1b[46m", COLOUR_TEXT, "\x1b[0m"),
-    "Blue" => const_format::concatcp!("\x1b[44m", COLOUR_TEXT, "\x1b[0m"),
-    "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, "\x1b[0m"),
-    "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, "\x1b[0m"),
-    "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, "\x1b[0m"), // Gray
-    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, "\x1b[0m"), // White
+    "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, END_COLOUR),
+    "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, END_COLOUR),
+    "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, END_COLOUR),
+    "Green" => const_format::concatcp!("\x1b[42m", COLOUR_TEXT, END_COLOUR),
+    "Cyan" => const_format::concatcp!("\x1b[46m", COLOUR_TEXT, END_COLOUR),
+    "Blue" => const_format::concatcp!("\x1b[44m", COLOUR_TEXT, END_COLOUR),
+    "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, END_COLOUR),
+    "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, END_COLOUR),
+    "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, END_COLOUR), // Gray
+    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // White
 };
 
 pub struct Board {
@@ -91,19 +91,20 @@ impl Board {
         return tile_sets;
     }
 
-    pub fn get_tile(&mut self, position: usize) -> &mut BoardTile {
+    pub fn get_tile(&mut self, position: usize) -> &BoardTile {
+        // Use the returned BoardTile to modify it (purchase, trade, build, etc.)
+        // Assume position is in bounds and thus, no error in getting the BoardTile
+        self.board
+            .get(position)
+            .expect("Could not get tile at the given position; position out of bounds")
+    }
+
+    pub fn get_tile_mut(&mut self, position: usize) -> &mut BoardTile {
         // Use the returned BoardTile to modify it (purchase, trade, build, etc.)
         // Assume position is in bounds and thus, no error in getting the BoardTile
         self.board
             .get_mut(position)
             .expect("Could not get tile at the given position; position out of bounds")
-    }
-
-    pub fn get_tile_name_from_position(&self, position: usize) -> String {
-        self.board
-            .get(position)
-            .expect("Could not get tile at the given position; position out of bounds")
-            .get_tile_name()
     }
 
     pub fn display_board(&self) {
@@ -180,7 +181,7 @@ impl Board {
                 BoardTile::Utility(property) => {
                     print!("{}", property.get_property_information_string());
                 }
-                BoardTile::Event(event) => {
+                BoardTile::Event(_) => {
                     // No need to display info for event tiles
                 }
             }

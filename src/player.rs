@@ -2,8 +2,10 @@ use board;
 
 pub struct Player {
     // ID is unique int identifier of range [0, 3] (max 3 because a maximum of 4 players)
-    // Also used to determined the position within the tile that it will be drawn onto.
-    pub id: u8,
+    // Used to find the position within the tile that it will be drawn onto.
+    // Also used to find a player in the list of players (done because id == index in list)
+    // Type of usize to easily use as index in arrays and vectors
+    pub id: usize,
     pub avatar: String,
     // Could create a safely bounded custom integer type with a set range [0, N], but
     // position var is going to be used in index anyways, so it needs to be in usize type
@@ -14,7 +16,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: u8, avatar: String) -> Self {
+    pub fn new(id: usize, avatar: String) -> Self {
         Self {
             id: id,
             avatar: avatar,
@@ -23,8 +25,9 @@ impl Player {
         }
     }
 
-    pub fn pay(&mut self, amount: i64) {
+    pub fn pay(&mut self, amount: i64) -> i64 {
         self.money -= amount;
+        1
     }
 
     pub fn collect(&mut self, amount: i64) {
@@ -35,7 +38,7 @@ impl Player {
         self.money
     }
 
-    pub fn move_forwards(&mut self, steps: u8) {
+    pub fn move_forwards(&mut self, steps: i8) {
         // Loop the values around if it reaches past the upper bounds
         // Ex: 39 => 40 => 0 => 1 => ...
         // Can also use modulus, but this is faster and is just as readable
@@ -51,7 +54,7 @@ impl Player {
         self.position = new_position;
     }
 
-    pub fn move_backwards(&mut self, steps: u8) {
+    pub fn move_backwards(&mut self, steps: i8) {
         // Loop the values around if it reaches past the lower bounds
         // Ex: 2 => 1 => 0 => 40 => 39 => ...
         // Can also use modulus, but this is faster and is just as readable

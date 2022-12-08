@@ -1,6 +1,3 @@
-#![allow(dead_code)] // leave this here until done testing
-#![allow(unused_variables)]
-
 extern crate const_format;
 extern crate phf;
 extern crate rand;
@@ -35,13 +32,13 @@ fn prompt(avatar: &String) -> Option<i32> {
 
 fn main() {
     // Set up the game: dice, players, board
-    let die_range: Uniform<u8> = Uniform::new_inclusive(1, 6);
+    let die_range: Uniform<i8> = Uniform::new_inclusive(1, 6);
     let mut die_1: StdRng = StdRng::from_entropy();
     let mut die_2: StdRng = StdRng::from_entropy();
 
     let mut players: Vec<player::Player> = Vec::<player::Player>::with_capacity(4);
     for (id, avatar) in game::PLAYER_PIECES.iter().enumerate() {
-        players.push(player::Player::new(id as u8, avatar.to_string()));
+        players.push(player::Player::new(id, avatar.to_string()));
     }
 
     let mut board: board::Board = game::create_board();
@@ -52,39 +49,48 @@ fn main() {
     players.iter().for_each(|player| player.display_at_start(0));
 
     // Assume players::Vec will not remove any items, so players[i] is guaranteed to succeed
-    let mut player: &mut player::Player;
     let mut is_dice_rollable: bool = true;
     for i in (0..players.len()).cycle() {
         display::terminal_bell();
         display::flush_buffer();
         display::inform(game::INSTRUCTIONS_MAIN_MENU_ROLL);
-        player = players.get_mut(i).unwrap();
 
-        while let Some(command) = prompt(&player.avatar) {
+        while let Some(command) = prompt(&players[i].avatar) {
             if command == 1 && is_dice_rollable {
                 // Roll and Move
-                let dice: [u8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
+                let dice: [i8; 2] = game::roll_dice(&die_range, &mut die_1, &mut die_2);
                 is_dice_rollable = game::is_doubles(&dice);
 
-                player.move_forwards(dice[0] + dice[1]);
+                (&mut players[i]).move_forwards(dice[0] + dice[1]);
+                let landed_tile: &BoardTile = board.get_tile(players[i].position);
 
+                // Check if the roll is double and let the player roll again if so
                 if is_dice_rollable {
                     display::output(format!(
-                        "[*] DOUBLES! You rolled {0} ({1} and {2}) onto {3}.",
+                        "[*] DOUBLES! You rolled {}, {:?}, onto {}.",
                         dice[0] + dice[1],
-                        dice[0],
-                        dice[1],
-                        board.get_tile_name_from_position(player.position)
+                        dice,
+                        landed_tile.get_tile_name()
                     ));
                 } else {
                     display::inform(game::INSTRUCTIONS_MAIN_MENU_END_TURN);
                     display::output(format!(
-                        "[*] You rolled {0} ({1} and {2}) onto {3}.",
+                        "[*] You rolled {}, {:?}, onto {}.",
                         dice[0] + dice[1],
-                        dice[0],
-                        dice[1],
-                        board.get_tile_name_from_position(player.position)
+                        dice,
+                        landed_tile.get_tile_name()
                     ));
+                }
+
+                // Player automatically pays rent to landlord and append the log
+                if let Some(landlord) = landed_tile.get_owner_id() {
+                    let rent: i64 = landed_tile.get_rent(dice[0] + dice[1]);
+                    (&mut players[i]).pay(rent);
+                    (&mut players[landlord]).collect(rent);
+                    print!(
+                        " You paid ${rent} to Player {} for rent.",
+                        &players[landlord].avatar
+                    );
                 }
             } else if command == 1 && !is_dice_rollable {
                 // End Turn - current player is finished and next player goes
@@ -93,14 +99,22 @@ fn main() {
                 break;
             } else if command == 2 {
                 // Buy Property
-                let tile: &mut BoardTile = board.get_tile(player.position);
-                if let Some(price) = game::purchase_tile(&mut player, tile) {
+                let tile: &mut BoardTile = board.get_tile_mut(players[i].position);
+                if let Some(cost) = game::try_to_buy_tile(&mut players[i], tile) {
                     display::output(format!(
-                        "[*] Purchased tile for ${}. Amount of money remaining ${}.",
-                        price, player.money
+                        "[*] Purchased tile for ${cost}. Amount of money remaining ${}.",
+                        players[i].money
                     ));
                 } else {
-                    display::output("[!] Cannot purchase tile!");
+                    if let Some(landlord) = tile.get_owner_id() {
+                        display::output(format!(
+                            "[!] Cannot purchase tile! Tile is owned by Player {}.",
+                            &players[landlord].avatar
+                        ));
+                    } else {
+                        // If tile cannot be purchased and has no owner, it is an event tile
+                        display::output("[!] Cannot purchase tile! Tile is unownable.");
+                    }
                 }
             } else {
                 display::output("")

@@ -2,9 +2,9 @@ use error;
 use tiles::board_tile::PropertyStatus;
 
 pub struct UtilityTile {
-    owner: Option<u8>,
+    pub owner: Option<usize>,
     property_status: PropertyStatus,
-    rent_multiplier: i64,
+    pub rent_multiplier: i64,
     pub property_cost: i64,
     pub info: serde_json::Value,
 }
@@ -30,16 +30,13 @@ impl UtilityTile {
         }
     }
 
-    pub fn acquired_by(&mut self, owner_id: u8) {
+    pub fn acquired_by(&mut self, owner_id: usize) {
         self.owner = Some(owner_id);
         self.property_status = PropertyStatus::Owned;
+        self.update_current_rent();
     }
 
-    pub fn is_owned(&self) -> bool {
-        self.owner.is_some()
-    }
-
-    fn get_rent(&self, level: &str) -> i64 {
+    fn get_rent_from_level(&self, level: &str) -> i64 {
         self.info
             .get("rent_multiplier")
             .expect(error::JSON_MISSING_RENT_MULTIPLIER)
@@ -59,8 +56,8 @@ impl UtilityTile {
         match self.property_status {
             PropertyStatus::Mortgaged => self.rent_multiplier = 0,
             PropertyStatus::Unowned => self.rent_multiplier = 0,
-            PropertyStatus::Owned => self.rent_multiplier = self.get_rent("basic"),
-            PropertyStatus::Tier1 => self.rent_multiplier = self.get_rent("2_utility"),
+            PropertyStatus::Owned => self.rent_multiplier = self.get_rent_from_level("basic"),
+            PropertyStatus::Tier1 => self.rent_multiplier = self.get_rent_from_level("2_utility"),
             _ => println!("Breaking the rules likely due to error in game logic"),
         }
     }

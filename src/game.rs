@@ -1,3 +1,10 @@
+///! The difference between methods defined here and those methods in `game.rs` or `main.rs`
+///! is that these methods are a wrapper for data and values inherent to the tiles.
+///! `game.rs` define wrapper functions for all BoardTiles that are more action based
+///! done by players.
+///! `main.rs` runs the main game loop that uses the functions defined here and `game.rs`
+///! It involves its own code but it is mostly for runnings these functions based on
+///! the game's overarching rules or to display logs for the player.
 use board;
 use error;
 use player;
@@ -54,7 +61,7 @@ pub fn create_board() -> board::Board {
     board::Board::new(tiles)
 }
 
-pub fn roll_dice(die_range: &Uniform<u8>, die_1: &mut StdRng, die_2: &mut StdRng) -> [u8; 2] {
+pub fn roll_dice(die_range: &Uniform<i8>, die_1: &mut StdRng, die_2: &mut StdRng) -> [i8; 2] {
     //! We split it up to make it more extendible in the future
     //! That is we could have an option to use a singular die [0, 12] for an equal
     //! distribution (which would change the game a lot) and make it easier to
@@ -62,28 +69,28 @@ pub fn roll_dice(die_range: &Uniform<u8>, die_1: &mut StdRng, die_2: &mut StdRng
     [die_range.sample(die_1), die_range.sample(die_2)]
 }
 
-pub fn is_doubles(dice: &[u8; 2]) -> bool {
+pub fn is_doubles(dice: &[i8; 2]) -> bool {
     dice[0] == dice[1]
 }
 
-pub fn purchase_tile(player: &mut player::Player, tile: &mut BoardTile) -> Option<i64> {
+pub fn try_to_buy_tile(buyer: &mut player::Player, tile: &mut BoardTile) -> Option<i64> {
     //! Makes the player spends it money to take ownership of a property tile
     //! Returns the price the player paid if allowed (not owned and is a property tile)
     //! Otherwise if unsuccessful, return None
     match tile {
-        BoardTile::Street(property) if !property.is_owned() => {
-            player.pay(property.property_cost);
-            property.acquired_by(player.id);
+        BoardTile::Street(property) if property.owner.is_none() => {
+            buyer.pay(property.property_cost);
+            property.acquired_by(buyer.id);
             Some(property.property_cost)
         }
-        BoardTile::Railroad(property) if !property.is_owned() => {
-            player.pay(property.property_cost);
-            property.acquired_by(player.id);
+        BoardTile::Railroad(property) if property.owner.is_none() => {
+            buyer.pay(property.property_cost);
+            property.acquired_by(buyer.id);
             Some(property.property_cost)
         }
-        BoardTile::Utility(property) if !property.is_owned() => {
-            player.pay(property.property_cost);
-            property.acquired_by(player.id);
+        BoardTile::Utility(property) if property.owner.is_none() => {
+            buyer.pay(property.property_cost);
+            property.acquired_by(buyer.id);
             Some(property.property_cost)
         }
         _ => None,

@@ -2,9 +2,9 @@ use error;
 use tiles::board_tile::PropertyStatus;
 
 pub struct RailroadTile {
-    owner: Option<u8>,
+    pub owner: Option<usize>,
     property_status: PropertyStatus,
-    rent: i64,
+    pub rent: i64,
     pub property_cost: i64,
     pub info: serde_json::Value,
 }
@@ -30,16 +30,13 @@ impl RailroadTile {
         }
     }
 
-    pub fn acquired_by(&mut self, owner_id: u8) {
+    pub fn acquired_by(&mut self, owner_id: usize) {
         self.owner = Some(owner_id);
         self.property_status = PropertyStatus::Owned;
+        self.update_current_rent();
     }
 
-    pub fn is_owned(&self) -> bool {
-        self.owner.is_some()
-    }
-
-    fn get_rent(&self, level: &str) -> i64 {
+    fn get_rent_from_level(&self, level: &str) -> i64 {
         self.info
             .get("rent")
             .expect(error::JSON_MISSING_RENT)
@@ -59,10 +56,10 @@ impl RailroadTile {
         match self.property_status {
             PropertyStatus::Mortgaged => self.rent = 0,
             PropertyStatus::Unowned => self.rent = 0,
-            PropertyStatus::Owned => self.rent = self.get_rent("basic"),
-            PropertyStatus::Tier1 => self.rent = self.get_rent("2_railroad"),
-            PropertyStatus::Tier2 => self.rent = self.get_rent("3_railroad"),
-            PropertyStatus::Tier3 => self.rent = self.get_rent("4_railroad"),
+            PropertyStatus::Owned => self.rent = self.get_rent_from_level("basic"),
+            PropertyStatus::Tier1 => self.rent = self.get_rent_from_level("2_railroad"),
+            PropertyStatus::Tier2 => self.rent = self.get_rent_from_level("3_railroad"),
+            PropertyStatus::Tier3 => self.rent = self.get_rent_from_level("4_railroad"),
             _ => println!("Breaking the rules likely due to error in game logic"),
         }
     }

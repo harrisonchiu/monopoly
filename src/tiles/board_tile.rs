@@ -14,6 +14,14 @@ impl BoardTile {
     //! All tile structs that is grouped in the `enum BoardTile` should
     //! be able to run and return the code within the closures of each `match`
     //! i.e. the structs should run the equivalent of the inherited methods
+    //!
+    //! The difference between methods defined here and those methods in `game.rs` or `main.rs`
+    //! is that these methods are a wrapper for data and values inherent to the tiles.
+    //! `game.rs` define wrapper functions for all BoardTiles that are more action based
+    //! done by players.
+    //! `main.rs` runs the main game loop that uses the functions defined here and `game.rs`
+    //! It involves its own code but it is mostly for runnings these functions based on
+    //! the game's overarching rules or to display logs for the player.
     pub fn get_tile_name(&self) -> String {
         match self {
             BoardTile::Street(tile) => tile
@@ -47,25 +55,25 @@ impl BoardTile {
             BoardTile::Street(tile) => tile
                 .info
                 .get("set")
-                .expect(error::JSON_MISSING_NAME)
+                .expect(error::JSON_MISSING_SET)
                 .as_str()
                 .expect(error::JSON_DESERIALIZE_TO_STR),
             BoardTile::Railroad(tile) => tile
                 .info
                 .get("set")
-                .expect(error::JSON_MISSING_NAME)
+                .expect(error::JSON_MISSING_SET)
                 .as_str()
                 .expect(error::JSON_DESERIALIZE_TO_STR),
             BoardTile::Utility(tile) => tile
                 .info
                 .get("set")
-                .expect(error::JSON_MISSING_NAME)
+                .expect(error::JSON_MISSING_SET)
                 .as_str()
                 .expect(error::JSON_DESERIALIZE_TO_STR),
             BoardTile::Event(tile) => tile
                 .info
                 .get("set")
-                .expect(error::JSON_MISSING_NAME)
+                .expect(error::JSON_MISSING_SET)
                 .as_str()
                 .expect(error::JSON_DESERIALIZE_TO_STR),
         }
@@ -77,6 +85,24 @@ impl BoardTile {
         board::COLOURED_REGION_OF_EACH_SET
             .get(self.get_set_name())
             .unwrap_or(&board::UNCOLOURED_REGION)
+    }
+
+    pub fn get_owner_id(&self) -> Option<usize> {
+        match self {
+            BoardTile::Street(tile) => tile.owner,
+            BoardTile::Railroad(tile) => tile.owner,
+            BoardTile::Utility(tile) => tile.owner,
+            BoardTile::Event(_) => None,
+        }
+    }
+
+    pub fn get_rent(&self, dice_sum: i8) -> i64 {
+        match self {
+            BoardTile::Street(tile) => tile.rent,
+            BoardTile::Railroad(tile) => tile.rent,
+            BoardTile::Utility(tile) => tile.rent_multiplier * (dice_sum as i64),
+            BoardTile::Event(_) => 0,
+        }
     }
 }
 
