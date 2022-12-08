@@ -172,13 +172,13 @@ impl Board {
             );
             match tile {
                 BoardTile::Street(property) => {
-                    print!(" {}", property.get_property_information_string());
+                    print!("{}", property.get_property_information_string());
                 }
                 BoardTile::Railroad(property) => {
-                    print!(" {}", property.get_property_information_string());
+                    print!("{}", property.get_property_information_string());
                 }
                 BoardTile::Utility(property) => {
-                    print!(" {}", property.get_property_information_string());
+                    print!("{}", property.get_property_information_string());
                 }
                 BoardTile::Event(event) => {
                     // No need to display info for event tiles

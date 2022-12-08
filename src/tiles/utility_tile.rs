@@ -68,7 +68,7 @@ impl UtilityTile {
     pub fn get_property_information_string(&self) -> String {
         match self.property_status {
             PropertyStatus::Mortgaged => format!("|MRTGAGE|"),
-            PropertyStatus::Unowned => format!("${}", self.property_cost.to_string()),
+            PropertyStatus::Unowned => format!(" ${}", self.property_cost.to_string()),
             PropertyStatus::Owned => format!("x{} X", self.rent_multiplier),
             PropertyStatus::Tier1 => format!("x{} X", self.rent_multiplier),
             _ => format!("ERROR"),

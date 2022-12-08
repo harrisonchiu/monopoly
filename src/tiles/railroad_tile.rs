@@ -70,7 +70,7 @@ impl RailroadTile {
     pub fn get_property_information_string(&self) -> String {
         match self.property_status {
             PropertyStatus::Mortgaged => format!("|MRTGAGE|"),
-            PropertyStatus::Unowned => format!("${}", self.property_cost.to_string()),
+            PropertyStatus::Unowned => format!(" ${}", self.property_cost.to_string()),
             PropertyStatus::Owned => format!("${} X", self.rent),
             PropertyStatus::Tier1 => format!("${} X", self.rent),
             PropertyStatus::Tier2 => format!("${} X", self.rent),
