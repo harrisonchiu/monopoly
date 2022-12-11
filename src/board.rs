@@ -1,11 +1,7 @@
-use std::collections::{HashMap, HashSet};
-type TileSetContainer = HashMap<String, HashSet<String>>;
-
 use display;
 use tiles::board_tile::BoardTile;
 
 use const_format;
-use phf;
 
 // These constants are only to easily refer to dimensions of the illustrated board
 // The board visuals are hard coded and NOT dynamically created and many things depend
@@ -15,6 +11,10 @@ pub const BOARD_LENGTH_BY_TILES: usize = 11;
 pub const BOARD_TOTAL_NUMBER_OF_TILES: usize = BOARD_LENGTH_BY_TILES * 4 - 4;
 pub const BOARD_HEIGHT_BY_CHAR: usize = 38;
 pub const TILE_LENGTH_BY_CHAR: usize = 7;
+
+// Uncoloured string of the tile's top border as seen in board::display_board().
+// This is used in tile structs to colour the top border.
+pub const TILE_COLOURED_REGION: &'static str = const_format::str_repeat!("▔", TILE_LENGTH_BY_CHAR);
 
 #[rustfmt::skip]
 pub static DISPLAY_BOARD_COORDS: [[u8; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
@@ -32,29 +32,8 @@ pub static DISPLAY_BOARD_COORDS: [[u8; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
     [82, 6], [82, 9], [82, 12], [82, 15], [82, 18], [82, 21], [82, 24], [82, 27], [82, 30],
 ];
 
-// Some tiles may not have colours associated to their sets. They will be uncoloured.
-pub const UNCOLOURED_REGION: &'static str = const_format::str_repeat!("▔", TILE_LENGTH_BY_CHAR);
-
-// No need for external crates for a simple coloured section, this is sufficient
-// Only coloured the background, so text foreground may be an issue. We assume white foreground
-const COLOUR_TEXT: &'static str = const_format::str_repeat!("▔", TILE_LENGTH_BY_CHAR);
-const END_COLOUR: &'static str = "\x1b[0m";
-pub static COLOURED_REGION_OF_EACH_SET: phf::Map<&'static str, &'static str> = phf::phf_map! {
-    "Red" => const_format::concatcp!("\x1b[41m", COLOUR_TEXT, END_COLOUR),
-    "Orange" => const_format::concatcp!("\x1b[48;5;166m", COLOUR_TEXT, END_COLOUR),
-    "Yellow" => const_format::concatcp!("\x1b[43m", COLOUR_TEXT, END_COLOUR),
-    "Green" => const_format::concatcp!("\x1b[42m", COLOUR_TEXT, END_COLOUR),
-    "Cyan" => const_format::concatcp!("\x1b[46m", COLOUR_TEXT, END_COLOUR),
-    "Blue" => const_format::concatcp!("\x1b[44m", COLOUR_TEXT, END_COLOUR),
-    "Magenta" => const_format::concatcp!("\x1b[45m", COLOUR_TEXT, END_COLOUR),
-    "Brown" => const_format::concatcp!("\x1b[48;5;94m", COLOUR_TEXT, END_COLOUR),
-    "Railroad" => const_format::concatcp!("\x1b[100m",  COLOUR_TEXT, END_COLOUR), // Gray
-    "Utility" => const_format::concatcp!("\x1b[47m",  COLOUR_TEXT, END_COLOUR), // White
-};
-
 pub struct Board {
     board: Vec<BoardTile>,
-    sets: TileSetContainer,
 }
 
 impl Board {
@@ -70,41 +49,7 @@ impl Board {
             );
         }
 
-        Self {
-            sets: Self::organize_sets(&board),
-            board: board,
-        }
-    }
-
-    fn organize_sets(board: &Vec<BoardTile>) -> TileSetContainer {
-        // Create map to collect all the tiles of the same set into one set
-        // Ex: { "Blue": {"Park Place", "BoardWalk"} } or { "Chance": {"Chance1", ...} }
-        // This collection makes it easy to look for other tiles of the same set/type
-        let mut tile_sets: TileSetContainer = TileSetContainer::new();
-        for tile in board {
-            // Insert tile name into the set if the group exists or create a new set of that group
-            tile_sets
-                .entry(tile.get_set_name().to_string())
-                .or_insert(HashSet::from([tile.get_tile_name()]))
-                .insert(tile.get_tile_name());
-        }
-        return tile_sets;
-    }
-
-    pub fn get_tile(&mut self, position: usize) -> &BoardTile {
-        // Use the returned BoardTile to modify it (purchase, trade, build, etc.)
-        // Assume position is in bounds and thus, no error in getting the BoardTile
-        self.board
-            .get(position)
-            .expect("Could not get tile at the given position; position out of bounds")
-    }
-
-    pub fn get_tile_mut(&mut self, position: usize) -> &mut BoardTile {
-        // Use the returned BoardTile to modify it (purchase, trade, build, etc.)
-        // Assume position is in bounds and thus, no error in getting the BoardTile
-        self.board
-            .get_mut(position)
-            .expect("Could not get tile at the given position; position out of bounds")
+        Self { board: board }
     }
 
     pub fn display_board(&self) {
@@ -150,41 +95,55 @@ impl Board {
         println!(" ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ");
         println!("  VISIT   CONN   VERMONT CHANCE?  ORNTL  READING INCOME  BALTIC   CHEST   MEDIT    GO    ");
         println!("  JAIL     AVE     AVE             AVE     RR      TAX     AVE             AVE           ");
-        self.display_board_tiles_colour();
-        self.display_board_tiles_info();
+        self.display_all_tile_colours();
+        self.display_all_property_information();
     }
 
-    fn display_board_tiles_colour(&self) {
-        for (i, tile) in self.board.iter().enumerate() {
-            print!(
-                "\x1B[{1};{0}H", // {line_number};{character_col} in the terminal
-                DISPLAY_BOARD_COORDS[i][0], DISPLAY_BOARD_COORDS[i][1]
-            );
-            print!("{}", tile.get_set_colour_string());
+    fn display_all_tile_colours(&self) {
+        for tile in &self.board {
+            match tile {
+                BoardTile::Street(property) => property.display_tile_colour(),
+                BoardTile::Railroad(property) => property.display_tile_colour(),
+                BoardTile::Utility(property) => property.display_tile_colour(),
+                BoardTile::Event(_) => (), // EventTiles do not display their colour set
+            }
         }
     }
 
-    fn display_board_tiles_info(&self) {
-        for (i, tile) in self.board.iter().enumerate() {
-            print!(
-                "\x1B[{1};{0}H", // {line_number};{character_col} in the terminal
-                DISPLAY_BOARD_COORDS[i][0],
-                DISPLAY_BOARD_COORDS[i][1] + 1 // 2nd row of tile
-            );
+    fn display_all_property_information(&self) {
+        for tile in &self.board {
             match tile {
-                BoardTile::Street(property) => {
-                    print!("{}", property.get_property_information_string());
-                }
-                BoardTile::Railroad(property) => {
-                    print!("{}", property.get_property_information_string());
-                }
-                BoardTile::Utility(property) => {
-                    print!("{}", property.get_property_information_string());
-                }
-                BoardTile::Event(_) => {
-                    // No need to display info for event tiles
-                }
+                BoardTile::Street(property) => property.display_property_information(),
+                BoardTile::Railroad(property) => property.display_property_information(),
+                BoardTile::Utility(property) => property.display_property_information(),
+                BoardTile::Event(_) => (), // EventTiles has no ownership info to display
             }
+        }
+    }
+
+    pub fn get_tile(&self, position: usize) -> &BoardTile {
+        self.board.get(position).unwrap()
+    }
+
+    pub fn get_tile_mut(&mut self, position: usize) -> &mut BoardTile {
+        self.board.get_mut(position).unwrap()
+    }
+
+    pub fn get_set_name_from_position(&self, position: usize) -> &String {
+        match self.get_tile(position) {
+            BoardTile::Street(property) => &property.set_name,
+            BoardTile::Railroad(property) => &property.set_name,
+            BoardTile::Utility(property) => &property.set_name,
+            BoardTile::Event(tile) => &tile.set_name,
+        }
+    }
+
+    pub fn get_tile_name(&self, position: usize) -> &String {
+        match self.get_tile(position) {
+            BoardTile::Street(property) => &property.name,
+            BoardTile::Railroad(property) => &property.name,
+            BoardTile::Utility(property) => &property.name,
+            BoardTile::Event(tile) => &tile.name,
         }
     }
 }

@@ -1,5 +1,4 @@
-use board;
-use error;
+#![allow(dead_code)]
 use tiles::{event_tile, railroad_tile, street_tile, utility_tile};
 
 pub enum BoardTile {
@@ -22,90 +21,9 @@ impl BoardTile {
     //! `main.rs` runs the main game loop that uses the functions defined here and `game.rs`
     //! It involves its own code but it is mostly for runnings these functions based on
     //! the game's overarching rules or to display logs for the player.
-    pub fn get_tile_name(&self) -> String {
-        match self {
-            BoardTile::Street(tile) => tile
-                .info
-                .get("name")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-            BoardTile::Railroad(tile) => tile
-                .info
-                .get("name")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-            BoardTile::Utility(tile) => tile
-                .info
-                .get("name")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-            BoardTile::Event(tile) => tile
-                .info
-                .get("name")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-        }
-    }
-
-    pub fn get_set_name(&self) -> &str {
-        // Must return &str to easily fetch from Map<&str, &str>. Conversion seems to
-        // keep quotes in the str which the keys obviously do not have so it fails to fetch.
-        // All JSON definitions must have a set field, so this should return str without fail
-        match self {
-            BoardTile::Street(tile) => tile
-                .info
-                .get("set")
-                .expect(error::JSON_MISSING_SET)
-                .as_str()
-                .expect(error::JSON_DESERIALIZE_TO_STR),
-            BoardTile::Railroad(tile) => tile
-                .info
-                .get("set")
-                .expect(error::JSON_MISSING_SET)
-                .as_str()
-                .expect(error::JSON_DESERIALIZE_TO_STR),
-            BoardTile::Utility(tile) => tile
-                .info
-                .get("set")
-                .expect(error::JSON_MISSING_SET)
-                .as_str()
-                .expect(error::JSON_DESERIALIZE_TO_STR),
-            BoardTile::Event(tile) => tile
-                .info
-                .get("set")
-                .expect(error::JSON_MISSING_SET)
-                .as_str()
-                .expect(error::JSON_DESERIALIZE_TO_STR),
-        }
-    }
-
-    pub fn get_set_colour_string(&self) -> &str {
-        // The top row (same row as ▔ top border) with background colour of the tile's set
-        // or no background colour. It does not affect foreground colour of ▔
-        board::COLOURED_REGION_OF_EACH_SET
-            .get(self.get_set_name())
-            .unwrap_or(&board::UNCOLOURED_REGION)
-    }
-
-    pub fn get_owner_id(&self) -> Option<usize> {
-        match self {
-            BoardTile::Street(tile) => tile.owner,
-            BoardTile::Railroad(tile) => tile.owner,
-            BoardTile::Utility(tile) => tile.owner,
-            BoardTile::Event(_) => None,
-        }
-    }
-
-    pub fn get_rent(&self, dice_sum: i8) -> i64 {
-        match self {
-            BoardTile::Street(tile) => tile.rent,
-            BoardTile::Railroad(tile) => tile.rent,
-            BoardTile::Utility(tile) => tile.rent_multiplier * (dice_sum as i64),
-            BoardTile::Event(_) => 0,
-        }
-    }
 }
 
+#[derive(PartialEq)]
 pub enum PropertyStatus {
     Mortgaged = -2,
     Unowned = -1,

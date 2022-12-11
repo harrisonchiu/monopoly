@@ -10,6 +10,7 @@
  * These are only here to help the user fix the errors.
  */
 
+#![allow(dead_code)]
 // Differences in property definitions: rent, rent_multiplier, house_cost, hotel_cost
 // Same between property definitions: name, type, set, mortgage_value, property_cost
 // Same between all tile definitions: name, type, set

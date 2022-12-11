@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::io::{self, Write};
 
 use board;
@@ -39,7 +40,12 @@ pub fn output<S: AsRef<str>>(output: S) {
     print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 4);
 
     // Erase the line, we want to clear any previous output so the user can see the new output
+    // Do NOT move cursor at the end of this function to allow appending of info
     print!("\x1B[2K{}", output.as_ref());
+}
+
+pub fn clear_output() {
+    print!("\x1B[{};1H\x1B[2K", board::BOARD_HEIGHT_BY_CHAR + 4);
 }
 
 pub fn terminal_bell() {

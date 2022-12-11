@@ -1,98 +1,240 @@
-///! The difference between methods defined here and those methods in `game.rs` or `main.rs`
-///! is that these methods are a wrapper for data and values inherent to the tiles.
-///! `game.rs` define wrapper functions for all BoardTiles that are more action based
-///! done by players.
-///! `main.rs` runs the main game loop that uses the functions defined here and `game.rs`
-///! It involves its own code but it is mostly for runnings these functions based on
-///! the game's overarching rules or to display logs for the player.
-use board;
+use std::collections::{HashMap, HashSet};
+use std::iter::{repeat, FromIterator};
+type PropertySet = HashMap<String, HashSet<usize>>;
+type OwnershipRecords = Vec<PropertySet>;
+
+use board::Board;
 use error;
-use player;
-
-use const_format;
-use rand::distributions::{Distribution, Uniform};
-use rand::rngs::StdRng;
-
 use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
 };
 
-// Maximmum of 4 players. Format of "FOREGROUND_COLOR AVATAR END_COLOUR"
-// Each player avatar is differently coloured (foreground) with a different symbol
-// ID MUST be in range [0, 3] because player drawing is based on id incrementing by 1 from 0
-// Leave ID as index of this array in the main game loop where the players are created
-pub const PLAYER_PIECES: [&'static str; 4] = [
-    const_format::concatcp!("\x1b[96m", "A", "\x1b[0m"), // Light blue
-    const_format::concatcp!("\x1b[92m", "B", "\x1b[0m"), // Light green
-    const_format::concatcp!("\x1b[91m", "C", "\x1b[0m"), // Light red
-    const_format::concatcp!("\x1b[95m", "D", "\x1b[0m"), // Light magenta
-];
+use rand::distributions::{Distribution, Uniform};
+use rand::{rngs::StdRng, SeedableRng};
 
-pub const INSTRUCTIONS_MAIN_MENU_ROLL: &'static str =
-    "    | [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
-pub const INSTRUCTIONS_MAIN_MENU_END_TURN: &'static str =
-    "    | [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+pub struct Monopoly {
+    board: Board,
+    dice: [StdRng; 2],
+    dice_range: Uniform<i8>,
 
-pub fn create_board() -> board::Board {
-    let tile_data_json: &str = include_str!("./tiles/board_tile_data.json");
-    let json: serde_json::Value = serde_json::from_str(&tile_data_json)
-        .expect("JSON could not be deserialized because of an error, likely has bad format");
+    /// { "Blue": {39, 37}, "Brown": {2, 3}, ... }
+    /// So we know that tiles 39 and 37 belong in the same set together called "Blue"
+    property_sets: PropertySet,
 
-    // Skip first JSON object because it is documentation and metadata, create board
-    // with the rest of it. JSON is array of objects so it should preserve order; it should
-    // define all the board tiles from GO (start) to Boardwalk (last tile before GO) in order
-    let mut tiles: Vec<BoardTile> = Vec::<BoardTile>::new();
-    for tile_data in json.as_array().unwrap().iter().skip(1) {
-        match tile_data
-            .get("type")
-            .expect(error::JSON_MISSING_TYPE)
-            .as_str()
-            .expect(error::JSON_DESERIALIZE_TO_STR)
-        {
-            "Street" => tiles.push(BoardTile::Street(StreetTile::new(tile_data.clone()))),
-            "Railroad" => tiles.push(BoardTile::Railroad(RailroadTile::new(tile_data.clone()))),
-            "Utility" => tiles.push(BoardTile::Utility(UtilityTile::new(tile_data.clone()))),
-            "Event" => tiles.push(BoardTile::Event(EventTile::new(tile_data.clone()))),
-            _ => continue,
+    /// [
+    ///     { "Blue": {39}, "Brown": {1,3} }, // Player 1 (by index, id = 0)
+    ///     { "Cyan": {6,8}, "Blue": {37}, ...}, // Player 2 (by index, id = 1)
+    /// ]
+    /// Keeps track of which player owns which tiles according to their sets,
+    /// organized in this way so it is easy to tell if a player completes their set
+    ownership_records: OwnershipRecords,
+}
+
+impl Monopoly {
+    pub fn new(number_of_players: usize) -> Self {
+        let tile_data_json: &str = include_str!("./tiles/board_tile_data.json");
+        let json: serde_json::Value = serde_json::from_str(&tile_data_json)
+            .expect("JSON could not be deserialized because of an error, likely has bad format");
+
+        // Skip first JSON object because it is documentation and metadata, create board
+        // with the rest of it. JSON is array of objects so it should preserve order; it should
+        // define all the board tiles from GO (start) to Boardwalk (last tile before GO) in order
+        let mut tiles: Vec<BoardTile> = Vec::<BoardTile>::new();
+        let mut sets: PropertySet = PropertySet::new();
+        for (id, tile_data) in json.as_array().unwrap().iter().skip(1).enumerate() {
+            sets.entry(
+                tile_data
+                    .get("set")
+                    .expect(error::JSON_MISSING_SET)
+                    .to_string(),
+            )
+            .or_insert(HashSet::from([id]))
+            .insert(id);
+
+            match tile_data
+                .get("type")
+                .expect(error::JSON_MISSING_TYPE)
+                .as_str()
+                .expect(error::JSON_DESERIALIZE_TO_STR)
+            {
+                "Street" => tiles.push(BoardTile::Street(StreetTile::new(id, tile_data))),
+                "Railroad" => tiles.push(BoardTile::Railroad(RailroadTile::new(id, tile_data))),
+                "Utility" => tiles.push(BoardTile::Utility(UtilityTile::new(id, tile_data))),
+                "Event" => tiles.push(BoardTile::Event(EventTile::new(id, tile_data))),
+                _ => continue,
+            }
+        }
+
+        Self {
+            board: Board::new(tiles),
+            dice: [StdRng::from_entropy(), StdRng::from_entropy()],
+            dice_range: Uniform::new_inclusive(1, 6),
+            property_sets: sets,
+            ownership_records: {
+                OwnershipRecords::from_iter(repeat(HashMap::new()).take(number_of_players))
+            },
         }
     }
 
-    board::Board::new(tiles)
-}
+    pub fn display_game(&self) {
+        // May need to use this to display other things e.g. logs, inventory, etc.
+        self.board.display_board();
+    }
 
-pub fn roll_dice(die_range: &Uniform<i8>, die_1: &mut StdRng, die_2: &mut StdRng) -> [i8; 2] {
-    //! We split it up to make it more extendible in the future
-    //! That is we could have an option to use a singular die [0, 12] for an equal
-    //! distribution (which would change the game a lot) and make it easier to
-    //! display the value of each die (draw each die value instead of just printing the sum)
-    [die_range.sample(die_1), die_range.sample(die_2)]
-}
+    pub fn get_tile_name(&self, position: usize) -> &String {
+        self.board.get_tile_name(position)
+    }
 
-pub fn is_doubles(dice: &[i8; 2]) -> bool {
-    dice[0] == dice[1]
-}
+    pub fn roll_dice(&mut self) -> [i8; 2] {
+        [
+            self.dice_range.sample(&mut self.dice[0]),
+            self.dice_range.sample(&mut self.dice[1]),
+        ]
+    }
 
-pub fn try_to_buy_tile(buyer: &mut player::Player, tile: &mut BoardTile) -> Option<i64> {
-    //! Makes the player spends it money to take ownership of a property tile
-    //! Returns the price the player paid if allowed (not owned and is a property tile)
-    //! Otherwise if unsuccessful, return None
-    match tile {
-        BoardTile::Street(property) if property.owner.is_none() => {
-            buyer.pay(property.property_cost);
-            property.acquired_by(buyer.id);
-            Some(property.property_cost)
+    pub fn is_doubles(&self, dice: &[i8; 2]) -> bool {
+        dice[0] == dice[1]
+    }
+
+    pub fn is_set_complete(&self, player: usize, tile: usize) -> bool {
+        //! If the given player owns every single tile of the colour set described
+        //! by the given tile's set, the set is considered complete
+        let set_name: &String = self.board.get_set_name_from_position(tile);
+
+        if let (Some(player_set), Some(property_set)) = (
+            self.ownership_records.get(player).unwrap().get(set_name),
+            self.property_sets.get(set_name),
+        ) {
+            player_set.len() == property_set.len()
+        } else {
+            false
         }
-        BoardTile::Railroad(property) if property.owner.is_none() => {
-            buyer.pay(property.property_cost);
-            property.acquired_by(buyer.id);
-            Some(property.property_cost)
+    }
+
+    pub fn get_landlord(&self, tile: usize) -> Option<usize> {
+        match self.board.get_tile(tile) {
+            BoardTile::Street(property) => property.owner,
+            BoardTile::Railroad(property) => property.owner,
+            BoardTile::Utility(property) => property.owner,
+            BoardTile::Event(_) => None, // EventTiles has no owner
         }
-        BoardTile::Utility(property) if property.owner.is_none() => {
-            buyer.pay(property.property_cost);
-            property.acquired_by(buyer.id);
-            Some(property.property_cost)
+    }
+
+    pub fn get_rent(&self, tile: usize, dice: &[i8; 2]) -> i64 {
+        match self.board.get_tile(tile) {
+            BoardTile::Street(property) => property.rent,
+            BoardTile::Railroad(property) => property.rent,
+            BoardTile::Utility(property) => property.rent_multiplier * (dice[0] + dice[1]) as i64,
+            BoardTile::Event(_) => 0, // EventTiles has no owner
         }
-        _ => None,
+    }
+
+    pub fn buy_tile(&mut self, buyer: usize, colour: &String, position: usize) -> Option<i64> {
+        let set_name: String = self.board.get_set_name_from_position(position).to_string();
+
+        match self.board.get_tile_mut(position) {
+            BoardTile::Street(property) if property.owner.is_none() => {
+                let mut is_set_complete: bool = false;
+                let property_cost: i64 = property.property_cost;
+
+                // Record the ownership in the records before transfering ownership to buyer
+                // in order to check if the buyer completed the set by looking at the records,
+                // so we can adjust and update the rent as we acquire it.
+                self.ownership_records[buyer]
+                    .entry(set_name.to_string())
+                    .or_insert(HashSet::from([position]))
+                    .insert(position);
+
+                // Check if the player has a completed colour set after acquiring this
+                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                    is_set_complete = set.len() == self.property_sets[&set_name].len();
+                }
+
+                // Transfer ownership of the tile to the buyer
+                property.acquired_by(buyer, colour);
+
+                // Apply the double rent rule on full set to the other tiles of that set
+                if is_set_complete {
+                    for tile_in_set in &self.property_sets[&set_name] {
+                        match self.board.get_tile_mut(*tile_in_set) {
+                            BoardTile::Street(tile) => tile.update_rent_full_set(),
+                            _ => panic!("Somehow a different tile type got mixed with this set"),
+                        }
+                    }
+                }
+
+                Some(property_cost)
+            }
+            BoardTile::Railroad(property) if property.owner.is_none() => {
+                let owned_railroads: &HashSet<usize>;
+                let property_cost: i64 = property.property_cost;
+
+                // Record the ownership in the records before transfering ownership to buyer
+                // in order to check if the buyer completed the set by looking at the records,
+                // so we can adjust and update the rent as we acquire it.
+                self.ownership_records[buyer]
+                    .entry(set_name.to_string())
+                    .or_insert(HashSet::from([position]))
+                    .insert(position);
+
+                // Check if the player has a completed colour set after acquiring this
+                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                    owned_railroads = set;
+                } else {
+                    panic!("Could not purchase Railroad tile. Failed to record ownership of tile.");
+                }
+
+                // Transfer ownership of the tile to the buyer
+                property.acquired_by(buyer, colour);
+
+                // Rent should scale for all tiles of this set based on the number of it owned
+                for tile_in_set in owned_railroads {
+                    match self.board.get_tile_mut(*tile_in_set) {
+                        BoardTile::Railroad(tile) => {
+                            tile.update_rent_total_number_of_owned_railroads(owned_railroads.len());
+                        }
+                        _ => panic!("Somehow a different tile type got mixed with this set"),
+                    }
+                }
+
+                Some(property_cost)
+            }
+            BoardTile::Utility(property) if property.owner.is_none() => {
+                let owned_utilities: &HashSet<usize>;
+                let property_cost: i64 = property.property_cost;
+
+                // Record the ownership in the records before transfering ownership to buyer
+                // in order to check if the buyer completed the set by looking at the records,
+                // so we can adjust and update the rent as we acquire it.
+                self.ownership_records[buyer]
+                    .entry(set_name.to_string())
+                    .or_insert(HashSet::from([position]))
+                    .insert(position);
+
+                // Check if the player has a completed colour set after acquiring this
+                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                    owned_utilities = set;
+                } else {
+                    panic!("Could not purchase Utility tile. Failed to record ownership of tile.");
+                }
+
+                // Transfer ownership of the tile to the buyer
+                property.acquired_by(buyer, colour);
+
+                // Rent should scale for all tiles of this set based on the number of it owned
+                for tile_in_set in owned_utilities {
+                    match self.board.get_tile_mut(*tile_in_set) {
+                        BoardTile::Utility(tile) => {
+                            tile.update_rent_total_number_of_owned_utilities(owned_utilities.len());
+                        }
+                        _ => panic!("Somehow a different tile type got mixed with this set"),
+                    }
+                }
+
+                Some(property_cost)
+            }
+            _ => None, // EventTiles cannot be purchased
+        }
     }
 }
