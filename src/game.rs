@@ -5,6 +5,7 @@ type OwnershipRecords = Vec<PropertySet>;
 
 use board::Board;
 use error;
+use player::Player;
 use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
@@ -18,7 +19,7 @@ pub struct Monopoly {
     dice: [StdRng; 2],
     dice_range: Uniform<i8>,
 
-    /// { "Blue": {39, 37}, "Brown": {2, 3}, ... }
+    /// { "Blue": {39, 37}, "Brown": {2, 3}, ... } // store tiles by their id
     /// So we know that tiles 39 and 37 belong in the same set together called "Blue"
     property_sets: PropertySet,
 
@@ -97,6 +98,7 @@ impl Monopoly {
         dice[0] == dice[1]
     }
 
+    #[allow(dead_code)]
     pub fn is_set_complete(&self, player: usize, tile: usize) -> bool {
         //! If the given player owns every single tile of the colour set described
         //! by the given tile's set, the set is considered complete

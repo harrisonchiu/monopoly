@@ -65,6 +65,7 @@ fn main() {
                 let rent: i64 = game.get_rent(tile, &dice);
 
                 display::output("[*] ");
+                is_dice_rollable = game.is_doubles(&dice);
                 if is_dice_rollable {
                     print!("DOUBLES!! ");
                 }
