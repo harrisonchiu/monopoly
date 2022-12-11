@@ -5,7 +5,7 @@ type OwnershipRecords = Vec<PropertySet>;
 
 use board::Board;
 use error;
-use player::Player;
+use player::Player; // TODO: put player here and main.rs willjust refer to the id
 use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
@@ -35,8 +35,10 @@ pub struct Monopoly {
 impl Monopoly {
     pub fn new(number_of_players: usize) -> Self {
         let tile_data_json: &str = include_str!("./tiles/board_tile_data.json");
-        let json: serde_json::Value = serde_json::from_str(&tile_data_json)
-            .expect("JSON could not be deserialized because of an error, likely has bad format");
+        let json: serde_json::Value =
+            serde_json::from_str(&tile_data_json).expect(&format!("{}", error::JSON_DESERIALIZE));
+
+        error::validate_tile_data_json(&json, true);
 
         // Skip first JSON object because it is documentation and metadata, create board
         // with the rest of it. JSON is array of objects so it should preserve order; it should
@@ -44,21 +46,11 @@ impl Monopoly {
         let mut tiles: Vec<BoardTile> = Vec::<BoardTile>::new();
         let mut sets: PropertySet = PropertySet::new();
         for (id, tile_data) in json.as_array().unwrap().iter().skip(1).enumerate() {
-            sets.entry(
-                tile_data
-                    .get("set")
-                    .expect(error::JSON_MISSING_SET)
-                    .to_string(),
-            )
-            .or_insert(HashSet::from([id]))
-            .insert(id);
+            sets.entry(tile_data["set"].to_string())
+                .or_insert(HashSet::from([id]))
+                .insert(id);
 
-            match tile_data
-                .get("type")
-                .expect(error::JSON_MISSING_TYPE)
-                .as_str()
-                .expect(error::JSON_DESERIALIZE_TO_STR)
-            {
+            match tile_data["type"].as_str().unwrap() {
                 "Street" => tiles.push(BoardTile::Street(StreetTile::new(id, tile_data))),
                 "Railroad" => tiles.push(BoardTile::Railroad(RailroadTile::new(id, tile_data))),
                 "Utility" => tiles.push(BoardTile::Utility(UtilityTile::new(id, tile_data))),
@@ -98,14 +90,13 @@ impl Monopoly {
         dice[0] == dice[1]
     }
 
-    #[allow(dead_code)]
     pub fn is_set_complete(&self, player: usize, tile: usize) -> bool {
         //! If the given player owns every single tile of the colour set described
         //! by the given tile's set, the set is considered complete
         let set_name: &String = self.board.get_set_name_from_position(tile);
 
         if let (Some(player_set), Some(property_set)) = (
-            self.ownership_records.get(player).unwrap().get(set_name),
+            self.ownership_records[player].get(set_name),
             self.property_sets.get(set_name),
         ) {
             player_set.len() == property_set.len()
@@ -149,7 +140,7 @@ impl Monopoly {
                     .insert(position);
 
                 // Check if the player has a completed colour set after acquiring this
-                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                if let Some(set) = self.ownership_records[buyer].get(&set_name) {
                     is_set_complete = set.len() == self.property_sets[&set_name].len();
                 }
 
@@ -181,7 +172,7 @@ impl Monopoly {
                     .insert(position);
 
                 // Check if the player has a completed colour set after acquiring this
-                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                if let Some(set) = self.ownership_records[buyer].get(&set_name) {
                     owned_railroads = set;
                 } else {
                     panic!("Could not purchase Railroad tile. Failed to record ownership of tile.");
@@ -215,7 +206,7 @@ impl Monopoly {
                     .insert(position);
 
                 // Check if the player has a completed colour set after acquiring this
-                if let Some(set) = (&self.ownership_records[buyer]).get(&set_name) {
+                if let Some(set) = self.ownership_records[buyer].get(&set_name) {
                     owned_utilities = set;
                 } else {
                     panic!("Could not purchase Utility tile. Failed to record ownership of tile.");

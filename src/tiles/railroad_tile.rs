@@ -19,46 +19,26 @@ pub struct RailroadTile {
 impl RailroadTile {
     pub fn new(id: usize, tile_data: &serde_json::Value) -> Self {
         let mut rent: Vec<i64> = Vec::<i64>::new();
-        if let Some(rent_object) = tile_data
-            .get("rent")
-            .expect(error::JSON_MISSING_RENT)
-            .as_object()
-        {
-            rent_object.iter().for_each(|(_, cost)| {
-                rent.push(cost.as_i64().expect(error::JSON_DESERIALIZE_TO_I64))
-            });
+        if let Some(rent_object) = tile_data["rent"].as_object() {
+            rent_object
+                .iter()
+                .for_each(|(_, cost)| rent.push(cost.as_i64().unwrap()));
             rent.sort();
         }
         if rent.len() != 4 {
-            panic!("Railroad rent field needs to be an object with 4 int rent cost values")
+            panic!("{}", error::JSON_RAILROAD_MISSING_RENT);
         }
 
         Self {
             id: id,
-            name: tile_data
-                .get("name")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-            set_name: tile_data
-                .get("set")
-                .expect(error::JSON_MISSING_NAME)
-                .to_string(),
-            colour: colours::get_background_colour_from_set(
-                tile_data
-                    .get("set")
-                    .expect(error::JSON_MISSING_NAME)
-                    .as_str()
-                    .expect(error::JSON_DESERIALIZE_TO_STR),
-            ),
+            name: tile_data["name"].to_string(),
+            set_name: tile_data["set"].to_string(),
+            colour: colours::get_set_background_colour(tile_data["set"].as_str().unwrap()),
             owner: None,
             owner_colour: "".to_string(),
             property_status: PropertyStatus::Unowned,
-            property_cost: tile_data
-                .get("property_cost")
-                .expect(error::JSON_MISSING_PROPERTY_COST)
-                .as_i64()
-                .expect(error::JSON_DESERIALIZE_TO_I64),
-            rent: rent.get(0).expect(error::JSON_MISSING_RENT).clone(),
+            property_cost: tile_data["property_cost"].as_i64().unwrap(),
+            rent: rent[0],
             rent_levels: rent,
         }
     }

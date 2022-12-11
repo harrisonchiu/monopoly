@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-pub fn get_background_colour_from_set(colour: &str) -> String {
+pub fn get_set_background_colour(colour: &str) -> String {
     //! Use
     match colour {
         "Red" => String::from("\x1b[41m"),
