@@ -5,7 +5,7 @@ type OwnershipRecords = Vec<PropertySet>;
 
 use board::Board;
 use error;
-use player::Player; // TODO: put player here and main.rs willjust refer to the id
+use player::{Pieces, Player};
 use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
@@ -16,6 +16,7 @@ use rand::{rngs::StdRng, SeedableRng};
 
 pub struct Monopoly {
     board: Board,
+    players: Vec<Player>,
     dice: [StdRng; 2],
     dice_range: Uniform<i8>,
 
@@ -59,8 +60,15 @@ impl Monopoly {
             }
         }
 
+        // Instantialize the players
+        let mut players: Vec<Player> = Vec::<Player>::with_capacity(number_of_players);
+        for player_id in 0..4 {
+            players.push(Player::new(player_id));
+        }
+
         Self {
             board: Board::new(tiles),
+            players: players,
             dice: [StdRng::from_entropy(), StdRng::from_entropy()],
             dice_range: Uniform::new_inclusive(1, 6),
             property_sets: sets,
@@ -73,44 +81,63 @@ impl Monopoly {
     pub fn display_game(&self) {
         // May need to use this to display other things e.g. logs, inventory, etc.
         self.board.display_board();
+        self.players
+            .iter()
+            .for_each(|player| player.display_at_position(player.position));
     }
 
+    // Getters for most fields of BoardTile structs
     pub fn get_tile_name(&self, position: usize) -> &String {
-        self.board.get_tile_name(position)
-    }
-
-    pub fn roll_dice(&mut self) -> [i8; 2] {
-        [
-            self.dice_range.sample(&mut self.dice[0]),
-            self.dice_range.sample(&mut self.dice[1]),
-        ]
-    }
-
-    pub fn is_doubles(&self, dice: &[i8; 2]) -> bool {
-        dice[0] == dice[1]
-    }
-
-    pub fn is_set_complete(&self, player: usize, tile: usize) -> bool {
-        //! If the given player owns every single tile of the colour set described
-        //! by the given tile's set, the set is considered complete
-        let set_name: &String = self.board.get_set_name_from_position(tile);
-
-        if let (Some(player_set), Some(property_set)) = (
-            self.ownership_records[player].get(set_name),
-            self.property_sets.get(set_name),
-        ) {
-            player_set.len() == property_set.len()
-        } else {
-            false
+        match self.board.get_tile(position) {
+            BoardTile::Street(property) => &property.name,
+            BoardTile::Railroad(property) => &property.name,
+            BoardTile::Utility(property) => &property.name,
+            BoardTile::Event(tile) => &tile.name,
         }
     }
 
-    pub fn get_landlord(&self, tile: usize) -> Option<usize> {
+    pub fn get_set_name(&self, position: usize) -> &String {
+        match self.board.get_tile(position) {
+            BoardTile::Street(property) => &property.set_name,
+            BoardTile::Railroad(property) => &property.set_name,
+            BoardTile::Utility(property) => &property.set_name,
+            BoardTile::Event(tile) => &tile.set_name,
+        }
+    }
+
+    pub fn get_colour(&self, position: usize) -> &String {
+        match self.board.get_tile(position) {
+            BoardTile::Street(property) => &property.colour,
+            BoardTile::Railroad(property) => &property.colour,
+            BoardTile::Utility(property) => &property.colour,
+            BoardTile::Event(tile) => &tile.colour,
+        }
+    }
+
+    pub fn get_owner(&self, tile: usize) -> Option<usize> {
         match self.board.get_tile(tile) {
             BoardTile::Street(property) => property.owner,
             BoardTile::Railroad(property) => property.owner,
             BoardTile::Utility(property) => property.owner,
             BoardTile::Event(_) => None, // EventTiles has no owner
+        }
+    }
+
+    pub fn get_owner_colour(&self, tile: usize) -> &String {
+        match self.board.get_tile(tile) {
+            BoardTile::Street(property) => &property.owner_colour,
+            BoardTile::Railroad(property) => &property.owner_colour,
+            BoardTile::Utility(property) => &property.owner_colour,
+            BoardTile::Event(tile) => &tile.colour,
+        }
+    }
+
+    pub fn get_property_cost(&self, position: usize) -> i64 {
+        match self.board.get_tile(position) {
+            BoardTile::Street(property) => property.property_cost,
+            BoardTile::Railroad(property) => property.property_cost,
+            BoardTile::Utility(property) => property.property_cost,
+            BoardTile::Event(_) => 0,
         }
     }
 
@@ -123,10 +150,35 @@ impl Monopoly {
         }
     }
 
-    pub fn buy_tile(&mut self, buyer: usize, colour: &String, position: usize) -> Option<i64> {
-        let set_name: String = self.board.get_set_name_from_position(position).to_string();
+    pub fn get_player(&self, id: usize) -> &Player {
+        &self.players[id]
+    }
 
-        match self.board.get_tile_mut(position) {
+    // Actions player can do in the game
+    pub fn roll_dice(&mut self) -> [i8; 2] {
+        [
+            self.dice_range.sample(&mut self.dice[0]),
+            self.dice_range.sample(&mut self.dice[1]),
+        ]
+    }
+
+    pub fn is_doubles(&self, dice: &[i8; 2]) -> bool {
+        dice[0] == dice[1]
+    }
+
+    pub fn move_player(&mut self, player: usize, dice: &[i8; 2]) -> usize {
+        self.players[player].walk(dice[0] + dice[1])
+    }
+
+    pub fn pay_rent_to(&mut self, tenent: usize, landlord: usize, rent: i64) {
+        self.players[tenent].pay(rent);
+        self.players[landlord].collect(rent);
+    }
+
+    pub fn buy_tile(&mut self, buyer: usize, tile: usize) -> Option<usize> {
+        let set_name: String = self.get_set_name(tile).to_string();
+
+        match self.board.get_tile_mut(tile) {
             BoardTile::Street(property) if property.owner.is_none() => {
                 let mut is_set_complete: bool = false;
                 let property_cost: i64 = property.property_cost;
@@ -136,8 +188,8 @@ impl Monopoly {
                 // so we can adjust and update the rent as we acquire it.
                 self.ownership_records[buyer]
                     .entry(set_name.to_string())
-                    .or_insert(HashSet::from([position]))
-                    .insert(position);
+                    .or_insert(HashSet::from([tile]))
+                    .insert(tile);
 
                 // Check if the player has a completed colour set after acquiring this
                 if let Some(set) = self.ownership_records[buyer].get(&set_name) {
@@ -145,19 +197,20 @@ impl Monopoly {
                 }
 
                 // Transfer ownership of the tile to the buyer
-                property.acquired_by(buyer, colour);
+                property.acquired_by(buyer, &Pieces::colour(&buyer).to_string());
 
                 // Apply the double rent rule on full set to the other tiles of that set
                 if is_set_complete {
                     for tile_in_set in &self.property_sets[&set_name] {
                         match self.board.get_tile_mut(*tile_in_set) {
-                            BoardTile::Street(tile) => tile.update_rent_full_set(),
+                            BoardTile::Street(t) => t.update_rent_full_set(),
                             _ => panic!("Somehow a different tile type got mixed with this set"),
                         }
                     }
                 }
 
-                Some(property_cost)
+                self.players[buyer].pay(property_cost);
+                Some(tile)
             }
             BoardTile::Railroad(property) if property.owner.is_none() => {
                 let owned_railroads: &HashSet<usize>;
@@ -168,8 +221,8 @@ impl Monopoly {
                 // so we can adjust and update the rent as we acquire it.
                 self.ownership_records[buyer]
                     .entry(set_name.to_string())
-                    .or_insert(HashSet::from([position]))
-                    .insert(position);
+                    .or_insert(HashSet::from([tile]))
+                    .insert(tile);
 
                 // Check if the player has a completed colour set after acquiring this
                 if let Some(set) = self.ownership_records[buyer].get(&set_name) {
@@ -179,19 +232,20 @@ impl Monopoly {
                 }
 
                 // Transfer ownership of the tile to the buyer
-                property.acquired_by(buyer, colour);
+                property.acquired_by(buyer, &Pieces::colour(&buyer).to_string());
 
                 // Rent should scale for all tiles of this set based on the number of it owned
                 for tile_in_set in owned_railroads {
                     match self.board.get_tile_mut(*tile_in_set) {
-                        BoardTile::Railroad(tile) => {
-                            tile.update_rent_total_number_of_owned_railroads(owned_railroads.len());
+                        BoardTile::Railroad(t) => {
+                            t.update_rent_total_number_of_owned_railroads(owned_railroads.len());
                         }
                         _ => panic!("Somehow a different tile type got mixed with this set"),
                     }
                 }
 
-                Some(property_cost)
+                self.players[buyer].pay(property_cost);
+                Some(tile)
             }
             BoardTile::Utility(property) if property.owner.is_none() => {
                 let owned_utilities: &HashSet<usize>;
@@ -202,8 +256,8 @@ impl Monopoly {
                 // so we can adjust and update the rent as we acquire it.
                 self.ownership_records[buyer]
                     .entry(set_name.to_string())
-                    .or_insert(HashSet::from([position]))
-                    .insert(position);
+                    .or_insert(HashSet::from([tile]))
+                    .insert(tile);
 
                 // Check if the player has a completed colour set after acquiring this
                 if let Some(set) = self.ownership_records[buyer].get(&set_name) {
@@ -213,19 +267,20 @@ impl Monopoly {
                 }
 
                 // Transfer ownership of the tile to the buyer
-                property.acquired_by(buyer, colour);
+                property.acquired_by(buyer, &Pieces::colour(&buyer).to_string());
 
                 // Rent should scale for all tiles of this set based on the number of it owned
                 for tile_in_set in owned_utilities {
                     match self.board.get_tile_mut(*tile_in_set) {
-                        BoardTile::Utility(tile) => {
-                            tile.update_rent_total_number_of_owned_utilities(owned_utilities.len());
+                        BoardTile::Utility(t) => {
+                            t.update_rent_total_number_of_owned_utilities(owned_utilities.len());
                         }
                         _ => panic!("Somehow a different tile type got mixed with this set"),
                     }
                 }
 
-                Some(property_cost)
+                self.players[buyer].pay(property_cost);
+                Some(tile)
             }
             _ => None, // EventTiles cannot be purchased
         }

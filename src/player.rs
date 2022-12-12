@@ -1,11 +1,29 @@
 use board;
 
-pub const PLAYER_PIECES: [(char, &'static str); 4] = [
-    ('A', "\x1b[96m"),
-    ('B', "\x1b[92m"),
-    ('C', "\x1b[91m"),
-    ('D', "\x1b[95m"),
-];
+pub struct Pieces;
+
+impl Pieces {
+    // The return output has the same lifetime as <id> parameter
+    pub fn colour<'a>(id: &'a usize) -> &'a str {
+        match id {
+            0 => "\x1b[96m",
+            1 => "\x1b[92m",
+            2 => "\x1b[91m",
+            3 => "\x1b[95m",
+            _ => " ",
+        }
+    }
+
+    pub fn avatar<'a>(id: &'a usize) -> &'a char {
+        match id {
+            0 => &'A',
+            1 => &'B',
+            2 => &'C',
+            3 => &'D',
+            _ => &'?',
+        }
+    }
+}
 
 pub struct Player {
     // ID is unique int identifier of range [0, 3] (max 3 because a maximum of 4 players)
@@ -24,11 +42,11 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: usize, avatar: char, colour: String) -> Self {
+    pub fn new(id: usize) -> Self {
         Self {
             id: id,
-            avatar: avatar,
-            colour: colour,
+            avatar: Pieces::avatar(&id).clone(),
+            colour: Pieces::colour(&id).to_string(),
             position: 0,
             money: 10000,
         }

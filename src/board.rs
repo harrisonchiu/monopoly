@@ -137,13 +137,4 @@ impl Board {
             BoardTile::Event(tile) => &tile.set_name,
         }
     }
-
-    pub fn get_tile_name(&self, position: usize) -> &String {
-        match self.get_tile(position) {
-            BoardTile::Street(property) => &property.name,
-            BoardTile::Railroad(property) => &property.name,
-            BoardTile::Utility(property) => &property.name,
-            BoardTile::Event(tile) => &tile.name,
-        }
-    }
 }

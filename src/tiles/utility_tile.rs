@@ -115,8 +115,12 @@ impl UtilityTile {
             PropertyStatus::Unowned => print!(" ${}", self.property_cost),
             // TODO: Somehow get player colour from owner_id,
             // rn this is just the tile's colour and not the owner
-            PropertyStatus::Owned => print!("{}X\x1b[0m x{}", self.colour, self.rent_multiplier),
-            PropertyStatus::Tier1 => print!("{}X\x1b[0m x{}", self.colour, self.rent_multiplier),
+            PropertyStatus::Owned => {
+                print!("{}X\x1b[0m x{}", self.owner_colour, self.rent_multiplier)
+            }
+            PropertyStatus::Tier1 => {
+                print!("{}X\x1b[0m x{}", self.owner_colour, self.rent_multiplier)
+            }
             _ => print!(" ERROR "),
         }
     }

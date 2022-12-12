@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+// #![allow(dead_code)]
 use std::io::{self, Write};
 
 use board;
@@ -8,11 +8,6 @@ pub fn reset_cursor_to_start() {
     // Good default and standard location for cursor so we know to
     // always count the rows and cols from the top left
     print!("\x1B[1;1H");
-}
-
-pub fn reset_cursor_to_end() {
-    // Count how many println!() in display_board(). It should be at least one more than it
-    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 2);
 }
 
 pub fn inform<S: AsRef<str>>(info: S) {

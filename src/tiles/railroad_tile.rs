@@ -119,10 +119,10 @@ impl RailroadTile {
             PropertyStatus::Unowned => print!(" ${}", self.property_cost),
             // TODO: Somehow get player colour from owner_id,
             // rn this is just the tile's colour and not the owner
-            PropertyStatus::Owned => print!("{}X\x1b[0m ${}", self.colour, self.rent),
-            PropertyStatus::Tier1 => print!("{}X\x1b[0m ${}", self.colour, self.rent),
-            PropertyStatus::Tier2 => print!("{}X\x1b[0m ${}", self.colour, self.rent),
-            PropertyStatus::Tier3 => print!("{}X\x1b[0m ${}", self.colour, self.rent),
+            PropertyStatus::Owned => print!("{}X\x1b[0m ${}", self.owner_colour, self.rent),
+            PropertyStatus::Tier1 => print!("{}X\x1b[0m ${}", self.owner_colour, self.rent),
+            PropertyStatus::Tier2 => print!("{}X\x1b[0m ${}", self.owner_colour, self.rent),
+            PropertyStatus::Tier3 => print!("{}X\x1b[0m ${}", self.owner_colour, self.rent),
             _ => print!(" ERROR "),
         }
     }
