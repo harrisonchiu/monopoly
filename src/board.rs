@@ -10,6 +10,7 @@ use const_format;
 pub const BOARD_LENGTH_BY_TILES: usize = 11;
 pub const BOARD_TOTAL_NUMBER_OF_TILES: usize = BOARD_LENGTH_BY_TILES * 4 - 4;
 pub const BOARD_HEIGHT_BY_CHAR: usize = 38;
+pub const BOARD_LENGTH_BY_CHAR: usize = 89;
 pub const TILE_LENGTH_BY_CHAR: usize = 7;
 
 // Uncoloured string of the tile's top border as seen in board::display_board().
@@ -127,14 +128,5 @@ impl Board {
 
     pub fn get_tile_mut(&mut self, position: usize) -> &mut BoardTile {
         self.board.get_mut(position).unwrap()
-    }
-
-    pub fn get_set_name_from_position(&self, position: usize) -> &String {
-        match self.get_tile(position) {
-            BoardTile::Street(property) => &property.set_name,
-            BoardTile::Railroad(property) => &property.set_name,
-            BoardTile::Utility(property) => &property.set_name,
-            BoardTile::Event(tile) => &tile.set_name,
-        }
     }
 }

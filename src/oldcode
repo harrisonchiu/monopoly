@@ -1,0 +1,14 @@
+    pub fn is_set_complete(&self, player: usize, tile: usize) -> bool {
+        //! If the given player owns every single tile of the colour set described
+        //! by the given tile's set, the set is considered complete
+        let set_name: &String = self.get_set_name(tile);
+
+        if let (Some(player_set), Some(property_set)) = (
+            self.ownership_records[player].get(set_name),
+            self.property_sets.get(set_name),
+        ) {
+            player_set.len() == property_set.len()
+        } else {
+            false
+        }
+    }

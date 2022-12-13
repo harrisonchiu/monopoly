@@ -47,7 +47,7 @@ fn prompt(id: usize) -> Option<CommandId> {
 }
 
 fn main() {
-    const NUMBER_OF_PLAYERS: usize = 4;
+    const NUMBER_OF_PLAYERS: usize = 3;
 
     let mut game: Monopoly = Monopoly::new(NUMBER_OF_PLAYERS);
     game.display_game();
@@ -62,8 +62,6 @@ fn main() {
             if command == Action::Move as CommandId && is_dice_rollable {
                 let dice: [i8; 2] = game.roll_dice();
                 let tile: usize = game.move_player(id, &dice);
-                let landlord: Option<usize> = game.get_owner(tile);
-                let rent: i64 = game.get_rent(tile, &dice);
 
                 is_dice_rollable = game.is_doubles(&dice);
                 if is_dice_rollable {
@@ -72,9 +70,10 @@ fn main() {
                     display::inform(interface::INSTRUCTIONS_END_TURN);
                     display::output("[*] ");
                 }
-
                 print!("Rolled {dice:?}, landing on {}. ", game.get_tile_name(tile));
-                if let Some(landlord) = landlord {
+
+                let rent: i64 = game.get_rent(tile, &dice);
+                if let Some(landlord) = game.get_owner(tile) {
                     if landlord == id {
                         break;
                     }
@@ -87,7 +86,7 @@ fn main() {
                     );
                 }
 
-                // game.buy_tile(id, &players[id].colour, players[id].position);
+                game.update_inventory_display();
             } else if command == Action::Move as CommandId && !is_dice_rollable {
                 display::clear_output();
                 is_dice_rollable = true;
@@ -96,6 +95,7 @@ fn main() {
                 let tile: usize = game.get_player(id).position;
 
                 if let Some(purchased_tile) = game.buy_tile(id, tile) {
+                    game.update_inventory_display();
                     display::output(format!(
                         "[*] Purchased {} for ${}. Amount of money remaining ${}.",
                         game.get_tile_name(purchased_tile),

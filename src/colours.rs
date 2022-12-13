@@ -1,5 +1,5 @@
-#![allow(dead_code)]
-pub fn get_set_background_colour(colour: &str) -> String {
+// #![allow(dead_code)]
+pub fn bg_set_colour(colour: &str) -> String {
     //! Use
     match colour {
         "Red" => String::from("\x1b[41m"),
@@ -14,19 +14,6 @@ pub fn get_set_background_colour(colour: &str) -> String {
         "Utility" => String::from("\x1b[47m"),   // White
         _ => panic!(
             "Unknown set name! We assume uses of this function \
-            and its parameter are hardcoded and NOT dynamically inputted."
-        ),
-    }
-}
-
-pub fn get_foreground_colour(colour: &str) -> &str {
-    match colour {
-        "Blue" => "\x1b[96m",
-        "Green" => "\x1b[92m",
-        "Red" => "\x1b[91m",
-        "Magenta" => "\x1b[95m",
-        _ => panic!(
-            "Unknown colour name! We assume uses of this function \
             and its parameter are hardcoded and NOT dynamically inputted."
         ),
     }

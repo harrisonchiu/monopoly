@@ -31,9 +31,9 @@ impl StreetTile {
 
         Self {
             id: id,
-            name: tile_data["name"].to_string(),
-            set_name: tile_data["set"].to_string(),
-            colour: colours::get_set_background_colour(tile_data["set"].as_str().unwrap()),
+            name: tile_data["name"].as_str().unwrap().to_string(),
+            set_name: tile_data["set"].as_str().unwrap().to_string(),
+            colour: colours::bg_set_colour(tile_data["set"].as_str().unwrap()),
             owner: None,
             owner_colour: "".to_string(),
             property_status: PropertyStatus::Unowned,
