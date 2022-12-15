@@ -43,6 +43,17 @@ pub fn clear_output() {
     print!("\x1B[{};1H\x1B[2K", board::BOARD_HEIGHT_BY_CHAR + 4);
 }
 
+pub fn debug<S: AsRef<str>>(debug: S) {
+    // Output shows if previous user command input was successful or not or any other info
+    // Use this over other print() because this clears previous output.
+    // Should be at least one more below than the constant used in move_cursor_to_input()
+    print!("\x1B[{};1H", board::BOARD_HEIGHT_BY_CHAR + 5);
+
+    // Erase the line, we want to clear any previous output so the user can see the new output
+    // Do NOT move cursor at the end of this function to allow appending of info
+    print!("\x1B[2K{}", debug.as_ref());
+}
+
 pub fn terminal_bell() {
     print!("\x07");
 }

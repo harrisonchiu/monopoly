@@ -12,6 +12,7 @@ pub struct UtilityTile {
     pub owner_colour: String,
     pub property_status: PropertyStatus,
     pub property_cost: i64,
+    pub mortgage_value: i64,
     pub rent_multiplier: i64,
     pub rent_multiplier_levels: Vec<i64>,
 }
@@ -38,6 +39,7 @@ impl UtilityTile {
             owner_colour: "".to_string(),
             property_status: PropertyStatus::Unowned,
             property_cost: tile_data["property_cost"].as_i64().unwrap(),
+            mortgage_value: tile_data["mortgage_value"].as_i64().unwrap(),
             rent_multiplier: rent_multiplier_levels[0],
             rent_multiplier_levels: rent_multiplier_levels,
         }
@@ -102,13 +104,21 @@ impl UtilityTile {
         );
     }
 
-    pub fn display_property_information(&self) {
+    pub fn clear_and_goto_line(&self, line: u8) {
         print!(
             // {line};{col}, the space erases previous info so text does not overlap
-            "\x1B[{1};{0}H       \x1B[{1};{0}H", // resets the cursor to draw
+            "\x1B[{1};{0}H{2:^tile_width$}\x1B[{1};{0}H", // resets the cursor to draw
             board::DISPLAY_BOARD_COORDS[self.id][0],
-            board::DISPLAY_BOARD_COORDS[self.id][1] + 1, // 2nd row of tile
-        );
+            // Line 1: colour, line 2: property info, line 3: player positions
+            // We subtract 1 because DISPLAY_BOARD_COORDS is already at line 1, so no need to add
+            board::DISPLAY_BOARD_COORDS[self.id][1] + line - 1,
+            " ",
+            tile_width = board::TILE_LENGTH_BY_CHAR
+        )
+    }
+
+    pub fn display_property_information(&self) {
+        self.clear_and_goto_line(2);
 
         match self.property_status {
             PropertyStatus::Mortgaged => print!("|MRTGAGE|"),
@@ -123,5 +133,49 @@ impl UtilityTile {
             }
             _ => print!(" ERROR "),
         }
+    }
+
+    pub fn display_tile_id(&self) {
+        self.clear_and_goto_line(3);
+
+        print!(
+            "{:^tile_width$}",
+            self.id,
+            tile_width = board::TILE_LENGTH_BY_CHAR
+        );
+    }
+
+    pub fn display_card(&self, left_starting_col: usize, top_starting_row: usize) -> String {
+        const CARD_WIDTH: usize = 37;
+        const WHITE_BACKGROUND: &str = "\x1b[47m";
+        const BLACK_FOREGROUND: &str = "\x1b[30m";
+
+        // idk why one space is needed after H first line but it starts earlier
+        format!(
+            "\x1B[{row};{col}H {WHITE_BACKGROUND}{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
+            \n\x1B[{col}C{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
+            \n\x1B[{col}C{WHITE_BACKGROUND}{BLACK_FOREGROUND}{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C{name: ^CARD_WIDTH$}\
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C  Property cost{property_cost: >20}  \
+            \n\x1B[{col}C  Mortgage value{mortgage_value: >19}  \
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C  If 1 owned in set{rent_multiplier_level_1: >16}  \
+            \n\x1B[{col}C  If 2 owned in set{rent_multiplier_level_2: >16}  \
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \x1b[0m",
+            empty = " ",
+            row = top_starting_row,
+            col = left_starting_col,
+            set_colour = match self.colour.is_empty() {
+                true => WHITE_BACKGROUND,
+                false => &self.colour,
+            },
+            name = &self.name,
+            property_cost = format!("${}", &self.property_cost),
+            mortgage_value = format!("${}", &self.mortgage_value),
+            rent_multiplier_level_1 = format!("x{} dice sum", &self.rent_multiplier_levels[0]),
+            rent_multiplier_level_2 = format!("x{} dice sum", &self.rent_multiplier_levels[1]),
+        )
     }
 }

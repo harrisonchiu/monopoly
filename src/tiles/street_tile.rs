@@ -12,8 +12,11 @@ pub struct StreetTile {
     pub owner_colour: String,
     pub property_status: PropertyStatus,
     pub property_cost: i64,
+    pub mortgage_value: i64,
     pub rent: i64,
     pub rent_levels: Vec<i64>,
+    pub house_cost: i64,
+    pub hotel_cost: i64,
 }
 
 impl StreetTile {
@@ -38,8 +41,11 @@ impl StreetTile {
             owner_colour: "".to_string(),
             property_status: PropertyStatus::Unowned,
             property_cost: tile_data["property_cost"].as_i64().unwrap(),
+            mortgage_value: tile_data["mortgage_value"].as_i64().unwrap(),
             rent: rent[0],
             rent_levels: rent,
+            house_cost: tile_data["house_cost"].as_i64().unwrap(),
+            hotel_cost: tile_data["hotel_cost"].as_i64().unwrap(),
         }
     }
 
@@ -100,13 +106,22 @@ impl StreetTile {
         print!("{}{}\x1b[0m", self.colour, board::TILE_COLOURED_REGION);
     }
 
-    pub fn display_property_information(&self) {
+    pub fn clear_and_goto_line(&self, line: u8) {
         print!(
             // {line};{col}, the space erases previous info so text does not overlap
-            "\x1B[{1};{0}H       \x1B[{1};{0}H", // resets the cursor to draw
+            "\x1B[{1};{0}H{2:^tile_width$}\x1B[{1};{0}H", // resets the cursor to draw
             board::DISPLAY_BOARD_COORDS[self.id][0],
-            board::DISPLAY_BOARD_COORDS[self.id][1] + 1, // 2nd row of tile
-        );
+            // Line 1: colour, line 2: property info, line 3: player positions
+            // We subtract 1 because DISPLAY_BOARD_COORDS is already at line 1, so no need to add
+            board::DISPLAY_BOARD_COORDS[self.id][1] + line - 1,
+            " ",
+            tile_width = board::TILE_LENGTH_BY_CHAR
+        )
+    }
+
+    pub fn display_property_information(&self) {
+        self.clear_and_goto_line(2);
+
         match self.property_status {
             PropertyStatus::Mortgaged => print!("|MRTGAGE|"),
             PropertyStatus::Unowned => print!(" ${}", self.property_cost),
@@ -119,5 +134,64 @@ impl StreetTile {
             PropertyStatus::Tier4 => print!("{}4\x1b[0m ${}", self.owner_colour, self.rent),
             PropertyStatus::Tier5 => print!("{}H\x1b[0m ${}", self.owner_colour, self.rent),
         }
+    }
+
+    pub fn display_tile_id(&self) {
+        self.clear_and_goto_line(3);
+
+        print!(
+            "{:^tile_width$}",
+            self.id,
+            tile_width = board::TILE_LENGTH_BY_CHAR
+        );
+    }
+
+    pub fn display_card<'a>(&self, left_starting_col: usize, top_starting_row: usize) -> String {
+        const CARD_WIDTH: usize = 37;
+        const WHITE_BACKGROUND: &str = "\x1b[47m";
+        const BLACK_FOREGROUND: &str = "\x1b[30m";
+
+        // idk why one space is needed after H first line but it starts earlier
+        format!(
+            "\x1B[{row};{col}H {WHITE_BACKGROUND}{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
+            \n\x1B[{col}C{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
+            \n\x1B[{col}C{WHITE_BACKGROUND}{BLACK_FOREGROUND}{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C{name: ^CARD_WIDTH$}\
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C  Property cost{property_cost: >20}  \
+            \n\x1B[{col}C  Mortgage value{mortgage_value: >19}  \
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C  Rent{basic_rent: >29}  \
+            \n\x1B[{col}C  Rent with full set{full_set_rent: >15}  \
+            \n\x1B[{col}C  Rent with 1 house{one_house: >16}  \
+            \n\x1B[{col}C  Rent with 2 houses{two_house: >15}  \
+            \n\x1B[{col}C  Rent with 3 houses{three_house: >15}  \
+            \n\x1B[{col}C  Rent with 4 houses{four_house: >15}  \
+            \n\x1B[{col}C  Rent with hotel{hotel: >18}  \
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \n\x1B[{col}C  House cost{house_cost: >23}  \
+            \n\x1B[{col}C  Hotel cost{hotel_cost: >23}  \
+            \n\x1B[{col}C{empty: ^CARD_WIDTH$}\
+            \x1b[0m",
+            empty = " ",
+            row = top_starting_row,
+            col = left_starting_col,
+            set_colour = match self.colour.is_empty() {
+                true => WHITE_BACKGROUND,
+                false => &self.colour,
+            },
+            name = &self.name,
+            property_cost = format!("${}", &self.property_cost),
+            mortgage_value = format!("${}", &self.mortgage_value),
+            basic_rent = format!("${}", &self.rent_levels[0]),
+            full_set_rent = format!("${}", &self.rent_levels[0] * 2),
+            one_house = format!("${}", &self.rent_levels[1]),
+            two_house = format!("${}", &self.rent_levels[2]),
+            three_house = format!("${}", &self.rent_levels[3]),
+            four_house = format!("${}", &self.rent_levels[4]),
+            hotel = format!("${}", &self.rent_levels[5]),
+            house_cost = format!("${} each", &self.house_cost),
+            hotel_cost = format!("${} (after 4 houses)", &self.house_cost),
+        )
     }
 }

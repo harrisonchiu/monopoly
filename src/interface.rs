@@ -2,18 +2,22 @@ use board;
 use colours;
 use game::PropertySet;
 use player::Player;
+use tiles::{
+    board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
+    street_tile::StreetTile, utility_tile::UtilityTile,
+};
 
 pub const INSTRUCTIONS_MOVE: &str =
     "    | [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
 pub const INSTRUCTIONS_END_TURN: &str =
     "    | [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
 
-const START_LEFT: usize = board::BOARD_LENGTH_BY_CHAR + 3;
-const START_TOP: usize = 2;
-const WIDTH_OF_COLUMN: usize = 5;
-const WIDTH_OF_COLOUR_COLUMN: usize = 3;
+pub fn display_inventory(ownership_records: &Vec<PropertySet>, players: &Vec<Player>) {
+    const START_LEFT: usize = board::BOARD_LENGTH_BY_CHAR + 3;
+    const START_TOP: usize = 2; // 2 lines down from the top of the terminal
+    const WIDTH_OF_COLUMN: usize = 5;
+    const WIDTH_OF_COLOUR_COLUMN: usize = 3;
 
-pub fn inventory_display(ownership_records: &Vec<PropertySet>, players: &Vec<Player>) {
     let number_of_players = players.len();
 
     // Top table header showing the columns of every player in the game
@@ -28,10 +32,10 @@ pub fn inventory_display(ownership_records: &Vec<PropertySet>, players: &Vec<Pla
 
     // Border separating the top table header from the data columns
     print!(
-        "\x1B[{};{START_LEFT}H{:=<w$}",
+        "\x1B[{};{START_LEFT}H{:=<width$}",
         START_TOP + 1,
         "=",
-        w = WIDTH_OF_COLOUR_COLUMN + 1,
+        width = WIDTH_OF_COLOUR_COLUMN + 1,
     );
     for _ in 0..number_of_players {
         print!("======");
@@ -57,5 +61,24 @@ pub fn inventory_display(ownership_records: &Vec<PropertySet>, players: &Vec<Pla
                 print!("{:>WIDTH_OF_COLUMN$}|", number_of_tiles_of_a_set_owned);
             }
         }
+    }
+}
+
+pub fn display_board_tile(board_tile: &BoardTile) {
+    const START_LEFT: usize = 26;
+
+    fn clear_inside_board() {
+        for line in 7..33 {
+            print!("\x1B[{line};{START_LEFT}H{: <38}", " ");
+        }
+    }
+
+    clear_inside_board();
+    match board_tile {
+        BoardTile::Street(property) => print!("{}", property.display_card(START_LEFT, 11)),
+        BoardTile::Railroad(property) => print!("{}", property.display_card(START_LEFT, 17)),
+        BoardTile::Utility(property) => print!("{}", property.display_card(START_LEFT, 19)),
+        BoardTile::Event(tile) => print!("{}", tile.display_card(START_LEFT, 25)),
+        _ => todo!(),
     }
 }

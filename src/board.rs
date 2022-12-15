@@ -34,7 +34,7 @@ pub static DISPLAY_BOARD_COORDS: [[u8; 2]; BOARD_TOTAL_NUMBER_OF_TILES] = [
 ];
 
 pub struct Board {
-    board: Vec<BoardTile>,
+    pub board: Vec<BoardTile>,
 }
 
 impl Board {

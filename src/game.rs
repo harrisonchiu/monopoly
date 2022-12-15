@@ -5,7 +5,7 @@ pub type PropertySet = BTreeMap<String, HashSet<usize>>;
 use board::Board;
 use error;
 use interface;
-use player::{Pieces, Player};
+use player::Player;
 use tiles::{
     board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
     street_tile::StreetTile, utility_tile::UtilityTile,
@@ -31,7 +31,6 @@ pub struct Monopoly {
     /// Keeps track of which player owns which tiles according to their sets,
     /// organized in this way so it is easy to tell if a player completes their set
     ownership_records: Vec<PropertySet>,
-    test: i64,
 }
 
 impl Monopoly {
@@ -46,24 +45,30 @@ impl Monopoly {
         // with the rest of it. JSON is array of objects so it should preserve order; it should
         // define all the board tiles from GO (start) to Boardwalk (last tile before GO) in order
         let mut tiles: Vec<BoardTile> = Vec::<BoardTile>::new();
-        let mut property_sets: PropertySet = PropertySet::new();
+        let mut all_sets_with_their_tiles: PropertySet = PropertySet::new();
+        let mut ownable_sets_empty: PropertySet = PropertySet::new();
         for (id, tile_data) in json.as_array().unwrap().iter().skip(1).enumerate() {
+            all_sets_with_their_tiles
+                .entry(tile_data["set"].as_str().unwrap().to_string())
+                .or_insert(HashSet::from([id]))
+                .insert(id);
+
             match tile_data["type"].as_str().unwrap() {
                 "Street" => {
                     tiles.push(BoardTile::Street(StreetTile::new(id, tile_data)));
-                    property_sets
+                    ownable_sets_empty
                         .entry(tile_data["set"].as_str().unwrap().to_string())
                         .or_insert(HashSet::new());
                 }
                 "Railroad" => {
                     tiles.push(BoardTile::Railroad(RailroadTile::new(id, tile_data)));
-                    property_sets
+                    ownable_sets_empty
                         .entry(tile_data["set"].as_str().unwrap().to_string())
                         .or_insert(HashSet::new());
                 }
                 "Utility" => {
                     tiles.push(BoardTile::Utility(UtilityTile::new(id, tile_data)));
-                    property_sets
+                    ownable_sets_empty
                         .entry(tile_data["set"].as_str().unwrap().to_string())
                         .or_insert(HashSet::new());
                 }
@@ -71,7 +76,6 @@ impl Monopoly {
                 _ => continue,
             }
         }
-        println!("{:?}", property_sets);
 
         // Instantialize the players
         let mut players: Vec<Player> = Vec::<Player>::with_capacity(number_of_players);
@@ -84,28 +88,56 @@ impl Monopoly {
             players: players,
             dice: [StdRng::from_entropy(), StdRng::from_entropy()],
             dice_range: Uniform::new_inclusive(1, 6),
-            property_sets: property_sets.clone(),
+            property_sets: all_sets_with_their_tiles,
             ownership_records: Vec::<PropertySet>::from_iter(
-                repeat(property_sets).take(number_of_players),
+                repeat(ownable_sets_empty).take(number_of_players),
             ),
-            test: 3,
         }
     }
 
     pub fn display_game(&self) {
         // May need to use this to display other things e.g. logs, inventory, etc.
         self.board.display_board();
-        self.players
-            .iter()
-            .for_each(|player| player.display_at_position(player.position));
+        self.display_players();
         self.update_inventory_display();
     }
 
     pub fn update_inventory_display(&self) {
-        interface::inventory_display(&self.ownership_records, &self.players);
+        interface::display_inventory(&self.ownership_records, &self.players);
     }
 
-    // Getters for most fields of BoardTile structs
+    pub fn view_tile_ids(&self) {
+        // display_tile_id() already clears the line to print its id
+        for tile in &self.board.board {
+            match tile {
+                BoardTile::Street(property) => property.display_tile_id(),
+                BoardTile::Railroad(property) => property.display_tile_id(),
+                BoardTile::Utility(property) => property.display_tile_id(),
+                BoardTile::Event(tile) => tile.display_tile_id(),
+            }
+        }
+    }
+
+    pub fn display_players(&self) {
+        // Need to clear any duplicate players or display ids, in order to redraw the players
+        for tile in &self.board.board {
+            match tile {
+                BoardTile::Street(property) => property.clear_and_goto_line(3),
+                BoardTile::Railroad(property) => property.clear_and_goto_line(3),
+                BoardTile::Utility(property) => property.clear_and_goto_line(3),
+                BoardTile::Event(tile) => tile.clear_and_goto_line(3),
+            }
+        }
+        self.players
+            .iter()
+            .for_each(|player| player.display_at_position(player.position));
+    }
+
+    pub fn display_full_tile_info(&self, tile: usize) {
+        interface::display_board_tile(self.board.get_tile(tile));
+    }
+
+    /* Getters for most of each board tile struct's fields */
     pub fn get_tile_name(&self, position: usize) -> &String {
         match self.board.get_tile(position) {
             BoardTile::Street(property) => &property.name,
@@ -173,7 +205,7 @@ impl Monopoly {
         &self.players[id]
     }
 
-    // Actions player can do in the game
+    /* Actions players can do in the game */
     pub fn roll_dice(&mut self) -> [i8; 2] {
         [
             self.dice_range.sample(&mut self.dice[0]),
@@ -189,7 +221,7 @@ impl Monopoly {
         self.players[player].walk(dice[0] + dice[1])
     }
 
-    pub fn pay_rent_to(&mut self, tenent: usize, landlord: usize, rent: i64) {
+    pub fn pay_rent(&mut self, tenent: usize, landlord: usize, rent: i64) {
         self.players[tenent].pay(rent);
         self.players[landlord].collect(rent);
     }
@@ -230,8 +262,9 @@ impl Monopoly {
                 // Check if player completes the set to apply double rent rule on full set ownership
                 if self.is_set_complete(buyer, tile) {
                     let owned_set: &HashSet<usize> = &self.ownership_records[buyer][&set_name];
-                    for tile_in_set in owned_set {
-                        if let BoardTile::Street(t) = self.board.get_tile_mut(*tile_in_set) {
+                    for street_tile in owned_set {
+                        let tile_in_set: &mut BoardTile = self.board.get_tile_mut(*street_tile);
+                        if let BoardTile::Street(t) = tile_in_set {
                             t.update_rent_full_set()
                         }
                     }
@@ -246,9 +279,9 @@ impl Monopoly {
                 self.record_tile_ownership(buyer, &set_name, tile);
 
                 // Rent scales for all tiles in the set based on the number of it owned by the buyer
-                let owned_railroads = &self.ownership_records[buyer][&set_name];
-                for railroads_id in owned_railroads {
-                    let tile_in_set = self.board.get_tile_mut(*railroads_id);
+                let owned_railroads: &HashSet<usize> = &self.ownership_records[buyer][&set_name];
+                for railroad_tile in owned_railroads {
+                    let tile_in_set: &mut BoardTile = self.board.get_tile_mut(*railroad_tile);
                     if let BoardTile::Railroad(t) = tile_in_set {
                         t.update_rent_total_number_of_owned_railroads(owned_railroads.len());
                     }
@@ -263,9 +296,9 @@ impl Monopoly {
                 self.record_tile_ownership(buyer, &set_name, tile);
 
                 // Rent scales for all tiles in the set based on the number of it owned by the buyer
-                let owned_utilities = &self.ownership_records[buyer][&set_name];
-                for utility_id in owned_utilities {
-                    let tile_in_set = self.board.get_tile_mut(*utility_id);
+                let owned_utilities: &HashSet<usize> = &self.ownership_records[buyer][&set_name];
+                for utility_tile in owned_utilities {
+                    let tile_in_set: &mut BoardTile = self.board.get_tile_mut(*utility_tile);
                     if let BoardTile::Utility(t) = tile_in_set {
                         t.update_rent_total_number_of_owned_utilities(owned_utilities.len());
                     }
