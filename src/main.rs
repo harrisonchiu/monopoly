@@ -20,38 +20,30 @@ use player::Pieces;
 
 #[derive(PartialEq)]
 enum Action {
-    /// (-inf, -1] - Error codes
-    /// [0, 99] - Actual numbers used to
-    /// 1XX - Normal game actions
-    /// 2XX - Debug actions
-    ///
-    Move = 1,
-    BuyProperty = 2,
-    ViewProperty = 103,
-    // when viewing tiles does
-    // not conflict with inputting commands
-    Redraw = 99,
-    Error = -99,
+    Move,
+    BuyProperty,
+    ViewIndex,
+    ViewProperty,
+
+    Trade,
+    TradeStart,
+    GiveTile,
+    GiveMoney,
+    TakeTile,
+    TakeMoney,
+    MinePop,
+    TheirPop,
+    Propose,
+    Reject,
+    Accept,
+    Abort,
+
+    Redraw,
+    None,
+    Error,
 }
 
-fn get_number_argument_from_command<'a>(input: &'a String) -> Option<i32> {
-    //! A number command is a 2 argument &str user input that is a directive.
-    //! The number will always follow the string command.
-    //! A number command is of the format: "<SINGLE_COMMAND_WORD> <ONE_NUMBER>"
-    //! Ex: let number_command: &str = "view 39";
-    if let Ok(number_argument) = input
-        .split_whitespace()
-        .nth(1)
-        .unwrap_or_default()
-        .parse::<i32>()
-    {
-        Some(number_argument)
-    } else {
-        None
-    }
-}
-
-fn prompt(id: usize) -> (Action, Option<i32>) {
+fn prompt(id: usize) -> (Action, Action, i64) {
     display::move_cursor_to_input();
     print!(
         "[{}Player {}\x1b[0m] >>> ",
@@ -65,33 +57,63 @@ fn prompt(id: usize) -> (Action, Option<i32>) {
         .read_line(&mut input_text)
         .expect("Failed to read from stdin!");
 
-    let number_argument: Option<i32> = get_number_argument_from_command(&input_text);
+    let mut args: [&str; 4] = ["", "", "", ""];
+    let mut number_argument: i64 = -99;
+    for (i, arg) in input_text.split_whitespace().enumerate().take(args.len()) {
+        args[i] = arg;
+        number_argument = arg.parse::<i64>().ok().unwrap_or_else(|| -99);
+    }
 
-    match input_text.trim() {
-        "move" | "roll" | "end" | "r" => (Action::Move, None),
-        "buy" | "b" => (Action::BuyProperty, None),
-        "view" | "v" => (Action::ViewProperty, None),
-        "redraw" => (Action::Redraw, None),
-        command if command.starts_with("view") && number_argument.is_some() => {
-            display::debug("SDFSDFSDFSDf");
-            (Action::ViewProperty, number_argument)
+    match args[0] {
+        "roll" | "r" => (Action::Move, Action::None, -99),
+        "buy" | "b" => (Action::BuyProperty, Action::None, -99),
+        "view" | "v" => {
+            if number_argument >= 0 {
+                (Action::ViewProperty, Action::None, number_argument)
+            } else {
+                (Action::ViewIndex, Action::None, -99)
+            }
         }
-        /// need to view property by index (view id)
-        /// need to trade money by numbers (give/take money)
-        /// need to bid by giving numbers (auction price)
-        /// maybe the numbers can be suffixed for these commands and
-        /// those non number commands will just give status code like http status
-        _ => (Action::Error, Some(-99)),
+        "trade" | "t" => {
+            if args[1] == "start" {
+                (Action::Trade, Action::TradeStart, number_argument)
+            } else if (args[1], args[2]) == ("give", "tile") {
+                (Action::Trade, Action::GiveTile, number_argument)
+            } else if (args[1], args[2]) == ("give", "money") {
+                (Action::Trade, Action::GiveMoney, number_argument)
+            } else if (args[1], args[2]) == ("take", "tile") {
+                (Action::Trade, Action::TakeTile, number_argument)
+            } else if (args[1], args[2]) == ("take", "money") {
+                (Action::Trade, Action::TakeMoney, number_argument)
+            } else if (args[1], args[2]) == ("mine", "pop") {
+                (Action::Trade, Action::MinePop, number_argument)
+            } else if (args[1], args[2]) == ("their", "pop") {
+                (Action::Trade, Action::TheirPop, number_argument)
+            } else if args[1] == "propose" {
+                (Action::Trade, Action::Propose, -99)
+            } else if args[1] == "accept" {
+                (Action::Trade, Action::Accept, -99)
+            } else if args[1] == "reject" {
+                (Action::Trade, Action::Reject, -99)
+            } else if args[1] == "abort" {
+                (Action::Trade, Action::Abort, -99)
+            } else {
+                (Action::Trade, Action::None, -99)
+            }
+        }
+        "redraw" => (Action::Redraw, Action::None, -99),
+        _ => (Action::Error, Action::Error, -99),
     }
 }
 
 fn main() {
-    const NUMBER_OF_PLAYERS: usize = 1;
+    const NUMBER_OF_PLAYERS: usize = 2;
 
     let mut game: Monopoly = Monopoly::new(NUMBER_OF_PLAYERS);
     game.display_game();
 
     let mut is_dice_rollable: bool = true;
+    let mut is_trade_started: bool = false;
     let mut view_menu: bool = true;
     for id in (0..NUMBER_OF_PLAYERS).cycle() {
         display::terminal_bell();
@@ -99,7 +121,7 @@ fn main() {
         display::flush_buffer();
 
         #[allow(irrefutable_let_patterns)]
-        while let (command, number) = prompt(id) {
+        while let (command, subcommand, number) = prompt(id) {
             if command == Action::Move && is_dice_rollable {
                 let dice: [i8; 2] = game.roll_dice();
                 let tile: usize = game.move_player(id, &dice);
@@ -111,7 +133,10 @@ fn main() {
                     display::inform(interface::INSTRUCTIONS_END_TURN);
                     display::output("[*] ");
                 }
-                print!("Rolled {dice:?}, landing on {}. ", game.get_tile_name(tile));
+                print!(
+                    "Rolled {dice:?}, landing on {}. ",
+                    &game.get_tile_name(tile)
+                );
 
                 let rent: i64 = game.get_rent(tile, &dice);
                 if let Some(landlord) = game.get_owner(tile) {
@@ -139,28 +164,154 @@ fn main() {
                     game.update_inventory_display();
                     display::output(format!(
                         "[*] Purchased {} for ${}. Amount of money remaining ${}.",
-                        game.get_tile_name(purchased_tile),
+                        &game.get_tile_name(purchased_tile),
                         game.get_property_cost(purchased_tile),
                         game.get_player(id).money
                     ));
                 } else if let Some(landlord) = game.get_owner(tile) {
                     display::output(format!(
                         "[!] Cannot purchase tile! {} is already owned by {}Player {}\x1b[0m.",
-                        game.get_tile_name(tile),
+                        &game.get_tile_name(tile),
                         &Pieces::colour(&landlord),
                         &Pieces::avatar(&landlord)
                     ));
                 } else {
                     display::output("[!] Cannot purchase tile! Tile cannot be owned!");
                 }
-            } else if command == Action::ViewProperty && number.is_none() {
+            } else if command == Action::ViewIndex {
                 match view_menu {
                     true => game.view_tile_ids(),
                     false => game.display_players(),
                 }
                 view_menu = !view_menu;
-            } else if command == Action::ViewProperty && number.is_some() {
-                game.display_full_tile_info(number.unwrap() as usize);
+            } else if command == Action::ViewProperty {
+                game.display_full_tile_info(number as usize);
+            } else if command == Action::Trade {
+                interface::clear_inside_board();
+                if NUMBER_OF_PLAYERS <= 1 {
+                    continue;
+                }
+
+                match subcommand {
+                    Action::TradeStart if !is_trade_started => {
+                        if (0..NUMBER_OF_PLAYERS).contains(&(number as usize))
+                            && id != number as usize
+                        {
+                            game.trade_start(id, number as usize);
+                            is_trade_started = true;
+                            display::output("[*] Started trade");
+                        } else if id == number as usize {
+                            display::output("[!] Cannot trade with yourself!");
+                        } else {
+                            display::output("[!] Unknown player ID");
+                        }
+                    }
+                    Action::TradeStart if is_trade_started => {
+                        display::output("[!] Already started trade!");
+                    }
+                    Action::GiveTile if is_trade_started => {
+                        if game.trade_give_tile(number as usize) {
+                            display::output(&format!("[*] Offered tile id {number}"));
+                        } else {
+                            display::output(&format!("[!] You do not own tile id {number}"));
+                        }
+                    }
+                    Action::GiveMoney if is_trade_started => {
+                        if game.trade_give_money(number) {
+                            display::output(&format!("[*] Offered ${number}"));
+                        } else {
+                            display::output(&format!("[!] You do not have ${number}"));
+                        }
+                    }
+                    Action::TakeTile if is_trade_started => {
+                        if game.trade_take_tile(number as usize) {
+                            display::output(&format!(
+                                "[*] Asked for tile id {number} from receiver"
+                            ));
+                        } else {
+                            display::output(&format!("[!] Receiver does not own tile id {number}"));
+                        }
+                    }
+                    Action::TakeMoney if is_trade_started => {
+                        if game.trade_take_money(number) {
+                            display::output(&format!("[*] Asked for ${number} from receiver"));
+                        }
+                        display::output(&format!("[!] Receiver does not have ${number}"));
+                    }
+                    Action::MinePop if is_trade_started => {
+                        if game.trade_mine_pop(number) {
+                            display::output(&format!(
+                                "[*] Removed trade item id {number} from proposer's offer"
+                            ));
+                        } else {
+                            display::output(&format!(
+                                "[*] Unknown item id {number} in proposer's offer"
+                            ));
+                        }
+                    }
+                    Action::TheirPop if is_trade_started => {
+                        if game.trade_their_pop(number) {
+                            display::output(&format!(
+                                "[*] Removed trade item id {number} from receiver's offer"
+                            ));
+                        } else {
+                            display::output(&format!(
+                                "[*] Unknown item id {number} in receiver's offer"
+                            ));
+                        }
+                    }
+                    Action::Propose if is_trade_started => loop {
+                        game.display_trading_desk();
+                        display::output(
+                            "[*] Switch to receiver, \
+                        so they can choose to accept or reject the trade",
+                        );
+                        match prompt(game.receiver) {
+                            (Action::Trade, Action::Accept, -99) => {
+                                game.accept_trade();
+                                display::output("[*] Trade accepted!");
+                                is_trade_started = false;
+                                break;
+                            }
+                            (Action::Trade, Action::Reject, -99) => {
+                                game.reject_trade();
+                                display::output("[*] Trade rejected!");
+                                is_trade_started = false;
+                                break;
+                            }
+                            _ => display::output("[!] Only commands: trade accept | trade reject"),
+                        }
+                    },
+                    Action::Abort if is_trade_started => {
+                        game.clear_trade();
+                        interface::clear_inside_board();
+                        is_trade_started = false;
+                        display::output("[*] Trade has been aborted");
+                    }
+                    Action::None if !is_trade_started => {
+                        display::output(format!("[*] Trade with someone: {}", Pieces::view_ids()));
+                    }
+                    Action::None if is_trade_started => {
+                        display::output(
+                            "[*] Trade commands: trade \
+                        {start X|give/take tile/money X|my/their pop X|propose/reject/abort}",
+                        );
+                    }
+                    // An actual trade command ran but a trade has not been started
+                    // so the game does not know which players to fetch info from
+                    _ if !is_trade_started => {
+                        display::output(
+                            "[!] You must start a trade with someone first! \
+                            Run: trade start <PLAYER_ID>",
+                        );
+                    }
+                    _ => display::output("[!] Unknown trade command"),
+                }
+                if is_trade_started {
+                    game.display_trading_desk();
+                }
+
+                game.update_inventory_display();
             } else if command == Action::Redraw {
                 display::clear_display();
                 display::flush_buffer();

@@ -48,7 +48,6 @@ impl EventTile {
         // idk why one space is needed after H first line but it starts earlier
         format!(
             "\x1B[{row};{col}H {WHITE_BACKGROUND}{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
-            \n\x1B[{col}C{set_colour}{empty: ^CARD_WIDTH$}\x1b[0m\
             \n\x1B[{col}C{WHITE_BACKGROUND}{BLACK_FOREGROUND}{empty: ^CARD_WIDTH$}\
             \n\x1B[{col}C{name: ^CARD_WIDTH$}\
             \n\x1B[{col}C{empty: ^CARD_WIDTH$}\

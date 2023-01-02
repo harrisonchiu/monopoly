@@ -23,6 +23,16 @@ impl Pieces {
             _ => &'?',
         }
     }
+
+    pub fn view_ids<'a>() -> String {
+        format!(
+            "{}: ID 0 // {}: ID 1 // {}: ID 2 // {}: ID 3",
+            Self::avatar(&0),
+            Self::avatar(&1),
+            Self::avatar(&2),
+            Self::avatar(&3)
+        )
+    }
 }
 
 pub struct Player {

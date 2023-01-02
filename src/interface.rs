@@ -2,15 +2,13 @@ use board;
 use colours;
 use game::PropertySet;
 use player::Player;
-use tiles::{
-    board_tile::BoardTile, event_tile::EventTile, railroad_tile::RailroadTile,
-    street_tile::StreetTile, utility_tile::UtilityTile,
-};
+use std::collections::BTreeMap;
+use tiles::board_tile::BoardTile;
 
 pub const INSTRUCTIONS_MOVE: &str =
-    "    | [1] Roll/Move | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+    "    | [r] Roll/Move | [b] Buy Property | [v] View a Property | [4] Trade | [5] Quit |";
 pub const INSTRUCTIONS_END_TURN: &str =
-    "    | [1] End Turn | [2] Buy Property | [3] View a Property | [4] Trade | [5] Quit |";
+    "    | [r] End Turn | [b] Buy Property | [v] View a Property | [4] Trade | [5] Quit |";
 
 pub fn display_inventory(ownership_records: &Vec<PropertySet>, players: &Vec<Player>) {
     const START_LEFT: usize = board::BOARD_LENGTH_BY_CHAR + 3;
@@ -64,14 +62,15 @@ pub fn display_inventory(ownership_records: &Vec<PropertySet>, players: &Vec<Pla
     }
 }
 
+pub fn clear_inside_board() {
+    const START_LEFT: usize = 26;
+    for line in 7..33 {
+        print!("\x1B[{line};{START_LEFT}H{: <38}", " ");
+    }
+}
+
 pub fn display_board_tile(board_tile: &BoardTile) {
     const START_LEFT: usize = 26;
-
-    fn clear_inside_board() {
-        for line in 7..33 {
-            print!("\x1B[{line};{START_LEFT}H{: <38}", " ");
-        }
-    }
 
     clear_inside_board();
     match board_tile {
@@ -81,4 +80,59 @@ pub fn display_board_tile(board_tile: &BoardTile) {
         BoardTile::Event(tile) => print!("{}", tile.display_card(START_LEFT, 25)),
         _ => todo!(),
     }
+}
+
+pub fn display_trading_desk(
+    proposer_avatar: char,
+    proposer_money: i64,
+    proposer_tiles: &BTreeMap<usize, String>,
+    receiver_avatar: char,
+    receiver_money: i64,
+    receiver_tiles: &BTreeMap<usize, String>,
+) {
+    const CARD_WIDTH: usize = 37;
+    const WHITE_BACKGROUND: &str = "\x1b[47m";
+    const BLACK_FOREGROUND: &str = "\x1b[30m";
+
+    for row in 7..19 {
+        print!(
+            "\x1B[{row};27H{WHITE_BACKGROUND}{BLACK_FOREGROUND}{empty: ^CARD_WIDTH$}",
+            empty = " "
+        );
+    }
+
+    print!(
+        "\x1B[7;27H{: ^CARD_WIDTH$}",
+        format!("Player {} Offerings (ITEM_ID: ITEM)", proposer_avatar)
+    );
+
+    if proposer_money != 0 {
+        print!("\x1B[8;27H  100: ${proposer_money}");
+    }
+
+    for (i, (tile_id, tile_name)) in proposer_tiles.iter().enumerate() {
+        print!("\x1B[{row};27H  {tile_id}: {tile_name}", row = i + 9);
+    }
+    print!("\x1B[0m");
+
+    for row in 20..32 {
+        print!(
+            "\x1B[{row};27H{WHITE_BACKGROUND}{BLACK_FOREGROUND}{empty: ^CARD_WIDTH$}",
+            empty = " "
+        );
+    }
+
+    print!(
+        "\x1B[20;27H{: ^CARD_WIDTH$}",
+        format!("Player {} Offerings (ITEM_ID: ITEM)", receiver_avatar)
+    );
+
+    if receiver_money != 0 {
+        print!("\x1B[21;27H  100: ${receiver_money}");
+    }
+
+    for (i, (tile_id, tile_name)) in receiver_tiles.iter().enumerate() {
+        print!("\x1B[{row};27H  {tile_id}: {tile_name}", row = i + 22);
+    }
+    print!("\x1B[0m");
 }
