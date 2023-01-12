@@ -1,0 +1,242 @@
+[
+    {
+        "name": "Go",
+        "display_name": "GO",
+        "type": "Event",
+        "set": "Corner"
+    },
+    {
+        "name": "Mediterranean Avenue",
+        "display_name": "MEDIT AVE",
+        "type": "Street",
+        "set": "Brown"
+    },
+    {
+        "name": "Community Chest 1",
+        "display_name": "CHEST",
+        "type": "Event",
+        "set": "Chest"
+    },
+    {
+        "name": "Baltic Avenue",
+        "display_name": "BALTIC AVE",
+        "type": "Street",
+        "set": "Brown"
+    },
+    {
+        "name": "Income Tax",
+        "display_name": "INCOME TAX",
+        "type": "Event",
+        "set": "Tax"
+    },
+    {
+        "name": "Reading Railroad",
+        "display_name": "READING RR",
+        "type": "Railroad",
+        "set": "Railroad"
+    },
+    {
+        "name": "Oriental Avenue",
+        "display_name": "ORNTL AVE",
+        "type": "Street",
+        "set": "Cyan"
+    },
+    {
+        "name": "Chance 1",
+        "display_name": "CHANCE?",
+        "type": "Event",
+        "set": "Chance"
+    },
+    {
+        "name": "Vermont Avenue",
+        "display_name": "VERMONT AVE",
+        "type": "Street",
+        "set": "Cyan"
+    },
+    {
+        "name": "Connecticut Avenue",
+        "display_name": "CONNECT AVE",
+        "type": "Street",
+        "set": "Cyan"
+    },
+    {
+        "name": "Visiting Jail",
+        "display_name": "VISIT JAIL",
+        "type": "Event",
+        "set": "Corner"
+    },
+    {
+        "name": "St. Charles Place",
+        "display_name": "CHARLES PLACE",
+        "type": "Street",
+        "set": "Magenta"
+    },
+    {
+        "name": "Electric Company",
+        "display_name": "ELEC COMPANY",
+        "type": "Utility",
+        "set": "Utility"
+    },
+    {
+        "name": "States Avenue",
+        "display_name": "STATES AVE",
+        "type": "Street",
+        "set": "Magenta"
+    },
+    {
+        "name": "Virginia Avenue",
+        "display_name": "VIRGNIA AVE",
+        "type": "Street",
+        "set": "Magenta"
+    },
+    {
+        "name": "Pennsylvania Railroad",
+        "display_name": "PENN RR",
+        "type": "Railroad",
+        "set": "Railroad"
+    },
+    {
+        "name": "St. James Place",
+        "display_name": "JAMES PLACE",
+        "type": "Street",
+        "set": "Orange"
+    },
+    {
+        "name": "Community Chest 2",
+        "display_name": "CHEST",
+        "type": "Event",
+        "set": "Chest"
+    },
+    {
+        "name": "Tennessee Avenue",
+        "display_name": "TENN AVE",
+        "type": "Street",
+        "set": "Orange"
+    },
+    {
+        "name": "New York Avenue",
+        "display_name": "NEWYORK AVE",
+        "type": "Street",
+        "set": "Orange"
+    },
+    {
+        "name": "Free Parking",
+        "display_name": "FREE PARK",
+        "type": "Event",
+        "set": "Corner"
+    },
+    {
+        "name": "Kentucky Avenue",
+        "display_name": "KNTUCKY AVE",
+        "type": "Street",
+        "set": "Red"
+    },
+    {
+        "name": "Chance 2",
+        "display_name": "CHANCE?",
+        "type": "Event",
+        "set": "Chance"
+    },
+    {
+        "name": "Indiana Avenue",
+        "display_name": "INDIANA AVE",
+        "type": "Street",
+        "set": "Red"
+    },
+    {
+        "name": "Illinois Avenue",
+        "display_name": "ILLNOIS AVE",
+        "type": "Street",
+        "set": "Red"
+    },
+    {
+        "name": "B. & O. Railroad",
+        "display_name": "B&O RR",
+        "type": "Railroad",
+        "set": "Railroad"
+    },
+    {
+        "name": "Atlantic Avenue",
+        "display_name": "ATLANTC AVE",
+        "type": "Street",
+        "set": "Yellow"
+    },
+    {
+        "name": "Ventnor Avenue",
+        "display_name": "VENTNOR AVE",
+        "type": "Street",
+        "set": "Yellow"
+    },
+    {
+        "name": "Water Works",
+        "display_name": "WATER WORKS",
+        "type": "Utility",
+        "set": "Utility"
+    },
+    {
+        "name": "Marvin Gardens",
+        "display_name": "MARVIN GARDENS",
+        "type": "Street",
+        "set": "Yellow"
+    },
+    {
+        "name": "Go To Jail",
+        "display_name": "GOTO JAIL",
+        "type": "Event",
+        "set": "Corner"
+    },
+    {
+        "name": "Pacific Avenue",
+        "display_name": "PACIFIC AVE",
+        "type": "Street",
+        "set": "Green"
+    },
+    {
+        "name": "North Carolina Avenue",
+        "display_name": "CAROLNA AVE",
+        "type": "Street",
+        "set": "Green"
+    },
+    {
+        "name": "Community Chest 3",
+        "display_name": "CHEST",
+        "type": "Event",
+        "set": "Chest"
+    },
+    {
+        "name": "Pennsylvania Avenue",
+        "display_name": "PENN AVE",
+        "type": "Street",
+        "set": "Green"
+    },
+    {
+        "name": "Short Railroad",
+        "display_name": "SHORT RR",
+        "type": "Railroad",
+        "set": "Railroad"
+    },
+    {
+        "name": "Chance 1",
+        "display_name": "CHANCE?",
+        "type": "Event",
+        "set": "Chance"
+    },
+    {
+        "name": "Park Place",
+        "display_name": "PARK PLACE",
+        "type": "Street",
+        "set": "Blue"
+    },
+    {
+        "name": "Luxury Tax",
+        "display_name": "LUXURY TAX",
+        "type": "Event",
+        "set": "Tax"
+    },
+    {
+        "name": "Boardwalk",
+        "display_name": "BRDWALK",
+        "type": "Street",
+        "set": "Blue"
+    }
+]
