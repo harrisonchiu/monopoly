@@ -1,0 +1,32 @@
+roll
+
+buy
+
+view
+view X
+
+trade start X 
+trade give X // if money, prepend $, otherwise it will look for tileid
+trade take X // if money, prepend $, otherwise it will look for tileid
+trade del X // where X is trade item id [0..n], increases by 1 for every `trade give`
+trade propose
+trade accept
+trade reject
+trade abort
+
+my_table: { int player_id: money, int trade_id: int tile_id }, where trade_id in [10..]
+    therefore player_id doesnot intersect trade_id
+    trades with money will update current money offer (does not create new money offer/trade_id)
+
+
+
+manage mortgage X
+manage buy X // upgrades property buildings by 1
+manage sell X // downgrades property buildings by 1
+
+auction start X
+auction bid X
+auction forfeit
+
+//
+party is struct that contains all players
