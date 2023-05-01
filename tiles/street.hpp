@@ -8,6 +8,8 @@
 #include <tiles/tile.hpp>
 
 class Street : public Property {
+  using json = nlohmann::json;
+
 protected:
   std::string get_property_status_label() const override;
 

@@ -1,7 +1,5 @@
 #include <string>
 
-#include <fmt/color.h>
-
 #include <board.hpp>
 #include <tiles/corner.hpp>
 #include <utils/color.hpp>

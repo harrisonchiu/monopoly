@@ -7,8 +7,6 @@
 
 #include <player.hpp>
 
-typedef nlohmann::json json;
-
 enum class TileType { Property, Event };
 
 enum class PropertyStatus {
@@ -23,6 +21,8 @@ enum class PropertyStatus {
 };
 
 class Tile {
+  using json = nlohmann::json;
+
 private:
   const int id;
   std::string name;
@@ -49,6 +49,8 @@ public:
 };
 
 class Property : public Tile {
+  using json = nlohmann::json;
+
 private:
   static constexpr Avatar no_owner{};
 
@@ -68,6 +70,8 @@ public:
 };
 
 class Event : public Tile {
+  using json = nlohmann::json;
+
 public:
   Event(const json &tile_data, int id) : Tile(tile_data, id) {}
   consteval TileType get_type() const override { return TileType::Event; }

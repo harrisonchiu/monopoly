@@ -5,8 +5,7 @@
 #include <array>
 #include <string_view>
 
-template <typename Key, typename Value, std::size_t Size>
-struct CompileTimeMap {
+template <typename Key, typename Value, size_t Size> struct CompileTimeMap {
   std::array<std::pair<Key, Value>, Size> data;
 
   constexpr Value at(const Key &key, const Value &default_value) const {
@@ -16,7 +15,6 @@ struct CompileTimeMap {
     if (iterator != end(data)) {
       return iterator->second;
     } else {
-      // throw std::range_error("Key Not Found in Map");
       return default_value;
     }
   }

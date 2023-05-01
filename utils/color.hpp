@@ -1,6 +1,7 @@
 #ifndef COLOR_HPP
 #define COLOR_HPP
 
+#include <array>
 #include <string>
 #include <string_view>
 
@@ -32,7 +33,7 @@ private:
   static constexpr auto map = CompileTimeMap<sv, ts, colors.size()>{{colors}};
 
 public:
-  static constexpr ts get(const std::string &color) {
+  static constexpr ts get(const std::string_view color) {
     return map.at(color, no_color);
   };
 

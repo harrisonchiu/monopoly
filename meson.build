@@ -4,6 +4,6 @@ tiles_src = [
     'tiles/street.cpp',
     'tiles/corner.cpp'
 ]
-src = ['main.cpp', 'board.cpp', 'player.cpp', tiles_src]
+src = ['main.cpp', 'board.cpp', 'player.cpp', 'view.cpp', tiles_src]
 
 executable('monopoly', src)

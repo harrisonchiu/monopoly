@@ -2,35 +2,27 @@
 #define BOARD_HPP
 
 #include <array>
+#include <queue>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <fmt/args.h>
+#include <fmt/color.h>
 #include <fmt/compile.h>
-#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include <tiles/tile.hpp>
 #include <utils/color.hpp>
-
-struct Size {
-  const int width{};
-  const int height{};
-};
+#include <utils/component.hpp>
+#include <utils/sorting.hpp>
+#include <utils/substrings.hpp>
 
 class Board {
+  using json = nlohmann::json;
+
 private:
   static constexpr int length_of_tile = 7;
   static constexpr int number_of_tiles = 40;
-
-  // typedef std::variant<Property, Event> board_tile;
-  // std::vector<std::variant<std::unique_ptr<Property>,
-  // std::unique_ptr<Event>>> board;
-  std::vector<std::unique_ptr<Tile>> board;
-
-  // Actual ids label each tile starting from GO (0) to the last tile (39)
-  // Visual ids label each tile iterated as a multi-lined string
-  // starting from top to bottom, left to right
 
   // Given the actual tile ids (index), get the visual tile ids (value)
   static constexpr std::array<int, number_of_tiles> actual_to_visual_order{
@@ -40,92 +32,124 @@ private:
 
   // Given the visual tile ids (index), get the actual tile ids (value)
   static constexpr std::array<int, number_of_tiles> visual_to_actual_order{
-      30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 31, 18,
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 19, 31, 18,
       32, 17, 33, 16, 34, 15, 35, 14, 36, 13, 37, 12, 38, 11,
       39, 10, 9,  8,  7,  6,  5,  4,  3,  2,  1,  0};
+  // Actual ids label each tile starting from GO (0) to the last tile (39)
+  // Visual ids label each tile iterated as a multi-lined string
+  // starting from top to bottom, left to right
 
-  // kColorPlaceholder MUST be 21 chars long because its replacement "▔▔▔▔▔▔▔"
-  // is a unicode str that is 21 in length. So when we take note of every index
-  // where this color placeholder occurs and then replace it, the size of the
-  // string and thus the index location does not change. This is also why the
-  // color placeholder already has a background colored formatted string: it
-  // adds chars and changes the length. We want the placeholder to not only
-  // be unique and descriptive, it should also be similar visually and bitwise.
-  // A background colored ▔▔▔▔▔▔▔ using fmtlib seems to always be 44 chars.
-  const std::string color_placeholder =
-      fmt::format(Color::none(), "COLOR_PLACEHOLDER_21L");
+  std::vector<std::unique_ptr<Tile>> board;
 
-  // Similar to kColorPlaceholder, we want the placeholder to be similar
-  // visually and bitwise to maintain consistency when we replace this
-  // placeholder. They take the form of what will appear.
-  // Info will always be a string of $ with 4 chars reserved
-  // for the digits (price) seperated by a space with 1 styled ASCII char
-  const std::string detail_placeholder =
-      fmt::format("$NNNN|{}", fmt::styled("X", Color::none()));
-  const std::string player_placeholder =
-      fmt::format("{} {} {} {}", Color::empty(1), Color::empty(1),
-                  Color::empty(1), Color::empty(1));
+  // @ascii_board is the main structure of the board with display_names
+  // tile_* holds the strings that will be printed ontop of @ascii_board
+  // Originally, @ascii_board had substrings replaced and entire @ascii_board
+  // reprited, but it would cause the terminal screen to flash which is
+  // annoying. Colors could be part of @ascii_board instead of the arrays, but
+  // it is more consistent with the other tile rows
+  std::string ascii_board{base_board};
+  std::array<std::string, number_of_tiles> tile_colors;
+  std::array<std::string, number_of_tiles> tile_details;
+  std::array<std::string, number_of_tiles> tile_players;
 
-  // Indices of the placeholders found in $ascii_board
-  std::vector<int> color_indices;
-  std::vector<int> detail_indices;
-  std::vector<int> player_indices;
+  using update_queue = std::shared_ptr<std::queue<int>>;
+  update_queue(tile_color_update_queue) = std::make_shared<std::queue<int>>();
+  update_queue(tile_detail_update_queue) = std::make_shared<std::queue<int>>();
+  update_queue(tile_player_update_queue) = std::make_shared<std::queue<int>>();
 
-  std::string ascii_board = R"(
-{INDENT} {{31:^7}} {{33:^7}} {{35:^7}} {{37:^7}} {{39:^7}} {{41:^7}} {{43:^7}} {{45:^7}} {{47:^7}} {{49:^7}} {{51:^7}}
-{INDENT} {{32:^7}} {{34:^7}} {{36:^7}} {{38:^7}} {{40:^7}} {{42:^7}} {{44:^7}} {{46:^7}} {{48:^7}} {{50:^7}} {{52:^7}}
-{INDENT}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|
-{INDENT}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|
-{INDENT}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|
-{INDENT}|{COLOR}|▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔|{COLOR}|
-{INDENT}|{INFOS}| {{30:<15}} | {CORE_PAD}                                  | {{53:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{29:<15}} | {CORE_PAD}                                  | {{54:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{28:<15}} | {CORE_PAD}                                  | {{55:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{27:<15}} | {CORE_PAD}                                  | {{56:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{26:<15}} | {CORE_PAD}                                  | {{57:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{25:<15}} | {CORE_PAD}                                  | {{58:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{24:<15}} | {CORE_PAD}                                  | {{59:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{23:<15}} | {CORE_PAD}                                  | {{60:>15}} |{INFOS}|
-{INDENT}|{USERS}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{USERS}|
-{INDENT}|{COLOR}| {SIDE_PAD} | {CORE_PAD}                                  | {SIDE_PAD} |{COLOR}|
-{INDENT}|{INFOS}| {{22:<15}} | {CORE_PAD}                                  | {{61:>15}} |{INFOS}|
-{INDENT}|{USERS}|                                                                       |{USERS}|
-{INDENT}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|{COLOR}|
-{INDENT}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|{INFOS}|
-{INDENT}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|{USERS}|
-{INDENT} ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ 
-{INDENT} {{20:^7}} {{18:^7}} {{16:^7}} {{14:^7}} {{12:^7}} {{10:^7}} {{8:^7}} {{6:^7}} {{4:^7}} {{2:^7}} {{0:^7}}
-{INDENT} {{21:^7}} {{19:^7}} {{17:^7}} {{15:^7}} {{13:^7}} {{11:^7}} {{9:^7}} {{7:^7}} {{5:^7}} {{3:^7}} {{1:^7}}
+  // Named arguments with brackets have the same length as the actual tile
+  // length. Therefore, it has the dimensions and visual base look of the board
+  // even before the placeholders are put there.
+  // This uses unicode char ▔. It is easier to iterate with wchar_t or wstring
+  // variations but it does not support constexpr as well and cannot easily
+  // convert to and from regular string.
+  // {NNN...} replaces unicode box char ▔, to easily to find substrings indices
+  // Unicode chars are considered as multiple chars. They are bigger than ASCII
+  static constexpr std::string_view base_board = R"(
+   {31:^7} {33:^7} {35:^7} {37:^7} {39:^7} {41:^7} {43:^7} {45:^7} {47:^7} {49:^7} {51:^7} 
+   {32:^7} {34:^7} {36:^7} {38:^7} {40:^7} {42:^7} {44:^7} {46:^7} {48:^7} {50:^7} {52:^7} 
+  |CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|
+  |DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|
+  |PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|
+  |CCCCCCC|{NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN}|CCCCCCC|
+  |DDDDDDD| {30:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {53:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {29:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {54:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {28:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {55:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {27:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {56:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {26:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {57:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {25:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {58:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {24:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {59:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {23:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {60:>15} |DDDDDDD|
+  |PPPPPPP| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |PPPPPPP|
+  |CCCCCCC| {INDENT} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {INDENT} |CCCCCCC|
+  |DDDDDDD| {22:<15} | {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII} | {61:>15} |DDDDDDD|
+  |PPPPPPP|                                                                       |PPPPPPP|
+  |CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|
+  |DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|
+  |PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|
+   ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+   {20:^7} {18:^7} {16:^7} {14:^7} {12:^7} {10:^7} {8:^7} {6:^7} {4:^7} {2:^7} {0:^7}      
+   {21:^7} {19:^7} {17:^7} {15:^7} {13:^7} {11:^7} {9:^7} {7:^7} {5:^7} {3:^7} {1:^7}      
 )";
 
+  // Find the (X, Y) coords of the substrings where origin (0, 0) is top left
+  // Finding and sorting to actual tile order should be done during compilation
+  static constexpr std::array<Position, number_of_tiles> color_coords =
+      sort_by_order<Position, number_of_tiles>(
+          find_coords<number_of_tiles>(base_board, "CCCCCCC"),
+          visual_to_actual_order);
+  static constexpr std::array<Position, number_of_tiles> detail_coords =
+      sort_by_order<Position, number_of_tiles>(
+          find_coords<number_of_tiles>(base_board, "DDDDDDD"),
+          visual_to_actual_order);
+  static constexpr std::array<Position, number_of_tiles> player_coords =
+      sort_by_order<Position, number_of_tiles>(
+          find_coords<number_of_tiles>(base_board, "PPPPPPP"),
+          visual_to_actual_order);
+
   std::string create_base_board(const json &board_data);
-  std::vector<int> find_substrings(const std::string &str,
-                                   const std::string &substr) const;
 
 public:
   Board(json &board_data);
   static constexpr int get_length_of_tile() { return length_of_tile; }
   static constexpr int get_number_of_tiles() { return number_of_tiles; }
-  const Size get_size() const;
-  const std::string get_board() const { return ascii_board; }
 
-  void update_tile_color(const std::string &group, int tile_id);
-  void update_tile_detail(const std::string &detail, int tile_id);
-  void display_board() const;
+  static constexpr auto get_color_coord(int id) { return &color_coords[id]; }
+  static constexpr auto get_detail_coord(int id) { return &detail_coords[id]; }
+  static constexpr auto get_player_coord(int id) { return &player_coords[id]; }
+
+  update_queue &get_color_queue() { return tile_color_update_queue; }
+  update_queue &get_detail_queue() { return tile_detail_update_queue; }
+  update_queue &get_player_queue() { return tile_player_update_queue; }
+
+  std::string_view get_board() const { return ascii_board; }
+  std::string_view get_tile_color(int id) const { return tile_colors[id]; }
+  std::string_view get_tile_detail(int id) const { return tile_details[id]; }
+  std::string_view get_tile_player(int id) const { return tile_players[id]; }
+
+  static constexpr Size get_size() {
+    // This seems to have to be declared in the header??
+    // No way the base_board is every smaller than 10 lines right?
+    constexpr auto newlines = find_substrs<10>(base_board, "\n");
+    constexpr int w = static_cast<int>(newlines[1] - newlines[0]);
+    constexpr int h = std::count(base_board.begin(), base_board.end(), '\n');
+
+    return Size{w, h};
+  }
 };
 
 #endif // BOARD_HPP

@@ -1,8 +1,6 @@
-#include <iostream>
 #include <string>
 
 #include <fmt/color.h>
-#include <fmt/core.h>
 
 #include <board.hpp>
 #include <tiles/street.hpp>

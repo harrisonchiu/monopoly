@@ -8,6 +8,8 @@
 #include <tiles/tile.hpp>
 
 class Corner : public Event {
+  using json = nlohmann::json;
+
 public:
   Corner(const json &tile_data, int id) : Event(tile_data, id) {}
   std::string get_detail() const override;
