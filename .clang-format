@@ -1,0 +1,9 @@
+BasedOnStyle: LLVM
+---
+Language: Cpp
+AlignAfterOpenBracket: BlockIndent
+
+# false makes folding brace initialization blocks better
+Cpp11BracedListStyle: false
+
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html

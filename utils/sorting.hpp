@@ -3,11 +3,11 @@
 
 #include <array>
 
-template <typename T, std::size_t Size>
-constexpr auto sort_by_order(std::array<T, Size> data,
-                             std::array<int, Size> order) {
+template <typename T, int Size>
+constexpr auto
+sort_by_order(std::array<T, Size> data, std::array<int, Size> order) {
   // O(N) sorting algorithm based on the order of a given array
-  // Copies and creates a new array.
+  // Copies all the values and creates a new array.
   // @data: array to be sorted based on @order
   // @order: array values determine the order of @data's elements. Its domain
   // must be continuous [0, @indices.len), strictly increasing by 1.

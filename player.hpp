@@ -27,6 +27,7 @@ private:
   const int id;
   const Avatar avatar;
 
+  int last_position = 0;
   int position = 0;
 
 public:

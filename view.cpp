@@ -4,17 +4,14 @@
 
 #include "view.hpp"
 
-View::View(std::shared_ptr<Board> board) : board{board} {
-  board_color_queue = board->get_color_queue();
-  board_detail_queue = board->get_detail_queue();
-  board_player_queue = board->get_player_queue();
-}
+// View::View(std::shared_ptr<Board> board) : board{board} {
+// }
 
-constexpr void View::move_to_top() const {
+void View::move_to_top() const {
   fmt::print("\x1b[{};{}H", container_pos.row, 0);
 }
 
-constexpr void View::move_to_bot() const {
+void View::move_to_bot() const {
   constexpr int height = container_pos.row + container_size.height;
   fmt::print("\x1b[{};{}H", height, 0);
 }
@@ -34,7 +31,6 @@ void View::draw_board_colors() {
                board->get_tile_color(tile_id));
     board_color_queue->pop();
   }
-  move_to_bot();
 }
 
 void View::draw_board_details() {
@@ -45,7 +41,6 @@ void View::draw_board_details() {
                board->get_tile_detail(tile_id));
     board_detail_queue->pop();
   }
-  move_to_bot();
 }
 
 void View::draw_board_players() {
@@ -56,5 +51,4 @@ void View::draw_board_players() {
                board->get_tile_player(tile_id));
     board_player_queue->pop();
   }
-  move_to_bot();
 }

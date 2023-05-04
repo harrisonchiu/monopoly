@@ -1,5 +1,6 @@
 #define FMT_HEADER_ONLY
 
+#include <concepts>
 #include <string>
 #include <string_view>
 
@@ -52,7 +53,7 @@ std::string Board::create_base_board(const json &board_data) {
     if ((tile_id >= 0 && tile_id <= 10) || (tile_id >= 20 && tile_id <= 30)) {
       // Assume name is 2 words seperated by 1 space, each word max 7 characters
       // If the name is only 1 word, make 2nd row empty or it will duplicate.
-      size_t space = tile_name.find(' ');
+      std::size_t space = tile_name.find(' ');
       if (space != std::string::npos) {
         board_format_args.push_back(tile_name.substr(0, space));
         board_format_args.push_back(tile_name.substr(space + 1));
@@ -65,20 +66,24 @@ std::string Board::create_base_board(const json &board_data) {
     }
   }
 
-  const auto repeat = [](int n, std::string str) {
-    std::string s{};
-    for (int i = 0; i < n; i++)
-      s += str;
-    return s;
-  };
-
   // Named arguments must be done after positional arguments
-  board_format_args.push_back(fmt::arg("INDENT", std::string(15, ' ')));
+  constexpr auto side_pad = repeat_str<1, length_of_tile * 2 + 1>(" ");
+  board_format_args.push_back(
+      fmt::arg("INDENT", std::string_view(side_pad.begin(), side_pad.end()))
+  );
+
+  constexpr auto center_pad = repeat_str<1, 33>(" ");
   board_format_args.push_back(fmt::arg(
-      "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", std::string(33, ' ')));
+      "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+      std::string_view(center_pad.begin(), center_pad.end())
+  ));
+
+  // 3 in repeat_str<> is the size of the string. Unicode chars must be string
+  constexpr auto border_box = repeat_str<3, length_of_tile * 10 + 1>("▔");
   board_format_args.push_back(fmt::arg(
       "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-      repeat(71, "▔")));
+      std::string_view(border_box.begin(), border_box.end())
+  ));
 
-  return fmt::vformat(ascii_board, board_format_args);
+  return fmt::vformat(base_board, board_format_args);
 }

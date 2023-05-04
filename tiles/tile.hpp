@@ -25,14 +25,12 @@ class Tile {
 
 private:
   const int id;
-  std::string name;
-  std::string group;
+  const std::string name;
+  const std::string group;
 
 public:
-  Tile(const json &tile_data, int id) : id{id} {
-    name = tile_data["name"];
-    group = tile_data["group"];
-  }
+  Tile(const json &tile_data, int id)
+      : id{id}, name{tile_data["name"]}, group{tile_data["group"]} {}
 
   virtual constexpr int get_id() const { return id; }
   virtual constexpr std::string get_name() const { return name; }
@@ -55,16 +53,15 @@ private:
   static constexpr Avatar no_owner{};
 
 protected:
-  int property_cost;
+  const int property_cost;
   PropertyStatus property_status = PropertyStatus::Unowned;
   std::unique_ptr<Avatar> owner = std::make_unique<Avatar>(no_owner);
 
   virtual std::string get_property_status_label() const = 0;
 
 public:
-  Property(const json &tile_data, int id) : Tile(tile_data, id) {
-    property_cost = tile_data["property_cost"];
-  }
+  Property(const json &tile_data, int id)
+      : Tile(tile_data, id), property_cost{tile_data["property_cost"]} {}
   consteval TileType get_type() const override { return TileType::Property; }
   virtual ~Property() {}
 };

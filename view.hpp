@@ -22,10 +22,13 @@ private:
   update_queue board_player_queue;
 
 public:
-  View(std::shared_ptr<Board> board_ptr);
+  View(std::shared_ptr<Board> board)
+      : board{board}, board_color_queue{board->get_color_queue()},
+        board_detail_queue{board->get_detail_queue()},
+        board_player_queue{board->get_player_queue()} {}
 
-  constexpr void move_to_top() const;
-  constexpr void move_to_bot() const;
+  void move_to_top() const;
+  void move_to_bot() const;
 
   void clear_screen() const;
   void draw_board() const;

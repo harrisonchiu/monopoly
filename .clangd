@@ -1,2 +1,21 @@
 CompileFlags:
-  Add: [-std=c++20]
+  Add: [-std=c++20, -Wall, -Wextra, -Werror, -Wpendantic]
+  Compiler: clang++
+
+Diagnostics:
+  UnusedIncludes: Strict
+  ClangTidy:
+    Add: [
+      modernize-*,
+      cppcoreguidelines-*,
+      hicpp-*,
+      misc-*,
+      readability-*,
+      portability-*,
+      performance-*,
+      clang-analyzer-*,
+      bugprone-*,
+      cert-*,
+      llvm-*
+    ]
+    Remove: readability-identifier-length

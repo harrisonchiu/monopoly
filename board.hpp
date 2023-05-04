@@ -47,7 +47,7 @@ private:
   // reprited, but it would cause the terminal screen to flash which is
   // annoying. Colors could be part of @ascii_board instead of the arrays, but
   // it is more consistent with the other tile rows
-  std::string ascii_board{base_board};
+  std::string ascii_board;
   std::array<std::string, number_of_tiles> tile_colors;
   std::array<std::string, number_of_tiles> tile_details;
   std::array<std::string, number_of_tiles> tile_players;
@@ -65,7 +65,7 @@ private:
   // convert to and from regular string.
   // {NNN...} replaces unicode box char ▔, to easily to find substrings indices
   // Unicode chars are considered as multiple chars. They are bigger than ASCII
-  static constexpr std::string_view base_board = R"(
+  static constexpr std::string_view base_board = R"""(
    {31:^7} {33:^7} {35:^7} {37:^7} {39:^7} {41:^7} {43:^7} {45:^7} {47:^7} {49:^7} {51:^7} 
    {32:^7} {34:^7} {36:^7} {38:^7} {40:^7} {42:^7} {44:^7} {46:^7} {48:^7} {50:^7} {52:^7} 
   |CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|CCCCCCC|
@@ -104,7 +104,7 @@ private:
    ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
    {20:^7} {18:^7} {16:^7} {14:^7} {12:^7} {10:^7} {8:^7} {6:^7} {4:^7} {2:^7} {0:^7}      
    {21:^7} {19:^7} {17:^7} {15:^7} {13:^7} {11:^7} {9:^7} {7:^7} {5:^7} {3:^7} {1:^7}      
-)";
+)""";
 
   // Find the (X, Y) coords of the substrings where origin (0, 0) is top left
   // Finding and sorting to actual tile order should be done during compilation
