@@ -1,47 +1,48 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include <array>
+#include "utils/color.hpp"
 
 #include <fmt/color.h>
-#include <fmt/core.h>
 
-#include <utils/color.hpp>
+#include <array>
 
 struct Avatar {
   // Must have default values so we can create a default Avatar
   // or also known as a no-owner Avatar
-  const char character{};
-  const fmt::text_style color = Color::none();
+  char character{};
+  fmt::text_style color = Color::none();
 };
 
 class Player {
 private:
   static constexpr int max_players = 4;
-  static constexpr std::array<Avatar, max_players> pieces = {
-      {{'A', Color::get("Blue")},
-       {'B', Color::get("Red")},
-       {'C', Color::get("Green")},
-       {'D', Color::get("Orange")}}};
+  static constexpr std::array<Avatar, max_players> pieces{
+    {{ 'A', Color::get("Blue") },
+     { 'B', Color::get("Red") },
+     { 'C', Color::get("Green") },
+     { 'D', Color::get("Orange") }}
+  };
 
-  const int id;
-  const Avatar avatar;
+  int id;
+  Avatar avatar;
+
+  // Ensure that avatar is initialized on object creation, so this has value
+  std::string player = fmt::format(avatar.color, std::string{ avatar.character });
 
   int last_position = 0;
   int position = 0;
 
 public:
-  Player(int id) : id{id}, avatar{pieces[id]} {}
+  explicit Player(int id) : id{ id }, avatar{ pieces.at(id) } {}
 
-  consteval int get_id() { return id; }
-  constexpr Avatar get_avatar() { return avatar; }
-  constexpr char get_character() { return avatar.character; }
-  constexpr fmt::text_style get_color() { return avatar.color; }
-  constexpr std::string get_player() {
-    return fmt::format(avatar.color, std::string{avatar.character});
-  }
+  consteval auto get_id() const -> int { return id; }
+  constexpr auto get_avatar() const -> Avatar { return avatar; }
+  constexpr auto get_character() const -> char { return avatar.character; }
+  constexpr auto get_color() const -> fmt::text_style { return avatar.color; }
+  constexpr auto get_player() const -> std::string_view { return player; }
 
-  int walk(int steps);
+  auto walk(int steps) -> int;
 };
 
 #endif // PLAYER_HPP

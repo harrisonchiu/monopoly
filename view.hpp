@@ -1,19 +1,16 @@
 #ifndef VIEW_HPP
 #define VIEW_HPP
 
-#include <queue>
-
-#include <fmt/color.h>
-
 #include "board.hpp"
 #include "utils/component.hpp"
+
+#include <queue>
 
 class View {
 private:
   static constexpr Size board_size = Board::get_size();
-  static constexpr Position container_pos = {0, 0};
-  static constexpr Size container_size = {board_size.width + 100,
-                                          board_size.height + 2};
+  static constexpr Size container_size = { board_size.width + 100, board_size.height + 2 };
+  static constexpr Position container_position = { 0, 0 };
   std::shared_ptr<Board> board;
 
   using update_queue = std::shared_ptr<std::queue<int>>;
@@ -22,15 +19,12 @@ private:
   update_queue board_player_queue;
 
 public:
-  View(std::shared_ptr<Board> board)
-      : board{board}, board_color_queue{board->get_color_queue()},
-        board_detail_queue{board->get_detail_queue()},
-        board_player_queue{board->get_player_queue()} {}
+  explicit View(std::shared_ptr<Board> board);
 
-  void move_to_top() const;
-  void move_to_bot() const;
+  static void move_to_top();
+  static void move_to_bot();
+  static void clear_screen();
 
-  void clear_screen() const;
   void draw_board() const;
   void draw_board_colors();
   void draw_board_details();

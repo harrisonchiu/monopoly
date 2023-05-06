@@ -7,19 +7,17 @@
 // Map that should have compile-time constructors and getter.
 // Use only for small size lookups without any inserting/deleting/modifying.
 // If any of those 3 actions are used, use a normal std::(unordered_)map
-template <typename Key, typename Value, std::size_t Size>
-struct CompileTimeMap {
-  std::array<std::pair<Key, Value>, Size> data;
+template <typename Key, typename Value, std::size_t Size> struct CompileTimeMap {
+  // Disable linting misc-non-private-member-variables-in-classes because I dont care
+  std::array<std::pair<Key, Value>, Size> data; // NOLINT
 
-  constexpr Value at(const Key &key, const Value &default_value) const {
+  constexpr auto at(const Key &key, const Value &default_value) const -> Value {
     const auto iterator =
-        std::find_if(begin(data), end(data),
-                     [&key](const auto &v) { return v.first == key; });
+        std::find_if(begin(data), end(data), [&key](const auto &v) { return v.first == key; });
     if (iterator != end(data)) {
       return iterator->second;
-    } else {
-      return default_value;
     }
+    return default_value;
   }
 };
 

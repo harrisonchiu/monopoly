@@ -1,11 +1,11 @@
 #ifndef SUBSTRINGS_HPP
 #define SUBSTRINGS_HPP
 
+#include "utils/component.hpp"
+
 #include <array>
 #include <string>
 #include <string_view>
-
-#include "utils/component.hpp"
 
 // N is size of array returned or the number of substring occurrences to get. If
 // N is less than or equal to the number of occurrences, the array will be the
@@ -46,7 +46,7 @@ consteval auto find_substrs(const std::string &str, const std::string &substr) {
 // Finds (col, row) of every substring occurrence in a multi-lined string where
 // lines are delimited by \n. (col, row) both start at the top left at (0, 0)
 template <std::size_t N>
-consteval auto find_coords(std::string_view str, std::string_view substr) {
+consteval auto find_position(std::string_view str, std::string_view substr) {
   static_assert(N > 0, "The number of occurrences to get, N, must be positive");
 
   std::array<Position, N> coords{};
@@ -56,15 +56,15 @@ consteval auto find_coords(std::string_view str, std::string_view substr) {
 
   for (int i = 0; i < str.length(); i++) {
     // Find newlines to determine the row it is on
-    if (str.substr(i, 1).compare("\n") == 0) {
+    if (str.substr(i, 1) == "\n") {
       last_newline = i;
       newline_count++;
     }
 
     // Find the substring and use its position with the previous newline to find
     // the col it starts on.
-    if (str.substr(i, substr.length()).compare(substr) == 0) {
-      coords[count++] = Position{i - last_newline, newline_count};
+    if (str.substr(i, substr.length()) == substr) {
+      coords[count++] = Position{ i - last_newline, newline_count };
       if (count >= N) {
         break;
       }
@@ -85,7 +85,7 @@ consteval auto find_coords(std::string_view str, std::string_view substr) {
 //  std::string_view sv(char_arr.begin(), char_arr.end());
 // which uses less instructions than `std::string_view s = std::string(71, ' ')`
 template <std::size_t N, std::size_t Count>
-consteval std::array<char, N * Count> repeat_str(std::string_view str) {
+consteval auto repeat_str(std::string_view str) -> std::array<char, N * Count> {
   constexpr std::size_t out_size = N * Count;
   std::array<char, out_size> result{};
 

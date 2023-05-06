@@ -2,8 +2,8 @@
 #define COMPONENT_HPP
 
 struct Size {
-  const int width{};
-  const int height{};
+  int width{};
+  int height{};
 };
 
 struct Position {

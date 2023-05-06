@@ -1,42 +1,49 @@
+#include "tiles/street.hpp"
+#include "tiles/tile.hpp"
+
+#include "board.hpp"
+
+#include <fmt/core.h>
+
 #include <string>
 
-#include <fmt/color.h>
+Street::Street(const json &tile_data, const int id) : Property(tile_data, id) { update_detail(); }
 
-#include <board.hpp>
-#include <tiles/street.hpp>
-#include <tiles/tile.hpp>
-
-std::string Street::get_property_status_label() const {
-  switch (property_status) {
+auto Street::get_property_status_label() const -> std::string {
+  switch (Property::get_property_status()) {
   case PropertyStatus::Mortgaged:
-    return fmt::format(owner->color, "M");
+    return fmt::format(Property::get_owner()->color, "M");
   case PropertyStatus::Unowned:
-    return fmt::format(owner->color, "_");
+    return fmt::format(Property::get_owner()->color, "_");
   case PropertyStatus::Owned:
-    return fmt::format(owner->color, "X");
+    return fmt::format(Property::get_owner()->color, "X");
   case PropertyStatus::Tier1:
-    return fmt::format(owner->color, "1H");
+    return fmt::format(Property::get_owner()->color, "1H");
   case PropertyStatus::Tier2:
-    return fmt::format(owner->color, "2H");
+    return fmt::format(Property::get_owner()->color, "2H");
   case PropertyStatus::Tier3:
-    return fmt::format(owner->color, "3H");
+    return fmt::format(Property::get_owner()->color, "3H");
   case PropertyStatus::Tier4:
-    return fmt::format(owner->color, "4H");
+    return fmt::format(Property::get_owner()->color, "4H");
   case PropertyStatus::Tier5:
-    return fmt::format(owner->color, "HT");
+    return fmt::format(Property::get_owner()->color, "HT");
   default:
-    return fmt::format(owner->color, "?");
+    return fmt::format(Property::get_owner()->color, "?");
   }
 }
 
-std::string Street::get_detail() const {
-  const std::string label = get_property_status_label();
-  const std::string cost = fmt::format("${}", property_cost);
+void Street::update_detail() {
+  const std::string property_status_label = get_property_status_label();
+  const std::string cost = fmt::format("${}", Property::get_property_cost());
 
-  const int chars_fmt_color_added = 23;
+  constexpr int chars_fmt_color_added = 23;
   const int max_string_length =
-      Board::get_length_of_tile() - (label.length() - chars_fmt_color_added);
+      Board::get_tile_length() -
+      (static_cast<int>(property_status_label.length()) - chars_fmt_color_added);
 
-  return fmt::format("{}{:>{LENGTH}}", get_property_status_label(), cost,
-                     fmt::arg("LENGTH", max_string_length));
+  const std::string new_detail = fmt::format(
+      "{}{:>{LENGTH}}", property_status_label, cost, fmt::arg("LENGTH", max_string_length)
+  );
+
+  Tile::set_detail(new_detail);
 }

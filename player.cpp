@@ -1,6 +1,6 @@
-#include <player.hpp>
+#include "player.hpp"
 
-int Player::walk(const int steps) {
+auto Player::walk(const int steps) -> int {
   last_position = position;
   position %= steps;
   return position;

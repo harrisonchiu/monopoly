@@ -1,18 +1,18 @@
 #ifndef CORNER_HPP
 #define CORNER_HPP
 
-#include <string>
+#include "tiles/tile.hpp"
 
 #include <nlohmann/json.hpp>
 
-#include <tiles/tile.hpp>
+#include <string>
 
 class Corner : public Event {
   using json = nlohmann::json;
 
 public:
-  Corner(const json &tile_data, int id) : Event(tile_data, id) {}
-  std::string get_detail() const override;
+  Corner(const json &tile_data, int id);
+  void update_detail() override;
 };
 
 #endif // CORNER_HPP

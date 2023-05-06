@@ -1,21 +1,21 @@
 #ifndef STREET_HPP
 #define STREET_HPP
 
-#include <string>
+#include "tiles/tile.hpp"
 
 #include <nlohmann/json.hpp>
 
-#include <tiles/tile.hpp>
+#include <string>
 
 class Street : public Property {
   using json = nlohmann::json;
 
 protected:
-  std::string get_property_status_label() const override;
+  auto get_property_status_label() const -> std::string override;
 
 public:
-  Street(const json &tile_data, const int id) : Property(tile_data, id) {}
-  std::string get_detail() const override;
+  Street(const json &tile_data, int id);
+  void update_detail() override;
 };
 
 #endif // STREET_HPP

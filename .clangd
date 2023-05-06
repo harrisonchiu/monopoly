@@ -2,20 +2,30 @@ CompileFlags:
   Add: [-std=c++20, -Wall, -Wextra, -Werror, -Wpendantic]
   Compiler: clang++
 
+InlayHints:
+  Designators: No # Removes array indices
+
 Diagnostics:
   UnusedIncludes: Strict
-  ClangTidy:
-    Add: [
-      modernize-*,
-      cppcoreguidelines-*,
-      hicpp-*,
-      misc-*,
-      readability-*,
-      portability-*,
-      performance-*,
-      clang-analyzer-*,
-      bugprone-*,
-      cert-*,
-      llvm-*
-    ]
-    Remove: readability-identifier-length
+  ## Moved to .clang-tidy
+  # ClangTidy:
+  #   Add: [
+  #     modernize-*,
+  #     cppcoreguidelines-*,
+  #     hicpp-*,
+  #     misc-*,
+  #     readability-*,
+  #     portability-*,
+  #     performance-*,
+  #     clang-analyzer-*,
+  #     bugprone-*,
+  #     cert-*,
+  #     llvm-*
+  #   ]
+  #   # @readability-identifier-length: we have short names such as @id
+  #   # @modernize-use-nodiscard: good practice to use it but it is too much visual noise
+  #   #   and often times I don't care if the return value is discarded. It should only be
+  #   #   put in places where the lack of taking the value actually leads to bad behaviour
+  #   Remove: [readability-identifier-length, modernize-use-nodiscard]
+  #   CheckOptions:
+  #     readability-identifier-naming.VariableCase: UPPER_CASE

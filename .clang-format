@@ -3,7 +3,15 @@ BasedOnStyle: LLVM
 Language: Cpp
 AlignAfterOpenBracket: BlockIndent
 
-# false makes folding brace initialization blocks better
+# The future is now. We should not be limited by the technical limitations
+# of the past. Especially when modern C++ has longer lines than Java.
+# Why is Java made fun of for needing widescreen monitors when this shit can exist
+# [[nodiscard]] static constexpr auto func_name(const type *const a) const -> return_type {}
+# 99 limit chosen arbitrarily, partly to follow Rust's 99 char limit
+ColumnLimit: 99
+
+# false makes folding blocks of brace initialized variables look better
 Cpp11BracedListStyle: false
+AlignArrayOfStructures: Right
 
 # https://clang.llvm.org/docs/ClangFormatStyleOptions.html

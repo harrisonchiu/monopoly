@@ -1,9 +1,11 @@
+#include "tiles/corner.hpp"
+#include "tiles/tile.hpp"
+
+#include "board.hpp"
+#include "utils/color.hpp"
+
 #include <string>
 
-#include <board.hpp>
-#include <tiles/corner.hpp>
-#include <utils/color.hpp>
+Corner::Corner(const json &tile_data, int id) : Event(tile_data, id) { update_detail(); }
 
-std::string Corner::get_detail() const {
-  return Color::empty(Board::get_length_of_tile());
-}
+void Corner::update_detail() { Tile::set_detail(Color::empty(Board::get_tile_length())); }

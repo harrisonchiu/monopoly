@@ -1,11 +1,11 @@
 #ifndef TILE_HPP
 #define TILE_HPP
 
-#include <string>
+#include "player.hpp"
 
 #include <nlohmann/json.hpp>
 
-#include <player.hpp>
+#include <string>
 
 enum class TileType { Property, Event };
 
@@ -24,26 +24,35 @@ class Tile {
   using json = nlohmann::json;
 
 private:
-  const int id;
-  const std::string name;
-  const std::string group;
+  int id;
+  std::string name;
+  std::string group;
+  std::string detail;
 
 public:
   Tile(const json &tile_data, int id)
-      : id{id}, name{tile_data["name"]}, group{tile_data["group"]} {}
+      : id{ id }, name{ tile_data["name"] }, group{ tile_data["group"] } {}
 
-  virtual constexpr int get_id() const { return id; }
-  virtual constexpr std::string get_name() const { return name; }
-  virtual constexpr std::string get_group() const { return group; }
-  virtual consteval TileType get_type() const = 0;
-  virtual std::string get_detail() const = 0;
+  constexpr auto get_id() const -> int { return id; }
+  constexpr auto get_name() const -> std::string_view { return name; }
+  constexpr auto get_group() const -> std::string_view { return group; }
+  constexpr auto get_detail() const -> std::string_view { return detail; }
+  constexpr auto set_detail(std::string new_detail) -> void { detail = std::move(new_detail); }
+  virtual void update_detail() = 0;
+  virtual consteval auto get_type() const -> TileType = 0;
 
   //   virtual void visited_by() = 0;
   //   virtual void view() = 0;
   //   virtual void interact() = 0;
   //   virtual void monopolize() = 0;
   //   virtual void change_owner() = 0;
-  virtual ~Tile() {}
+
+  // Special member functions defined for Rule of Five to get rid of warnings
+  Tile(const Tile &) = delete; // Copy
+  auto operator=(const Tile &) -> Tile & = delete;
+  Tile(const Tile &&) = delete; // Move
+  auto operator=(const Tile &&) -> Tile & = delete;
+  virtual ~Tile() = default; // Destructor
 };
 
 class Property : public Tile {
@@ -51,19 +60,27 @@ class Property : public Tile {
 
 private:
   static constexpr Avatar no_owner{};
+  int property_cost;
+  PropertyStatus property_status = PropertyStatus::Unowned;
+  std::shared_ptr<Avatar> owner = std::make_shared<Avatar>(no_owner);
 
 protected:
-  const int property_cost;
-  PropertyStatus property_status = PropertyStatus::Unowned;
-  std::unique_ptr<Avatar> owner = std::make_unique<Avatar>(no_owner);
-
-  virtual std::string get_property_status_label() const = 0;
+  auto get_property_cost() const -> int { return property_cost; }
+  auto get_property_status() const -> PropertyStatus { return property_status; }
+  virtual auto get_property_status_label() const -> std::string = 0;
+  auto get_owner() const -> std::shared_ptr<Avatar> { return owner; }
 
 public:
   Property(const json &tile_data, int id)
-      : Tile(tile_data, id), property_cost{tile_data["property_cost"]} {}
-  consteval TileType get_type() const override { return TileType::Property; }
-  virtual ~Property() {}
+      : Tile(tile_data, id), property_cost{ tile_data["property_cost"] } {}
+  consteval auto get_type() const -> TileType override { return TileType::Property; }
+
+  // Special member functions defined for Rule of Five to get rid of warnings
+  Property(const Property &) = delete; // Copy
+  auto operator=(const Property &) -> Property & = delete;
+  Property(const Property &&) = delete; // Move
+  auto operator=(const Property &&) -> Property & = delete;
+  ~Property() override = default; // Destructor
 };
 
 class Event : public Tile {
@@ -71,8 +88,14 @@ class Event : public Tile {
 
 public:
   Event(const json &tile_data, int id) : Tile(tile_data, id) {}
-  consteval TileType get_type() const override { return TileType::Event; }
-  virtual ~Event() {}
+  consteval auto get_type() const -> TileType override { return TileType::Event; }
+
+  // // Special member functions defined for Rule of Five to get rid of warnings
+  Event(const Event &) = delete; // Copy
+  auto operator=(const Event &) -> Event & = delete;
+  Event(const Event &&) = delete; // Move
+  auto operator=(const Event &&) -> Event & = delete;
+  ~Event() override = default; // Destructor
 };
 
 #endif // TILE_HPP
