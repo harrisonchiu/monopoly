@@ -26,12 +26,12 @@ Board::Board(json &board_data) {
       board.emplace_back(std::make_unique<Corner>(tile_data, id));
     }
 
-    const std::string_view color = tile_data["group"].get<std::string_view>();
-    tile_colors.at(id) = fmt::format(Color::get(color), "▔▔▔▔▔▔▔");
+    // Create what each row of a tile should look like
+    tile_colors.at(id) = fmt::format(Color::get(board.back()->get_group()), "▔▔▔▔▔▔▔");
     tile_details.at(id) = board.back()->get_detail();
-    tile_players.at(id) = std::string(tile_length, ' ');
+    tile_players.at(id).fill(" ");
 
-    // Notify View that there are visual changes to the board, so update it
+    // Notify View that there are visual changes to the board, so visually update it
     tile_color_update_queue->push(id);
     tile_detail_update_queue->push(id);
     tile_player_update_queue->push(id);
@@ -49,7 +49,6 @@ auto Board::create_base_board(const json &board_data) -> std::string {
     const std::string tile_name = board_data[tile_id]["display_name"];
 
     // Only the top and bottom row need to split the name into 2 parts
-
     if ((tile_id >= bot_row_start && tile_id <= bot_row_end) ||
         (tile_id >= top_row_start && tile_id <= top_row_end)) {
       // Assume name is 2 words seperated by 1 space, each word max 7 characters
@@ -87,4 +86,33 @@ auto Board::create_base_board(const json &board_data) -> std::string {
   ));
 
   return fmt::vformat(base_board, board_format_args);
+}
+
+void Board::set_players(std::shared_ptr<std::vector<Player>> p, int tile_start) {
+  players = std::move(p);
+  for (int player_id = 0; player_id < Player::get_max_players(); player_id++) {
+    tile_players.at(tile_start).at(player_id) = players->at(player_id).get_avatar();
+  }
+  tile_player_update_queue->push(tile_start);
+}
+
+void Board::update_player_pos(int player_id) {
+  int current_pos = players->at(player_id).get_pos();
+  int last_pos = players->at(player_id).get_last_pos();
+
+  std::swap(tile_players.at(last_pos).at(player_id), tile_players.at(current_pos).at(player_id));
+
+  tile_player_update_queue->push(last_pos);
+  tile_player_update_queue->push(current_pos);
+
+  players->at(player_id).set_pos_updated(true);
+}
+
+// Wrapper function to easily move every player tokens
+void Board::update_all_player_pos() {
+  for (const auto &player : *players) {
+    if (!player.is_pos_updated()) {
+      update_player_pos(player.get_id());
+    }
+  }
 }

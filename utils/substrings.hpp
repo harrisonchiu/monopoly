@@ -18,12 +18,12 @@ consteval auto find_substrs(std::string_view str, std::string_view substr) {
   // Find all the substring's locations inside the parent string
   // Use a vector because we do not know how many occurrences there will be
   std::array<std::size_t, N> indices{};
-  std::size_t position = 0;
+  std::size_t pos = 0;
   int substr_find_count = 0;
 
-  while ((position = str.find(substr, position)) != std::string_view::npos) {
-    indices[substr_find_count++] = position;
-    position += substr.length();
+  while ((pos = str.find(substr, pos)) != std::string_view::npos) {
+    indices[substr_find_count++] = pos;
+    pos += substr.length();
 
     if (substr_find_count >= N) {
       break;
@@ -45,8 +45,7 @@ consteval auto find_substrs(const std::string &str, const std::string &substr) {
 // occurrences, the extra elements in the array will be 0s.
 // Finds (col, row) of every substring occurrence in a multi-lined string where
 // lines are delimited by \n. (col, row) both start at the top left at (0, 0)
-template <std::size_t N>
-consteval auto find_position(std::string_view str, std::string_view substr) {
+template <std::size_t N> consteval auto find_pos(std::string_view str, std::string_view substr) {
   static_assert(N > 0, "The number of occurrences to get, N, must be positive");
 
   std::array<Position, N> coords{};

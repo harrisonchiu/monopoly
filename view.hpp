@@ -10,13 +10,13 @@ class View {
 private:
   static constexpr Size board_size = Board::get_size();
   static constexpr Size container_size = { board_size.width + 100, board_size.height + 2 };
-  static constexpr Position container_position = { 0, 0 };
+  static constexpr Position container_pos = { 0, 0 };
   std::shared_ptr<Board> board;
 
   using update_queue = std::shared_ptr<std::queue<int>>;
-  update_queue board_color_queue;
-  update_queue board_detail_queue;
-  update_queue board_player_queue;
+  update_queue board_color_update_queue;
+  update_queue board_detail_update_queue;
+  update_queue board_player_update_queue;
 
 public:
   explicit View(std::shared_ptr<Board> board);

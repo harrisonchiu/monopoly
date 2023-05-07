@@ -1,6 +1,7 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include "player.hpp"
 #include "tiles/tile.hpp"
 #include "utils/component.hpp"
 #include "utils/sorting.hpp"
@@ -36,7 +37,7 @@ private:
     35, 14, 36, 13, 37, 12, 38, 11, 39, 10, 9,  8,  7,  6,  5,  4,  3,  2,  1,  0
   };
 
-  std::vector<std::unique_ptr<Tile>> board;
+  std::shared_ptr<std::vector<Player>> players;
 
   // @ascii_board is the main structure of the board with display_names
   // @tile_* holds the strings that will be printed ontop of @ascii_board.
@@ -44,22 +45,32 @@ private:
   // would cause the terminal screen to flash which is annoying. Colors could be part of
   // @ascii_board instead of the arrays, but it is more consistent with the other tile rows
   std::string ascii_board;
-  std::array<std::string, number_of_tiles> tile_colors;
-  std::array<std::string, number_of_tiles> tile_details;
-  std::array<std::string, number_of_tiles> tile_players;
 
+  // @tile_* store the data that will be drawn on the tiles based on the @Tile in @board
+  // @tile_colors uses string because it must generate it on @Board construction,
+  //    so it cannot rely on references. @Tile does not store the color border string, only group
+  // @tile_details uses string_view because it just references the @Tile.detail which they create
+  // @tile_players uses string_view because it just references @Player.char which already exists
+  std::vector<std::unique_ptr<Tile>> board;
+  std::array<std::string, number_of_tiles> tile_colors;
+  std::array<std::string_view, number_of_tiles> tile_details;
+
+  using presence = std::array<std::string, Player::get_max_players()>;
+  std::array<presence, number_of_tiles> tile_players{};
+
+  // The @Tiles that must be visually updated because some change happened to that tile
   using update_queue = std::shared_ptr<std::queue<int>>;
   update_queue tile_color_update_queue = std::make_shared<std::queue<int>>();
   update_queue tile_detail_update_queue = std::make_shared<std::queue<int>>();
   update_queue tile_player_update_queue = std::make_shared<std::queue<int>>();
 
-  // Named arguments with brackets have the same length as the actual tile length. Therefore, it
-  // has the dimensions and visual base look of the board even before the placeholders are put
-  // there. This uses unicode char ▔. It is easier to iterate with wchar_t or wstring variations
-  // but it does not support constexpr as well and cannot easily convert to and from regular
-  // string. {NNN...} replaces unicode box char ▔, to easily to find substrings indices.
-  // Unicode chars are considered as multiple chars. They are bigger than ASCII.
-  // Also makes viewing board more properly aligned on editors other than VSCode (they make it
+  // Named arguments with brackets have the same length as the actual tile length. Therefore,
+  // it has the dimensions and visual base look of the board even before the placeholders are
+  // put there. This uses unicode char ▔. It is easier to iterate with wchar_t or wstring
+  // variations but it does not support constexpr as well and cannot easily convert to and from
+  // regular string. {NNN...} replaces unicode box char ▔, to easily to find substrings
+  // indices. Unicode chars are considered as multiple chars. They are bigger than ASCII. Also
+  // makes viewing board more properly aligned on editors other than VSCode (they make it
   // appear as 1 char) like Github where it appears as 3 width long chars.
   static constexpr std::string_view base_board{ R"""(
    {31:^7} {33:^7} {35:^7} {37:^7} {39:^7} {41:^7} {43:^7} {45:^7} {47:^7} {49:^7} {51:^7} 
@@ -104,17 +115,17 @@ private:
 
   // Find the (X, Y) coords of the substrings where origin (0, 0) is top left
   // Finding and sorting to actual tile order should be done during compilation
-  static constexpr std::array<Position, number_of_tiles> color_position =
+  static constexpr std::array<Position, number_of_tiles> color_pos =
       sort_by_order<Position, number_of_tiles>(
-          find_position<number_of_tiles>(base_board, "CCCCCCC"), visual_to_actual_order
+          find_pos<number_of_tiles>(base_board, "CCCCCCC"), visual_to_actual_order
       );
-  static constexpr std::array<Position, number_of_tiles> detail_position =
+  static constexpr std::array<Position, number_of_tiles> detail_pos =
       sort_by_order<Position, number_of_tiles>(
-          find_position<number_of_tiles>(base_board, "DDDDDDD"), visual_to_actual_order
+          find_pos<number_of_tiles>(base_board, "DDDDDDD"), visual_to_actual_order
       );
-  static constexpr std::array<Position, number_of_tiles> player_position =
+  static constexpr std::array<Position, number_of_tiles> player_pos =
       sort_by_order<Position, number_of_tiles>(
-          find_position<number_of_tiles>(base_board, "PPPPPPP"), visual_to_actual_order
+          find_pos<number_of_tiles>(base_board, "PPPPPPP"), visual_to_actual_order
       );
 
   static auto create_base_board(const json &board_data) -> std::string;
@@ -124,22 +135,29 @@ public:
   static constexpr auto get_tile_length() -> int { return tile_length; }
   static constexpr auto get_number_of_tiles() -> int { return number_of_tiles; }
 
-  static constexpr auto get_color_position(int id) { return &color_position.at(id); }
-  static constexpr auto get_detail_position(int id) { return &detail_position.at(id); }
-  static constexpr auto get_player_position(int id) { return &player_position.at(id); }
+  static constexpr auto get_color_pos(int id) -> const Position & { return color_pos.at(id); }
+  static constexpr auto get_detail_pos(int id) -> const Position & { return detail_pos.at(id); }
+  static constexpr auto get_player_pos(int id) -> const Position & { return player_pos.at(id); }
 
-  auto get_color_queue() -> update_queue & { return tile_color_update_queue; }
-  auto get_detail_queue() -> update_queue & { return tile_detail_update_queue; }
-  auto get_player_queue() -> update_queue & { return tile_player_update_queue; }
+  auto get_color_update_queue() -> update_queue & { return tile_color_update_queue; }
+  auto get_detail_update_queue() -> update_queue & { return tile_detail_update_queue; }
+  auto get_player_update_queue() -> update_queue & { return tile_player_update_queue; }
+
+  void set_players(std::shared_ptr<std::vector<Player>> p, int tile_start);
+  auto get_player(int player_id) const -> const Player & { return players->at(player_id); }
 
   auto get_board_str() const -> std::string_view { return ascii_board; }
-  auto get_tile_color(int id) const -> std::string_view { return tile_colors.at(id); }
-  auto get_tile_detail(int id) const -> std::string_view { return tile_details.at(id); }
-  auto get_tile_player(int id) const -> std::string_view { return tile_players.at(id); }
+  auto get_tile_color(int tile_id) const -> std::string_view { return tile_colors.at(tile_id); }
+  auto get_tile_detail(int tile_id) const -> std::string_view { return tile_details.at(tile_id); }
+  auto get_tile_players(int tile_id) const -> presence { return tile_players.at(tile_id); }
+
+  void update_player_pos(int player_id);
+  void update_all_player_pos();
 
   static constexpr auto get_size() -> Size {
     // This seems to have to be declared in the header??
     // No way the base_board has only 2 lines right?
+    // Assume first 2 lines represent the width of the board and are non-unicode chars (1 byte)
     constexpr auto newlines = find_substrs<2>(base_board, "\n");
     constexpr int width = static_cast<int>(newlines[1] - newlines[0]);
     constexpr int height = std::count(base_board.begin(), base_board.end(), '\n');

@@ -6,8 +6,10 @@
 #include <fmt/color.h>
 
 #include <array>
+#include <vector>
 
-struct Avatar {
+// Officially, playing pieces are called tokens
+struct Token {
   // Must have default values so we can create a default Avatar
   // or also known as a no-owner Avatar
   char character{};
@@ -17,7 +19,7 @@ struct Avatar {
 class Player {
 private:
   static constexpr int max_players = 4;
-  static constexpr std::array<Avatar, max_players> pieces{
+  static constexpr std::array<Token, max_players> tokens{
     {{ 'A', Color::get("Blue") },
      { 'B', Color::get("Red") },
      { 'C', Color::get("Green") },
@@ -25,24 +27,38 @@ private:
   };
 
   int id;
-  Avatar avatar;
+  Token token;
 
-  // Ensure that avatar is initialized on object creation, so this has value
-  std::string player = fmt::format(avatar.color, std::string{ avatar.character });
+  // Ensure that piece is initialized on object creation, so this has value
+  std::string avatar;
 
-  int last_position = 0;
-  int position = 0;
+  int last_pos = 0;
+  int pos = 0;
+
+  // Just because we moved the player with @Player method, doesn't mean @Board or @View
+  // knows about it. @Board needs to know to move the pieces
+  bool is_movement_updated = true;
+
+  explicit Player(int id);
 
 public:
-  explicit Player(int id) : id{ id }, avatar{ pieces.at(id) } {}
+  static auto create_single(int id) -> Player;
+  static auto create_multiple(int n) -> std::vector<Player>;
 
-  consteval auto get_id() const -> int { return id; }
-  constexpr auto get_avatar() const -> Avatar { return avatar; }
-  constexpr auto get_character() const -> char { return avatar.character; }
-  constexpr auto get_color() const -> fmt::text_style { return avatar.color; }
-  constexpr auto get_player() const -> std::string_view { return player; }
+  static consteval auto get_max_players() -> int { return max_players; }
 
-  auto walk(int steps) -> int;
+  constexpr auto get_id() const -> int { return id; }
+  constexpr auto get_avatar() const -> std::string_view { return avatar; }
+  constexpr auto get_character() const -> char { return token.character; }
+  constexpr auto get_color() const -> const fmt::text_style & { return token.color; }
+
+  constexpr auto get_pos() const -> int { return pos; }
+  constexpr auto get_last_pos() const -> int { return last_pos; }
+
+  constexpr auto is_pos_updated() const -> bool { return is_movement_updated; }
+  constexpr void set_pos_updated(bool is_updated) { is_movement_updated = is_updated; }
+
+  void walk(int steps);
 };
 
 #endif // PLAYER_HPP
