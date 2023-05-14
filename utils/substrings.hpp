@@ -22,9 +22,10 @@ consteval auto find_substrs(std::string_view str, std::string_view substr) {
   int substr_find_count = 0;
 
   while ((pos = str.find(substr, pos)) != std::string_view::npos) {
-    indices[substr_find_count++] = pos;
+    indices[substr_find_count] = pos;
     pos += substr.length();
 
+    ++substr_find_count;
     if (substr_find_count >= N) {
       break;
     }
@@ -53,17 +54,18 @@ template <std::size_t N> consteval auto find_pos(std::string_view str, std::stri
   int newline_count = 1;
   int count = 0;
 
-  for (int i = 0; i < str.length(); i++) {
+  for (int i = 0; i < str.length(); ++i) {
     // Find newlines to determine the row it is on
     if (str.substr(i, 1) == "\n") {
       last_newline = i;
-      newline_count++;
+      ++newline_count;
     }
 
     // Find the substring and use its position with the previous newline to find
     // the col it starts on.
     if (str.substr(i, substr.length()) == substr) {
-      coords[count++] = Position{ i - last_newline, newline_count };
+      coords[count] = Position{ i - last_newline, newline_count };
+      ++count;
       if (count >= N) {
         break;
       }

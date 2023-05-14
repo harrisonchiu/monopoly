@@ -51,7 +51,7 @@ private:
   //    so it cannot rely on references. @Tile does not store the color border string, only group
   // @tile_details uses string_view because it just references the @Tile.detail which they create
   // @tile_players uses string_view because it just references @Player.char which already exists
-  std::vector<std::unique_ptr<Tile>> board;
+  std::vector<std::shared_ptr<Tile>> board;
   std::array<std::string, number_of_tiles> tile_colors;
   std::array<std::string_view, number_of_tiles> tile_details;
 
@@ -153,6 +153,9 @@ public:
 
   void update_player_pos(int player_id);
   void update_all_player_pos();
+
+  auto get_tile(int tile_id) const -> std::shared_ptr<Tile> { return board.at(tile_id); }
+  auto get_current_tile(int player_id) const -> std::shared_ptr<Tile>;
 
   static constexpr auto get_size() -> Size {
     // This seems to have to be declared in the header??

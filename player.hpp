@@ -18,6 +18,7 @@ struct Token {
 
 class Player {
 private:
+  // Implicitly, @player_ids must be in range [0, 3]
   static constexpr int max_players = 4;
   static constexpr std::array<Token, max_players> tokens{
     {{ 'A', Color::get("Blue") },

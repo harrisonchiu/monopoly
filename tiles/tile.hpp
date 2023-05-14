@@ -2,23 +2,11 @@
 #define TILE_HPP
 
 #include "player.hpp"
+#include "tiles/tile_attributes.hpp"
 
 #include <nlohmann/json.hpp>
 
 #include <string>
-
-enum class TileType { Property, Event };
-
-enum class PropertyStatus {
-  Mortgaged,
-  Unowned,
-  Owned, // Basic rent | 1 owned of the set
-  Tier1, // 1 house    | 2 owned of the set
-  Tier2, // 2 house    | 3 owned of the set
-  Tier3, // 3 house    | 4 owned of the set
-  Tier4, // 4 house    | 5 owned of the set
-  Tier5, // 5 house    | 6 owned of the set
-};
 
 class Tile {
   using json = nlohmann::json;
@@ -39,7 +27,7 @@ public:
   constexpr auto get_detail() const -> std::string_view { return detail; }
   constexpr auto set_detail(std::string new_detail) -> void { detail = std::move(new_detail); }
   virtual void update_detail() = 0;
-  virtual consteval auto get_type() const -> TileType = 0;
+  virtual constexpr auto get_type() const -> TileType = 0;
 
   //   virtual void visited_by() = 0;
   //   virtual void view() = 0;
@@ -73,7 +61,7 @@ protected:
 public:
   Property(const json &tile_data, int id)
       : Tile(tile_data, id), property_cost{ tile_data["property_cost"] } {}
-  consteval auto get_type() const -> TileType override { return TileType::Property; }
+  constexpr auto get_type() const -> TileType override { return TileType::Property; }
 
   // Special member functions defined for Rule of Five to get rid of warnings
   Property(const Property &) = delete; // Copy
@@ -88,7 +76,7 @@ class Event : public Tile {
 
 public:
   Event(const json &tile_data, int id) : Tile(tile_data, id) {}
-  consteval auto get_type() const -> TileType override { return TileType::Event; }
+  constexpr auto get_type() const -> TileType override { return TileType::Event; }
 
   // // Special member functions defined for Rule of Five to get rid of warnings
   Event(const Event &) = delete; // Copy

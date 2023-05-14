@@ -13,9 +13,9 @@ auto Player::create_multiple(int n) -> std::vector<Player> {
   players.reserve(max_players);
 
   // Cannot create more than the maximum number of players
-  int number_of_players = n <= max_players ? n : max_players;
+  const int number_of_players = n <= max_players ? n : max_players;
 
-  for (int id = 0; id < number_of_players; id++) {
+  for (int id = 0; id < number_of_players; ++id) {
     players.emplace_back(Player(id));
   }
   return players;

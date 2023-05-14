@@ -9,8 +9,15 @@
 class View {
 private:
   static constexpr Size board_size = Board::get_size();
-  static constexpr Size container_size = { board_size.width + 100, board_size.height + 2 };
-  static constexpr Position container_pos = { 0, 0 };
+  static constexpr Position board_pos = { 0, 0 }; // {x: col #, y: row #}
+
+  static constexpr Size console_size = { board_size.width, 4 };
+  static constexpr Position console_pos = { board_pos.col, board_pos.row + board_size.height + 2 };
+
+  static constexpr Size container_size = { board_size.width + 100,
+                                           board_size.height + console_size.height };
+  static constexpr Position container_pos = { 0, 0 }; // {x: col #, y: row #}
+
   std::shared_ptr<Board> board;
 
   using update_queue = std::shared_ptr<std::queue<int>>;
@@ -29,6 +36,10 @@ public:
   void draw_board_colors();
   void draw_board_details();
   void draw_board_players();
+
+  static void draw_prompt(std::string_view player);
+  static void output(std::string_view log);
+  static void clear_output();
 };
 
 #endif // VIEW_HPP

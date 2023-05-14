@@ -66,3 +66,15 @@ void View::draw_board_players() {
     board_player_update_queue->pop();
   }
 }
+
+void View::draw_prompt(std::string_view player) {
+  fmt::print("\x1b[{};{}H[{}]{}\x1b[0K", console_pos.row, console_pos.col, player, ">>> ");
+}
+
+void View::output(std::string_view log) {
+  fmt::print("\x1b[{};{}H\x1b[2K{}", console_pos.row + 1, console_pos.col, log);
+}
+
+void View::clear_output() {
+  fmt::print("\x1b[{};{}H\x1b[2K", console_pos.row + 1, console_pos.col);
+}

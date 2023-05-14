@@ -4,8 +4,7 @@
 #include <array>
 
 template <typename T, std::size_t Size>
-constexpr auto
-sort_by_order(std::array<T, Size> data, std::array<int, Size> order) {
+constexpr auto sort_by_order(std::array<T, Size> data, std::array<int, Size> order) {
   // O(N) sorting algorithm based on the order of a given array
   // Copies all the values and creates a new array.
   // @data: array to be sorted based on @order
@@ -14,7 +13,7 @@ sort_by_order(std::array<T, Size> data, std::array<int, Size> order) {
   // i.e. NO gaps Ex: fn([a, b, c, d], [0, 3, 2, 1]) -> [a, d, c, b]
 
   std::array<T, Size> sorted{};
-  for (std::size_t i = 0; i < Size; i++) {
+  for (std::size_t i = 0; i < Size; ++i) {
     sorted[order[i]] = data[i];
   }
 

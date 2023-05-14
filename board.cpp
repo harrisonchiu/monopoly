@@ -16,14 +16,14 @@
 Board::Board(json &board_data) {
   ascii_board = create_base_board(board_data);
 
-  for (int id = 0; id < number_of_tiles; id++) {
-    json &tile_data = board_data[id];
+  for (int id = 0; id < number_of_tiles; ++id) {
+    const json &tile_data = board_data[id];
 
     // Create actual tiles to be manipulated
     if (tile_data["type"] == "Street") {
-      board.emplace_back(std::make_unique<Street>(tile_data, id));
+      board.emplace_back(std::make_shared<Street>(tile_data, id));
     } else {
-      board.emplace_back(std::make_unique<Corner>(tile_data, id));
+      board.emplace_back(std::make_shared<Corner>(tile_data, id));
     }
 
     // Create what each row of a tile should look like
@@ -45,7 +45,7 @@ auto Board::create_base_board(const json &board_data) -> std::string {
   constexpr int top_row_end = 30;
 
   fmt::dynamic_format_arg_store<fmt::format_context> board_format_args;
-  for (int tile_id = 0; tile_id < number_of_tiles; tile_id++) {
+  for (int tile_id = 0; tile_id < number_of_tiles; ++tile_id) {
     const std::string tile_name = board_data[tile_id]["display_name"];
 
     // Only the top and bottom row need to split the name into 2 parts
@@ -78,7 +78,7 @@ auto Board::create_base_board(const json &board_data) -> std::string {
       std::string_view(center_pad.begin(), center_pad.end())
   ));
 
-  // 3 in repeat_str<> is the size of the string. Unicode chars must be string
+  // 3 in repeat_str<> is the size of the string ▔. Unicode chars must be string
   constexpr auto border_box = repeat_str<3, tile_length * 10 + 1>("▔");
   board_format_args.push_back(fmt::arg(
       "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
@@ -90,17 +90,20 @@ auto Board::create_base_board(const json &board_data) -> std::string {
 
 void Board::set_players(std::shared_ptr<std::vector<Player>> p, int tile_start) {
   players = std::move(p);
-  for (int player_id = 0; player_id < Player::get_max_players(); player_id++) {
+  for (int player_id = 0; player_id < Player::get_max_players(); ++player_id) {
     tile_players.at(tile_start).at(player_id) = players->at(player_id).get_avatar();
   }
   tile_player_update_queue->push(tile_start);
 }
 
 void Board::update_player_pos(int player_id) {
-  int current_pos = players->at(player_id).get_pos();
-  int last_pos = players->at(player_id).get_last_pos();
+  const int current_pos = players->at(player_id).get_pos();
+  const int last_pos = players->at(player_id).get_last_pos();
 
-  std::swap(tile_players.at(last_pos).at(player_id), tile_players.at(current_pos).at(player_id));
+  // Must be std::string& to swap the references in the arrays
+  std::string &previous_token_pos = tile_players.at(last_pos).at(player_id);
+  std::string &current_token_pos = tile_players.at(current_pos).at(player_id);
+  std::swap(previous_token_pos, current_token_pos);
 
   tile_player_update_queue->push(last_pos);
   tile_player_update_queue->push(current_pos);
@@ -115,4 +118,10 @@ void Board::update_all_player_pos() {
       update_player_pos(player.get_id());
     }
   }
+}
+
+auto Board::get_current_tile(int player_id) const -> std::shared_ptr<Tile> {
+  const int current_pos = get_player(player_id).get_pos();
+
+  return get_tile(current_pos);
 }
