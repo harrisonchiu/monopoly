@@ -43,6 +43,7 @@ public:
   static auto parse_command(std::string_view command) -> args_list;
   void run_command(args_list &args);
 
+  // Game actions return string which are logs that tell the user any needed game details
   auto move_player(args_list &args) -> std::string;
   auto end_turn(args_list &args) -> std::string;
   auto buy_tile(args_list &args) -> std::string;

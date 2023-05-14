@@ -9,6 +9,7 @@
 
 Street::Street(const json &tile_data, const int id) : Property(tile_data, id) { update_detail(); }
 
+// TODO: this could be done as a compile time map
 auto Street::get_property_status_label() const -> std::string {
   switch (Property::get_property_status()) {
   case PropertyStatus::Mortgaged:

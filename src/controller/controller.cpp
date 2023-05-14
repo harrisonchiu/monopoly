@@ -42,6 +42,8 @@ auto Controller::prompt() -> std::string {
   return command;
 }
 
+// Given some command made up of words or enclosed by brackets, separated by whitespace,
+// returns a list of args so functions can take it and do the actions easily.
 auto Controller::parse_command(std::string_view command) -> args_list {
   if (command.empty()) {
     return args_list{};
@@ -54,25 +56,35 @@ auto Controller::parse_command(std::string_view command) -> args_list {
   //    3 args: {1 2 3 4 5 6} arg_num_2 arg_num_3
   const static RE2 re(R"((\{([0-9$]+\s*)+\})|(\w+))");
   re2::StringPiece input(command);
-  re2::StringPiece bracketed_tokens;
-  re2::StringPiece normal_tokens;
+  re2::StringPiece bracketed_arg;
+  re2::StringPiece normal_arg;
   args_list args{};
 
-  // Seperate the command str into a list of arguments to easily do actions.
+  // Seperate the command str into a list of arguments.
   // Each arg after the regex pattern is a StringPiece that holds the result of a capture
   // group. The 2nd capture group is each digit between `{}`. We do not care so put nullptr there.
   // If the input does not match patter (e.g. only contains whitespace), returns an empty list
-  while (RE2::FindAndConsume(&input, re, &bracketed_tokens, (void *)nullptr, &normal_tokens)) {
-    if (bracketed_tokens != nullptr) {
-      args.push_back(bracketed_tokens.as_string());
-    } else if (normal_tokens != nullptr) {
-      args.push_back(normal_tokens.as_string());
+  while (RE2::FindAndConsume(&input, re, &bracketed_arg, (void *)nullptr, &normal_arg)) {
+    if (bracketed_arg != nullptr) {
+      args.push_back(bracketed_arg.as_string());
+    } else if (normal_arg != nullptr) {
+      args.push_back(normal_arg.as_string());
     }
   }
 
   return args;
 }
 
+// Every different has a unique keyword (the first arg). It specifies the main action to be done.
+// All the args that follow this keyword modifies, adds detail, or specifies the behaviour
+// Example:
+//    buy <tile_id>
+//    `buy` is the keyword and `<tile_id>` is the arg that specifies which tile to buy
+// Unique keywords are good for design both in player use and code.
+//  Player: more clear for what command to use and what it does
+//  Code: we use a map to link a keyword with its associated action (function). Much more
+//  clearer and extensible than many if/switch statements. Less duplicate code.
+//  Disadvantage: slower.
 void Controller::run_command(args_list &args) {
   if (args.empty()) {
     return;

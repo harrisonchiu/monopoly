@@ -8,8 +8,7 @@
 #include <array>
 #include <vector>
 
-// Officially, playing pieces are called tokens
-struct Token {
+struct Piece {
   // Must have default values so we can create a default Avatar
   // or also known as a no-owner Avatar
   char character{};
@@ -20,7 +19,7 @@ class Player {
 private:
   // Implicitly, @player_ids must be in range [0, 3]
   static constexpr int max_players = 4;
-  static constexpr std::array<Token, max_players> tokens{
+  static constexpr std::array<Piece, max_players> pieces{
     {{ 'A', Color::get("Blue") },
      { 'B', Color::get("Red") },
      { 'C', Color::get("Green") },
@@ -28,9 +27,8 @@ private:
   };
 
   int id;
-  Token token;
+  Piece piece;
 
-  // Ensure that piece is initialized on object creation, so this has value
   std::string avatar;
 
   int last_pos = 0;
@@ -43,6 +41,7 @@ private:
   explicit Player(int id);
 
 public:
+  // Use these methods to construct Player rather than default constructor
   static auto create_single(int id) -> Player;
   static auto create_multiple(int n) -> std::vector<Player>;
 
@@ -50,13 +49,13 @@ public:
 
   constexpr auto get_id() const -> int { return id; }
   constexpr auto get_avatar() const -> std::string_view { return avatar; }
-  constexpr auto get_character() const -> char { return token.character; }
-  constexpr auto get_color() const -> const fmt::text_style & { return token.color; }
-
+  constexpr auto get_character() const -> char { return piece.character; }
+  constexpr auto get_color() const -> const fmt::text_style & { return piece.color; }
   constexpr auto get_pos() const -> int { return pos; }
   constexpr auto get_last_pos() const -> int { return last_pos; }
 
   constexpr auto is_pos_updated() const -> bool { return is_movement_updated; }
+  constexpr auto is_pos_outdated() const -> bool { return !is_movement_updated; }
   constexpr void set_pos_updated(bool is_updated) { is_movement_updated = is_updated; }
 
   void walk(int steps);

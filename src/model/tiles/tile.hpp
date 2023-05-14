@@ -47,16 +47,16 @@ class Property : public Tile {
   using json = nlohmann::json;
 
 private:
-  static constexpr Token no_owner{};
+  static constexpr Piece no_owner{};
   int property_cost;
   PropertyStatus property_status = PropertyStatus::Unowned;
-  std::shared_ptr<Token> owner = std::make_shared<Token>(no_owner);
+  std::shared_ptr<Piece> owner = std::make_shared<Piece>(no_owner);
 
 protected:
   auto get_property_cost() const -> int { return property_cost; }
   auto get_property_status() const -> PropertyStatus { return property_status; }
   virtual auto get_property_status_label() const -> std::string = 0;
-  auto get_owner() const -> std::shared_ptr<Token> { return owner; }
+  auto get_owner() const -> std::shared_ptr<Piece> { return owner; }
 
 public:
   Property(const json &tile_data, int id)
