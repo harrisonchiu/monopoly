@@ -1,5 +1,5 @@
 CompileFlags:
-  Add: [-std=c++20, -Wall, -Wextra, -Werror, -Wpendantic]
+  Add: [-std=c++20, -Wall, -Wextra, -Werror, -Wpedantic]
   Compiler: clang++
 
 InlayHints:
