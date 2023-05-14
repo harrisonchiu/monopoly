@@ -1,6 +1,6 @@
-#include "player.hpp"
+#include "src/model/player.hpp"
 
-#include "board.hpp"
+#include "src/model/board.hpp"
 
 Player::Player(int id)
     : id{ id }, token{ tokens.at(id) },

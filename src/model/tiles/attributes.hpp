@@ -1,5 +1,5 @@
-#ifndef TILE_ATTRIBUTES_HPP
-#define TILE_ATTRIBUTES_HPP
+#ifndef ATTRIBUTE_HPP
+#define ATTRIBUTE_HPP
 
 enum class TileType { Property, Event };
 
@@ -14,4 +14,4 @@ enum class PropertyStatus {
   Tier5, // 5 house    | 6 owned of the set
 };
 
-#endif // TILE_ATTRIBUTES_HPP
+#endif // ATTRIBUTE_HPP

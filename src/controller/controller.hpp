@@ -1,9 +1,9 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
-#include "board.hpp"
-#include "player.hpp"
-#include "view.hpp"
+#include "src/model/board.hpp"
+#include "src/model/player.hpp"
+#include "src/view/view.hpp"
 
 #include <functional>
 #include <iterator>

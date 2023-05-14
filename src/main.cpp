@@ -1,9 +1,9 @@
 #define FMT_HEADER_ONLY
 
-#include "board.hpp"
-#include "controller.hpp"
-#include "player.hpp"
-#include "view.hpp"
+#include "src/controller/controller.hpp"
+#include "src/model/board.hpp"
+#include "src/model/player.hpp"
+#include "src/view/view.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -11,7 +11,7 @@
 
 auto main() -> int {
   using json = nlohmann::json;
-  std::ifstream file("tiles/board_data.json"); // runtime lookup
+  std::ifstream file("data/classic_board.json"); // runtime lookup
   json tile_data = json::parse(file);
 
   auto players = std::make_shared<std::vector<Player>>(Player::create_multiple(4));

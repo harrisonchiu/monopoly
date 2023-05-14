@@ -1,7 +1,7 @@
 #ifndef SUBSTRINGS_HPP
 #define SUBSTRINGS_HPP
 
-#include "utils/component.hpp"
+#include "src/view/components.hpp"
 
 #include <array>
 #include <string>

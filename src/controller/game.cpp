@@ -1,9 +1,9 @@
-#include "controller.hpp"
+#include "src/controller/controller.hpp"
 
-#include "board.hpp"
-#include "player.hpp"
-#include "tiles/tile_attributes.hpp"
-#include "view.hpp"
+#include "src/model/board.hpp"
+#include "src/model/player.hpp"
+#include "src/model/tiles/attributes.hpp"
+#include "src/view/view.hpp"
 
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
   constexpr int steps = 1;

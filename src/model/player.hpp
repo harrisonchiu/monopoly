@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "utils/color.hpp"
+#include "src/utils/color.hpp"
 
 #include <fmt/color.h>
 

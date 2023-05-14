@@ -1,8 +1,8 @@
 #ifndef TILE_HPP
 #define TILE_HPP
 
-#include "player.hpp"
-#include "tiles/tile_attributes.hpp"
+#include "src/model/player.hpp"
+#include "src/model/tiles/attributes.hpp"
 
 #include <nlohmann/json.hpp>
 

@@ -20,17 +20,17 @@ project_dep = [json_dep, fmt_dep, re2_dep]
 build_args = ['-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wcast-align']
 
 tiles_src = [
-    'tiles/street.cpp',
-    'tiles/corner.cpp'
+    'src/model/tiles/street.cpp',
+    'src/model/tiles/corner.cpp'
 ]
 
 src = [
-    'main.cpp',
-    'board.cpp',
-    'player.cpp',
-    'view.cpp',
-    'controller.cpp',
-    'game.cpp',
+    'src/main.cpp',
+    'src/model/board.cpp',
+    'src/model/player.cpp',
+    'src/view/view.cpp',
+    'src/controller/controller.cpp',
+    'src/controller/game.cpp',
     tiles_src
 ]
 

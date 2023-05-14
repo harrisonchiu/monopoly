@@ -1,8 +1,8 @@
-#include "tiles/corner.hpp"
-#include "tiles/tile.hpp"
+#include "src/model/tiles/corner.hpp"
+#include "src/model/tiles/tile.hpp"
 
-#include "board.hpp"
-#include "utils/color.hpp"
+#include "src/model/board.hpp"
+#include "src/utils/color.hpp"
 
 #include <string>
 

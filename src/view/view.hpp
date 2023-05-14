@@ -1,8 +1,8 @@
 #ifndef VIEW_HPP
 #define VIEW_HPP
 
-#include "board.hpp"
-#include "utils/component.hpp"
+#include "src/model/board.hpp"
+#include "src/view/components.hpp"
 
 #include <queue>
 

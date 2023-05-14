@@ -1,8 +1,8 @@
 #define FMT_HEADER_ONLY
 
-#include "view.hpp"
+#include "src/view/view.hpp"
 
-#include "board.hpp"
+#include "src/model/board.hpp"
 
 #include <fmt/ranges.h>
 

@@ -1,8 +1,8 @@
-#include "controller.hpp"
+#include "src/controller/controller.hpp"
 
-#include "board.hpp"
-#include "player.hpp"
-#include "view.hpp"
+#include "src/model/board.hpp"
+#include "src/model/player.hpp"
+#include "src/view/view.hpp"
 
 #include <re2/re2.h>
 #include <re2/stringpiece.h>

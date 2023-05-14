@@ -1,7 +1,7 @@
 #ifndef CORNER_HPP
 #define CORNER_HPP
 
-#include "tiles/tile.hpp"
+#include "src/model/tiles/tile.hpp"
 
 #include <nlohmann/json.hpp>
 

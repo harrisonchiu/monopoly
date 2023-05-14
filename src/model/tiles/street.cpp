@@ -1,7 +1,7 @@
-#include "tiles/street.hpp"
-#include "tiles/tile.hpp"
+#include "src/model/tiles/street.hpp"
+#include "src/model/tiles/tile.hpp"
 
-#include "board.hpp"
+#include "src/model/board.hpp"
 
 #include <fmt/core.h>
 

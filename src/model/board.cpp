@@ -1,11 +1,11 @@
 #define FMT_HEADER_ONLY
 
-#include "board.hpp"
+#include "src/model/board.hpp"
 
-#include "tiles/corner.hpp"
-#include "tiles/street.hpp"
-#include "utils/color.hpp"
-#include "utils/substrings.hpp"
+#include "src/model/tiles/corner.hpp"
+#include "src/model/tiles/street.hpp"
+#include "src/utils/color.hpp"
+#include "src/utils/substrings.hpp"
 
 #include <fmt/args.h>
 #include <nlohmann/json.hpp>

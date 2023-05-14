@@ -1,11 +1,11 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include "player.hpp"
-#include "tiles/tile.hpp"
-#include "utils/component.hpp"
-#include "utils/sorting.hpp"
-#include "utils/substrings.hpp"
+#include "src/model/player.hpp"
+#include "src/model/tiles/tile.hpp"
+#include "src/utils/sorting.hpp"
+#include "src/utils/substrings.hpp"
+#include "src/view/components.hpp"
 
 #include <nlohmann/json.hpp>
 
