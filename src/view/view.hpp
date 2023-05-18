@@ -7,6 +7,8 @@
 #include <queue>
 
 class View {
+  using update_queue = std::shared_ptr<std::queue<int>>;
+
 private:
   static constexpr Size board_size = Board::get_size();
   static constexpr Position board_pos = { 0, 0 }; // {x: col #, y: row #}
@@ -20,7 +22,6 @@ private:
 
   std::shared_ptr<Board> board;
 
-  using update_queue = std::shared_ptr<std::queue<int>>;
   update_queue board_color_update_queue;
   update_queue board_detail_update_queue;
   update_queue board_player_update_queue;
@@ -34,7 +35,9 @@ public:
 
   void draw_board() const;
   void draw_board_colors();
+  void request_tile_color_update(int tile_id);
   void draw_board_details();
+  void request_tile_detail_update(int tile_id);
   void draw_board_players();
 
   static void draw_prompt(std::string_view player);

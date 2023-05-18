@@ -27,6 +27,7 @@ Controller::Controller(
 }
 
 void Controller::visualize_game() {
+  view->clear_screen();
   view->draw_board();
   view->draw_board_colors();
   view->draw_board_details();

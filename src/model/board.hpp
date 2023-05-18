@@ -40,8 +40,6 @@ private:
     35, 14, 36, 13, 37, 12, 38, 11, 39, 10, 9,  8,  7,  6,  5,  4,  3,  2,  1,  0
   };
 
-  std::shared_ptr<std::vector<Player>> players;
-
   // @ascii_board is the main structure of the board with display_names
   // @tile_* holds the strings that will be printed ontop of @ascii_board.
   // Originally, @ascii_board had substrings replaced and entire @ascii_board reprited, but it
@@ -55,9 +53,6 @@ private:
   // @tile_details uses string_view because it just references the @Tile.detail which they create
   // @tile_players uses string_view because it just references @Player.char which already exists
   std::vector<std::shared_ptr<Tile>> board;
-  std::array<std::string, number_of_tiles> tile_colors;
-  std::array<std::string_view, number_of_tiles> tile_details;
-
   std::array<presence, number_of_tiles> tile_players{};
 
   // The @Tiles that must be visually updated because some change happened to that tile
@@ -143,21 +138,14 @@ public:
   auto get_color_update_queue() -> update_queue & { return tile_color_update_queue; }
   auto get_detail_update_queue() -> update_queue & { return tile_detail_update_queue; }
   auto get_player_update_queue() -> update_queue & { return tile_player_update_queue; }
-  void update_detail_tile(int tile_id);
-
-  void set_players(std::shared_ptr<std::vector<Player>> players, int tile_start);
-  auto get_player(int player_id) const -> const Player & { return players->at(player_id); }
 
   auto get_board_str() const -> std::string_view { return ascii_board; }
-  auto get_tile_color(int tile_id) const -> std::string_view { return tile_colors.at(tile_id); }
-  auto get_tile_detail(int tile_id) const -> std::string_view { return tile_details.at(tile_id); }
   auto get_tile_players(int tile_id) const -> const presence & { return tile_players.at(tile_id); }
 
-  void update_player_pos(int player_id);
-  void update_all_player_pos();
+  void place_player_pieces(const Player &player, int tile_start);
+  void move_player_piece(Player &player);
 
   auto get_tile(int tile_id) const -> const std::shared_ptr<Tile> & { return board.at(tile_id); }
-  auto get_current_tile(int player_id) const -> const std::shared_ptr<Tile> &;
 
   static constexpr auto get_size() -> Size {
     // This seems to have to be declared in the header??

@@ -4,7 +4,6 @@
 
 #include "src/model/tiles/corner.hpp"
 #include "src/model/tiles/street.hpp"
-#include "src/utils/color.hpp"
 #include "src/utils/substrings.hpp"
 
 #include <fmt/args.h>
@@ -26,12 +25,9 @@ Board::Board(const json &board_data) {
       board.emplace_back(std::make_shared<Corner>(tile_data, id));
     }
 
-    // Create what each row of a tile should look like by default
-    tile_colors.at(id) = fmt::format(Color::get(board.back()->get_group()), "▔▔▔▔▔▔▔");
-    tile_details.at(id) = board.back()->get_detail();
+    // Color and detail are part of the tile itself, so store it in @Tile
+    // Pieces (players) are placed on the board, so store it here
     tile_players.at(id).fill(" ");
-
-    // Notify @View that there are changes to the board, so visually update it
     tile_color_update_queue->push(id);
     tile_detail_update_queue->push(id);
     tile_player_update_queue->push(id);
@@ -88,28 +84,25 @@ auto Board::create_base_board(const json &board_data) -> std::string {
   return fmt::vformat(base_board, board_format_args);
 }
 
-// Add all the players that will be playing to the board. Use after creating the board
-void Board::set_players(std::shared_ptr<std::vector<Player>> p, const int tile_start) {
-  players = std::move(p);
-  for (int player_id = 0; player_id < Player::get_max_players(); ++player_id) {
-    tile_players.at(tile_start).at(player_id) = players->at(player_id).get_avatar();
-  }
+// Add player pieces to the board. Use after creating the board
+void Board::place_player_pieces(const Player &player, const int tile_start) {
+  tile_players.at(tile_start).at(player.get_id()) = player.get_avatar();
   tile_player_update_queue->push(tile_start);
 }
 
 // @Player may have moved, but @Board may not have moved the piece itself.
 // @View relies on this to visually update player movement.
-void Board::update_player_pos(const int player_id) {
-  Player &player = players->at(player_id);
+// Assume pieces exist on the board
+void Board::move_player_piece(Player &player) {
+  const int player_id = player.get_id();
   const int current_pos = player.get_pos();
   const int last_pos = player.get_last_pos();
 
-  // Return early if position does not need to be changed
+  // Exit early if the piece does not need to be moved
   if (player.is_pos_updated() || current_pos == last_pos) {
     return;
   }
 
-  // Must be std::string& to swap the references in the arrays
   std::string &previous_piece_pos = tile_players.at(last_pos).at(player_id);
   std::string &current_piece_pos = tile_players.at(current_pos).at(player_id);
   std::swap(previous_piece_pos, current_piece_pos);
@@ -119,18 +112,3 @@ void Board::update_player_pos(const int player_id) {
 
   player.set_pos_updated(true);
 }
-
-// Wrapper function to easily move all player pieces
-void Board::update_all_player_pos() {
-  for (const auto &player : *players) {
-    update_player_pos(player.get_id());
-  }
-}
-
-auto Board::get_current_tile(const int player_id) const -> const std::shared_ptr<Tile> & {
-  const int current_pos = get_player(player_id).get_pos();
-
-  return get_tile(current_pos);
-}
-
-void Board::update_detail_tile(int tile_id) { tile_detail_update_queue->push(tile_id); }

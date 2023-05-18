@@ -7,11 +7,11 @@
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
   constexpr int steps = 1;
   current_player->walk(steps);
+  board->move_player_piece(*current_player);
   view->draw_board_players();
 
-  const int player_id = current_player->get_id();
   const std::string_view player = current_player->get_avatar();
-  const std::string_view landed_tile = board->get_current_tile(player_id)->get_name();
+  const std::string_view landed_tile = board->get_tile(current_player->get_pos())->get_name();
   std::string log =
       fmt::format("Player {} rolled {} and landed on {}.", player, steps, landed_tile);
   return log;
@@ -33,20 +33,35 @@ auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
 }
 
 auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
-  const int player_id = current_player->get_id();
-  const std::shared_ptr<Tile> &tile = board->get_current_tile(player_id);
-  const int tile_cost = tile->get_cost();
+  const std::shared_ptr<Tile> &tile = board->get_tile(current_player->get_pos());
 
+  if (!tile->get_is_ownable()) {
+    return fmt::format("{} is not for sale. Cannot purchase.", tile->get_name());
+  }
+
+  if (tile->get_owner_id() == current_player->get_id()) {
+    return fmt::format("{} is already owned by you. Cannot purchase.", tile->get_name());
+  }
+
+  if (tile->get_owner_id() != -1) {
+    return fmt::format(
+        "{} is already owned by Player {}. Cannot purchase.", tile->get_name(),
+        current_player->get_avatar()
+    );
+  }
+
+  const int tile_cost = tile->get_cost();
   if (current_player->get_money() >= tile_cost) {
     current_player->withdraw(tile_cost);
     tile->set_owner(*current_player);
   }
 
-  board->update_detail_tile(tile->get_id());
+  view->request_tile_detail_update(tile->get_id());
   view->draw_board_details();
 
   std::string log = fmt::format(
-      "Player {} purchased {} for ${}.", current_player->get_avatar(), tile->get_name(), tile_cost
+      "Player {} purchased {} for ${}. Balance remaining: ${}", current_player->get_avatar(),
+      tile->get_name(), tile_cost, current_player->get_money()
   );
   return log;
 }

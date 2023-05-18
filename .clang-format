@@ -14,4 +14,7 @@ ColumnLimit: 99
 Cpp11BracedListStyle: false
 AlignArrayOfStructures: Right
 
+# Puts each initializer on its own line
+PackConstructorInitializers: NextLine
+
 # https://clang.llvm.org/docs/ClangFormatStyleOptions.html
