@@ -14,7 +14,8 @@ auto main() -> int {
   std::ifstream file("data/classic_board.json"); // runtime lookup
   json tile_data = json::parse(file);
 
-  auto players = std::make_shared<std::vector<Player>>(Player::create_multiple(4));
+  std::shared_ptr<std::vector<Player>> players =
+      std::make_shared<std::vector<Player>>(Player::create_multiple(4));
   auto board = std::make_shared<Board>(tile_data);
   board->set_players(players, 0);
 

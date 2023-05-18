@@ -5,7 +5,7 @@
 // But it feels like extra overhead and unnecessary
 enum class TileType { Property, Event };
 
-enum class PropertyStatus {
+enum class OwnershipStatus {
   // Implicitly marks the maximum number of tiles per group
   Mortgaged,
   Unowned,
@@ -15,6 +15,10 @@ enum class PropertyStatus {
   Tier3, // 3 house    | 4 owned of the group
   Tier4, // 4 house    | 5 owned of the group
   Tier5, // 5 house    | 6 owned of the group
+
+  // Number of items in this enum except for this one. Used to determine size.
+  // i.e. { Mortgaged, Unowned, Owned, COUNT = 3}
+  COUNT = 8,
 };
 
 #endif // ATTRIBUTE_HPP

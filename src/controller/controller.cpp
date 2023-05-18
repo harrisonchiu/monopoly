@@ -23,7 +23,7 @@ Controller::Controller(
   commands["r"] = &Controller::move_player;
   commands["end"] = &Controller::end_turn;
   commands["e"] = &Controller::end_turn;
-  // commands["buy"] = &Controller : buy_tile;
+  commands["buy"] = &Controller::buy_tile;
 }
 
 void Controller::visualize_game() {

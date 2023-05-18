@@ -13,7 +13,7 @@
 #include <string>
 #include <string_view>
 
-Board::Board(json &board_data) {
+Board::Board(const json &board_data) {
   ascii_board = create_base_board(board_data);
 
   for (int id = 0; id < number_of_tiles; ++id) {
@@ -89,7 +89,7 @@ auto Board::create_base_board(const json &board_data) -> std::string {
 }
 
 // Add all the players that will be playing to the board. Use after creating the board
-void Board::set_players(std::shared_ptr<std::vector<Player>> p, int tile_start) {
+void Board::set_players(std::shared_ptr<std::vector<Player>> p, const int tile_start) {
   players = std::move(p);
   for (int player_id = 0; player_id < Player::get_max_players(); ++player_id) {
     tile_players.at(tile_start).at(player_id) = players->at(player_id).get_avatar();
@@ -99,13 +99,13 @@ void Board::set_players(std::shared_ptr<std::vector<Player>> p, int tile_start) 
 
 // @Player may have moved, but @Board may not have moved the piece itself.
 // @View relies on this to visually update player movement.
-void Board::update_player_pos(int player_id) {
+void Board::update_player_pos(const int player_id) {
   Player &player = players->at(player_id);
   const int current_pos = player.get_pos();
   const int last_pos = player.get_last_pos();
 
   // Return early if position does not need to be changed
-  if (player.is_pos_outdated() || current_pos == last_pos) {
+  if (player.is_pos_updated() || current_pos == last_pos) {
     return;
   }
 
@@ -127,8 +127,10 @@ void Board::update_all_player_pos() {
   }
 }
 
-auto Board::get_current_tile(int player_id) const -> std::shared_ptr<Tile> {
+auto Board::get_current_tile(const int player_id) const -> const std::shared_ptr<Tile> & {
   const int current_pos = get_player(player_id).get_pos();
 
   return get_tile(current_pos);
 }
+
+void Board::update_detail_tile(int tile_id) { tile_detail_update_queue->push(tile_id); }

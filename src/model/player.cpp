@@ -2,16 +2,18 @@
 
 #include "src/model/board.hpp"
 
-Player::Player(int id)
-    : id{ id }, piece{ pieces.at(id) },
-      avatar{ fmt::format(piece.color, std::string{ piece.character }) } {}
+// Creates a default non-playable player to represent no owners for tiles
+Player::Player()
+    : id{ -1 }, piece{ std::make_shared<Piece>() },
+      avatar{ fmt::format(piece->color, std::string{ piece->character }) } {}
 
-// Does not check for players with duplicate ids. No 2 players should have the same id.
-auto Player::create_single(int id) -> Player { return Player(id); }
+Player::Player(const int id)
+    : id{ id }, piece{ std::make_shared<Piece>(pieces.at(id)) },
+      avatar{ fmt::format(piece->color, std::string{ piece->character }) } {}
 
 // Creates 0 to 4 players each with unique ids.
 // Ids are the order in which they are created starting from 0, ending at 3 for the last player.
-auto Player::create_multiple(int n) -> std::vector<Player> {
+auto Player::create_multiple(const int n) -> std::vector<Player> {
   std::vector<Player> players;
   players.reserve(max_players);
 
@@ -19,7 +21,8 @@ auto Player::create_multiple(int n) -> std::vector<Player> {
   const int number_of_players = n <= max_players ? n : max_players;
 
   for (int id = 0; id < number_of_players; ++id) {
-    players.emplace_back(Player(id));
+    Player player = Player(id);
+    players.emplace_back(std::move(player));
   }
   return players;
 };
@@ -31,3 +34,7 @@ void Player::walk(const int steps) {
 
   is_movement_updated = false;
 }
+
+void Player::withdraw(const int amount) { money -= amount; }
+
+void Player::deposit(const int amount) { money += amount; }

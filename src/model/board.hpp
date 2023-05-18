@@ -18,6 +18,9 @@
 class Board {
   using json = nlohmann::json;
 
+  using update_queue = std::shared_ptr<std::queue<int>>;
+  using presence = std::array<std::string, Player::get_max_players()>;
+
 private:
   static constexpr int tile_length = 7; // Length in chars
   static constexpr int number_of_tiles = 40;
@@ -55,11 +58,9 @@ private:
   std::array<std::string, number_of_tiles> tile_colors;
   std::array<std::string_view, number_of_tiles> tile_details;
 
-  using presence = std::array<std::string, Player::get_max_players()>;
   std::array<presence, number_of_tiles> tile_players{};
 
   // The @Tiles that must be visually updated because some change happened to that tile
-  using update_queue = std::shared_ptr<std::queue<int>>;
   update_queue tile_color_update_queue = std::make_shared<std::queue<int>>();
   update_queue tile_detail_update_queue = std::make_shared<std::queue<int>>();
   update_queue tile_player_update_queue = std::make_shared<std::queue<int>>();
@@ -131,7 +132,7 @@ private:
   static auto create_base_board(const json &board_data) -> std::string;
 
 public:
-  explicit Board(json &board_data);
+  explicit Board(const json &board_data);
   static constexpr auto get_tile_length() -> int { return tile_length; }
   static constexpr auto get_number_of_tiles() -> int { return number_of_tiles; }
 
@@ -142,20 +143,21 @@ public:
   auto get_color_update_queue() -> update_queue & { return tile_color_update_queue; }
   auto get_detail_update_queue() -> update_queue & { return tile_detail_update_queue; }
   auto get_player_update_queue() -> update_queue & { return tile_player_update_queue; }
+  void update_detail_tile(int tile_id);
 
-  void set_players(std::shared_ptr<std::vector<Player>> p, int tile_start);
+  void set_players(std::shared_ptr<std::vector<Player>> players, int tile_start);
   auto get_player(int player_id) const -> const Player & { return players->at(player_id); }
 
   auto get_board_str() const -> std::string_view { return ascii_board; }
   auto get_tile_color(int tile_id) const -> std::string_view { return tile_colors.at(tile_id); }
   auto get_tile_detail(int tile_id) const -> std::string_view { return tile_details.at(tile_id); }
-  auto get_tile_players(int tile_id) const -> presence { return tile_players.at(tile_id); }
+  auto get_tile_players(int tile_id) const -> const presence & { return tile_players.at(tile_id); }
 
   void update_player_pos(int player_id);
   void update_all_player_pos();
 
-  auto get_tile(int tile_id) const -> std::shared_ptr<Tile> { return board.at(tile_id); }
-  auto get_current_tile(int player_id) const -> std::shared_ptr<Tile>;
+  auto get_tile(int tile_id) const -> const std::shared_ptr<Tile> & { return board.at(tile_id); }
+  auto get_current_tile(int player_id) const -> const std::shared_ptr<Tile> &;
 
   static constexpr auto get_size() -> Size {
     // This seems to have to be declared in the header??

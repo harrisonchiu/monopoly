@@ -17,23 +17,28 @@ private:
   std::string group;
   std::string detail;
 
+  int cost = 0;
+  int owner_id = -1;
+  std::shared_ptr<Piece> owner_marker = std::make_shared<Piece>();
+  bool is_ownable = false;
+  OwnershipStatus ownership_status = OwnershipStatus::Unowned;
+
 public:
-  Tile(const json &tile_data, int id)
-      : id{ id }, name{ tile_data["name"] }, group{ tile_data["group"] } {}
+  Tile(const json &tile_data, int id);
 
   constexpr auto get_id() const -> int { return id; }
   constexpr auto get_name() const -> std::string_view { return name; }
   constexpr auto get_group() const -> std::string_view { return group; }
   constexpr auto get_detail() const -> std::string_view { return detail; }
-  constexpr auto set_detail(std::string new_detail) -> void { detail = std::move(new_detail); }
+  constexpr void set_detail(std::string new_detail) { detail = std::move(new_detail); }
   virtual void update_detail() = 0;
-  virtual constexpr auto get_type() const -> TileType = 0;
 
-  //   virtual void visited_by() = 0;
-  //   virtual void view() = 0;
-  //   virtual void interact() = 0;
-  //   virtual void monopolize() = 0;
-  //   virtual void change_owner() = 0;
+  auto get_cost() const -> int { return cost; }
+  void set_owner(Player &player);
+  auto get_owner_id() const -> int { return owner_id; }
+  auto get_owner_marker() const -> const std::shared_ptr<Piece> & { return owner_marker; }
+  auto get_is_ownable() const -> bool { return is_ownable; }
+  auto get_ownership_status() const -> OwnershipStatus { return ownership_status; }
 
   // Special member functions defined for Rule of Five to get rid of warnings
   Tile(const Tile &) = delete; // Copy
@@ -43,47 +48,20 @@ public:
   virtual ~Tile() = default; // Destructor
 };
 
+// Property abstract class
 class Property : public Tile {
   using json = nlohmann::json;
 
-private:
-  static constexpr Piece no_owner{};
-  int property_cost;
-  PropertyStatus property_status = PropertyStatus::Unowned;
-  std::shared_ptr<Piece> owner = std::make_shared<Piece>(no_owner);
-
-protected:
-  auto get_property_cost() const -> int { return property_cost; }
-  auto get_property_status() const -> PropertyStatus { return property_status; }
-  virtual auto get_property_status_label() const -> std::string = 0;
-  auto get_owner() const -> std::shared_ptr<Piece> { return owner; }
-
 public:
-  Property(const json &tile_data, int id)
-      : Tile(tile_data, id), property_cost{ tile_data["property_cost"] } {}
-  constexpr auto get_type() const -> TileType override { return TileType::Property; }
-
-  // Special member functions defined for Rule of Five to get rid of warnings
-  Property(const Property &) = delete; // Copy
-  auto operator=(const Property &) -> Property & = delete;
-  Property(const Property &&) = delete; // Move
-  auto operator=(const Property &&) -> Property & = delete;
-  ~Property() override = default; // Destructor
+  Property(const json &tile_data, int id);
 };
 
+// Event abstract class
 class Event : public Tile {
   using json = nlohmann::json;
 
 public:
-  Event(const json &tile_data, int id) : Tile(tile_data, id) {}
-  constexpr auto get_type() const -> TileType override { return TileType::Event; }
-
-  // // Special member functions defined for Rule of Five to get rid of warnings
-  Event(const Event &) = delete; // Copy
-  auto operator=(const Event &) -> Event & = delete;
-  Event(const Event &&) = delete; // Move
-  auto operator=(const Event &&) -> Event & = delete;
-  ~Event() override = default; // Destructor
+  Event(const json &tile_data, int id);
 };
 
 #endif // TILE_HPP

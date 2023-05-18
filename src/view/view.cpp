@@ -51,7 +51,9 @@ void View::draw_board_details() {
   while (!(board_detail_update_queue->empty())) {
     const int tile_id = board_detail_update_queue->front();
     const Position &pos = board->get_detail_pos(tile_id);
-    fmt::print("\x1b[{};{}H{}", pos.row, pos.col, board->get_tile_detail(tile_id));
+    const std::shared_ptr<Tile> &tile = board->get_tile(tile_id);
+    tile->update_detail();
+    fmt::print("\x1b[{};{}H{}", pos.row, pos.col, tile->get_detail());
     board_detail_update_queue->pop();
   }
 }

@@ -10,10 +10,10 @@
 #include <string_view>
 
 class Color {
-private:
   using sv = std::string_view;
   using ts = fmt::text_style;
 
+private:
   // White foreground is considered nothing because terminals usually have white
   // text and thus appear like normal. We are assuming white terminal text color
   static constexpr ts no_color = fmt::fg(fmt::color::white);
@@ -36,7 +36,7 @@ private:
 
 public:
   static constexpr auto get(const std::string_view color) -> ts {
-    return map.at(color, no_color);
+    return map.get(color, no_color);
   };
 
   static constexpr auto none() -> ts { return no_color; }

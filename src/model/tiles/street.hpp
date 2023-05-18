@@ -3,15 +3,34 @@
 
 #include "src/model/tiles/tile.hpp"
 
+#include "src/model/tiles/attributes.hpp"
+#include "src/utils/map.hpp"
+
 #include <nlohmann/json.hpp>
 
-#include <string>
+#include <array>
+#include <string_view>
 
 class Street : public Property {
   using json = nlohmann::json;
+  using status_labels = std::pair<OwnershipStatus, std::string_view>;
 
-protected:
-  auto get_property_status_label() const -> std::string override;
+private:
+  static constexpr std::size_t status_count = static_cast<std::size_t>(OwnershipStatus::COUNT);
+  static constexpr std::array<status_labels, status_count> labels = {
+    {
+     { OwnershipStatus::Mortgaged, "M" },
+     { OwnershipStatus::Unowned, "_" },
+     { OwnershipStatus::Owned, "X" },
+     { OwnershipStatus::Tier1, "1H" },
+     { OwnershipStatus::Tier2, "2H" },
+     { OwnershipStatus::Tier3, "3H" },
+     { OwnershipStatus::Tier4, "4H" },
+     { OwnershipStatus::Tier5, "HT" },
+     }
+  };
+  static constexpr auto ownership_labels =
+      CompileTimeMap<OwnershipStatus, std::string_view, labels.size()>{ { labels } };
 
 public:
   Street(const json &tile_data, int id);

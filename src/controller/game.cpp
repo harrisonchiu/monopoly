@@ -2,7 +2,6 @@
 
 #include "src/model/board.hpp"
 #include "src/model/player.hpp"
-#include "src/model/tiles/attributes.hpp"
 #include "src/view/view.hpp"
 
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
@@ -11,16 +10,15 @@ auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
   view->draw_board_players();
 
   const int player_id = current_player->get_id();
+  const std::string_view player = current_player->get_avatar();
   const std::string_view landed_tile = board->get_current_tile(player_id)->get_name();
-
-  const std::string_view player_avatar = current_player->get_avatar();
   std::string log =
-      fmt::format("Player {} rolled {} and landed on {}.", player_avatar, steps, landed_tile);
+      fmt::format("Player {} rolled {} and landed on {}.", player, steps, landed_tile);
   return log;
 }
 
 auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
-  const std::string_view turn_ender_avatar = current_player->get_avatar();
+  const std::string_view turn_ender = current_player->get_avatar();
 
   ++turn_number;
   ++current_player;
@@ -28,21 +26,27 @@ auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
     current_player = players->begin();
   }
 
-  const std::string_view next_player_avatar = current_player->get_avatar();
-  std::string log = fmt::format(
-      "Player {} ended their turn. Now Player {} turn.", turn_ender_avatar, next_player_avatar
-  );
-
+  const std::string_view next_player = current_player->get_avatar();
+  std::string log =
+      fmt::format("Player {} ended their turn. Now Player {} turn.", turn_ender, next_player);
   return log;
 }
 
-auto Controller::buy_tile(args_list &args) -> std::string {
+auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   const int player_id = current_player->get_id();
-  const TileType tile_type = board->get_current_tile(player_id)->get_type();
+  const std::shared_ptr<Tile> &tile = board->get_current_tile(player_id);
+  const int tile_cost = tile->get_cost();
 
-  std::string log;
-  if (tile_type == TileType::Property) {
+  if (current_player->get_money() >= tile_cost) {
+    current_player->withdraw(tile_cost);
+    tile->set_owner(*current_player);
   }
 
-  return args[0];
+  board->update_detail_tile(tile->get_id());
+  view->draw_board_details();
+
+  std::string log = fmt::format(
+      "Player {} purchased {} for ${}.", current_player->get_avatar(), tile->get_name(), tile_cost
+  );
+  return log;
 }

@@ -21,7 +21,10 @@ build_args = ['-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wcast-align']
 
 tiles_src = [
     'src/model/tiles/street.cpp',
-    'src/model/tiles/corner.cpp'
+    'src/model/tiles/corner.cpp',
+    'src/model/tiles/property.cpp',
+    'src/model/tiles/event.cpp',
+    'src/model/tiles/tile.cpp',
 ]
 
 src = [
