@@ -34,12 +34,6 @@ consteval auto find_substrs(std::string_view str, std::string_view substr) {
   return indices;
 }
 
-// Overloading to support other similar string types
-template <std::size_t N>
-consteval auto find_substrs(const std::string &str, const std::string &substr) {
-  return find_substrs<N>(std::string_view(str), std::string_view(substr));
-}
-
 // N is size of array returned or the number of substring occurrences to get. If
 // N is less than or equal to the number of occurrences, the array will be the
 // index of those occurrences in order. If N is greater than the number of

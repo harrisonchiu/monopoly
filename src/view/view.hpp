@@ -7,8 +7,6 @@
 #include <queue>
 
 class View {
-  using update_queue = std::shared_ptr<std::queue<int>>;
-
 private:
   static constexpr Size board_size = Board::get_size();
   static constexpr Position board_pos = { 0, 0 }; // {x: col #, y: row #}
@@ -21,10 +19,6 @@ private:
   static constexpr Position container_pos = { 0, 0 }; // {x: col #, y: row #}
 
   std::shared_ptr<Board> board;
-
-  update_queue board_color_update_queue;
-  update_queue board_detail_update_queue;
-  update_queue board_player_update_queue;
 
 public:
   explicit View(std::shared_ptr<Board> board);

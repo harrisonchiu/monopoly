@@ -28,9 +28,9 @@ Board::Board(const json &board_data) {
     // Color and detail are part of the tile itself, so store it in @Tile
     // Pieces (players) are placed on the board, so store it here
     tile_players.at(id).fill(" ");
-    tile_color_update_queue->push(id);
-    tile_detail_update_queue->push(id);
-    tile_player_update_queue->push(id);
+    tile_color_update_queue.push(id);
+    tile_detail_update_queue.push(id);
+    tile_player_update_queue.push(id);
   }
 }
 
@@ -87,7 +87,7 @@ auto Board::create_base_board(const json &board_data) -> std::string {
 // Add player pieces to the board. Use after creating the board
 void Board::place_player_pieces(const Player &player, const int tile_start) {
   tile_players.at(tile_start).at(player.get_id()) = player.get_avatar();
-  tile_player_update_queue->push(tile_start);
+  tile_player_update_queue.push(tile_start);
 }
 
 // @Player may have moved, but @Board may not have moved the piece itself.
@@ -107,8 +107,8 @@ void Board::move_player_piece(Player &player) {
   std::string &current_piece_pos = tile_players.at(current_pos).at(player_id);
   std::swap(previous_piece_pos, current_piece_pos);
 
-  tile_player_update_queue->push(last_pos);
-  tile_player_update_queue->push(current_pos);
+  tile_player_update_queue.push(last_pos);
+  tile_player_update_queue.push(current_pos);
 
   player.set_pos_updated(true);
 }

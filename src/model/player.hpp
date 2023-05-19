@@ -30,7 +30,8 @@ private:
   std::shared_ptr<Piece> piece;
   std::string avatar;
 
-  int money{ 99999 };
+  static constexpr int starting_money = 99999;
+  int money = starting_money;
 
   // Just because we moved the player with @Player method, doesn't mean @Board or @View
   // knows about it. @Board needs to know to move the pieces

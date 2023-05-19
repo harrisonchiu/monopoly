@@ -18,7 +18,7 @@
 class Board {
   using json = nlohmann::json;
 
-  using update_queue = std::shared_ptr<std::queue<int>>;
+  using update_queue = std::queue<int>;
   using presence = std::array<std::string, Player::get_max_players()>;
 
 private:
@@ -56,9 +56,9 @@ private:
   std::array<presence, number_of_tiles> tile_players{};
 
   // The @Tiles that must be visually updated because some change happened to that tile
-  update_queue tile_color_update_queue = std::make_shared<std::queue<int>>();
-  update_queue tile_detail_update_queue = std::make_shared<std::queue<int>>();
-  update_queue tile_player_update_queue = std::make_shared<std::queue<int>>();
+  update_queue tile_color_update_queue;
+  update_queue tile_detail_update_queue;
+  update_queue tile_player_update_queue;
 
   // Named arguments with brackets have the same length as the actual tile length. Therefore,
   // it has the dimensions and visual base look of the board even before the placeholders are
