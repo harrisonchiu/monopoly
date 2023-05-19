@@ -1,7 +1,7 @@
 #include "src/controller/controller.hpp"
 
 #include "src/model/board.hpp"
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
 #include <re2/re2.h>
@@ -15,7 +15,8 @@ Controller::Controller(
     std::unique_ptr<View> view_ptr, std::shared_ptr<Board> board_ptr,
     std::shared_ptr<std::vector<Player>> players_ptr
 )
-    : players{ std::move(players_ptr) }, board{ std::move(board_ptr) },
+    : players{ std::move(players_ptr) },
+      board{ std::move(board_ptr) },
       view{ std::move(view_ptr) } {
 
   current_player = players->begin();

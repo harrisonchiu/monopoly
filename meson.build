@@ -30,7 +30,7 @@ tiles_src = [
 src = [
     'src/main.cpp',
     'src/model/board.cpp',
-    'src/model/player.cpp',
+    'src/model/players/player.cpp',
     'src/view/view.cpp',
     'src/controller/controller.cpp',
     'src/controller/game.cpp',

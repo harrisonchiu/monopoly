@@ -1,7 +1,7 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/model/tiles/tile.hpp"
 #include "src/utils/sorting.hpp"
 #include "src/utils/substrings.hpp"

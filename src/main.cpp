@@ -2,7 +2,7 @@
 
 #include "src/controller/controller.hpp"
 #include "src/model/board.hpp"
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
 #include <nlohmann/json.hpp>

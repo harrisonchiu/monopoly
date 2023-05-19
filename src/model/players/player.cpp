@@ -1,14 +1,16 @@
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 
 #include "src/model/board.hpp"
 
 // Creates a default non-playable player to represent no owners for tiles
 Player::Player()
-    : id{ -1 }, piece{ std::make_shared<Piece>() },
+    : id{ -1 },
+      piece{ std::make_shared<Piece>() },
       avatar{ fmt::format(piece->color, std::string{ piece->character }) } {}
 
 Player::Player(const int id)
-    : id{ id }, piece{ std::make_shared<Piece>(pieces.at(id)) },
+    : id{ id },
+      piece{ std::make_shared<Piece>(pieces.at(id)) },
       avatar{ fmt::format(piece->color, std::string{ piece->character }) } {}
 
 // Creates 0 to 4 players each with unique ids.

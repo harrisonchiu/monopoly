@@ -1,7 +1,7 @@
 #ifndef TILE_HPP
 #define TILE_HPP
 
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/model/tiles/attributes.hpp"
 
 #include <nlohmann/json.hpp>

@@ -2,7 +2,7 @@
 #define CONTROLLER_HPP
 
 #include "src/model/board.hpp"
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
 #include <functional>

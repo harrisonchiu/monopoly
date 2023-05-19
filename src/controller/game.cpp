@@ -1,7 +1,7 @@
 #include "src/controller/controller.hpp"
 
 #include "src/model/board.hpp"
-#include "src/model/player.hpp"
+#include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
