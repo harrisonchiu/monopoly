@@ -2,6 +2,8 @@
 #define TILE_HPP
 
 #include "src/model/players/player.hpp"
+
+#include "src/model/players/token.hpp"
 #include "src/model/tiles/attributes.hpp"
 
 #include <nlohmann/json.hpp>
@@ -25,7 +27,8 @@ private:
   OwnershipStatus ownership_status = OwnershipStatus::Unowned;
 
   int owner_id = -1;
-  std::shared_ptr<Piece> owner_marker = std::make_shared<Piece>();
+  Piece owner_marker{};
+  std::shared_ptr<const Piece> owner_marker2{};
 
 public:
   Tile(const json &tile_data, int id);
@@ -44,7 +47,7 @@ public:
 
   void set_owner(const Player &player);
   auto get_owner_id() const -> int { return owner_id; }
-  auto get_owner_marker() const -> const std::shared_ptr<Piece> & { return owner_marker; }
+  auto get_owner_marker() const -> const Piece & { return owner_marker; }
 
   // Special member functions defined for Rule of Five to get rid of warnings
   Tile(const Tile &) = delete; // Copy

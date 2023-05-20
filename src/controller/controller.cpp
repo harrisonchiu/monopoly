@@ -56,7 +56,7 @@ auto Controller::parse_command(std::string_view command) -> args_list {
   // Example:
   //    1 arg: {23 32 19 $2}
   //    3 args: {1 2 3 4 5 6} arg_num_2 arg_num_3
-  const static RE2 re(R"((\{([0-9$]+\s*)+\})|(\w+))");
+  static const RE2 re(R"((\{([0-9$]+\s*)+\})|(\w+))");
   re2::StringPiece input(command);
   re2::StringPiece bracketed_arg;
   re2::StringPiece normal_arg;

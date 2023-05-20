@@ -13,5 +13,5 @@ Tile::Tile(const json &tile_data, int id)
 
 void Tile::set_owner(const Player &player) {
   owner_id = player.get_id();
-  owner_marker = player.get_piece();
+  owner_marker2 = std::make_shared<Piece>(player.get_piece());
 }

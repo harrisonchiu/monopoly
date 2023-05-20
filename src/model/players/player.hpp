@@ -1,34 +1,34 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "src/utils/color.hpp"
+#include "src/model/players/token.hpp"
+
+#include "src/utils/map.hpp"
 
 #include <fmt/color.h>
+#include <fmt/format.h>
 
 #include <array>
 #include <vector>
 
-struct Piece {
-  // Must have default values so we can create a default Avatar
-  // or also known as a no-owner Avatar
-  char character{};
-  fmt::text_style color{ Color::none() };
-};
+using namespace std::literals;
 
 class Player {
 private:
   // Implicitly, @player_ids must be in range [0, 3]
   static constexpr int max_players = 4;
-  static constexpr std::array<Piece, max_players> pieces{
-    {{ 'A', Color::get("Blue") },
-     { 'B', Color::get("Red") },
-     { 'C', Color::get("Green") },
-     { 'D', Color::get("Orange") }}
+  static constexpr std::array<std::pair<int, Piece>, max_players> pieces{
+    {
+     { 1, { .character = "A", .color = Color::get("Blue") } },
+     { 1, { .character = "B", .color = Color::get("Red") } },
+     { 1, { .character = "C", .color = Color::get("Green") } },
+     { 1, { .character = "D", .color = Color::get("Orange") } },
+     }
   };
+  static constexpr auto map = CompileTimeMap<int, Piece, pieces.size()>{ { pieces } };
 
   int id;
   std::shared_ptr<Piece> piece;
-  std::string avatar;
 
   static constexpr int starting_money = 99999;
   int money = starting_money;
@@ -48,10 +48,10 @@ public:
   static consteval auto get_max_players() -> int { return max_players; }
 
   constexpr auto get_id() const -> int { return id; }
-  auto get_piece() const -> const std::shared_ptr<Piece> & { return piece; }
+  auto get_piece() const -> const Piece { return piece; }
   auto get_avatar() const -> std::string_view { return avatar; }
-  auto get_character() const -> char { return piece->character; }
-  auto get_color() const -> const fmt::text_style & { return piece->color; }
+  auto get_character() const -> std::string_view { return piece.character; }
+  auto get_color() const -> const fmt::text_style & { return piece.color; }
   auto get_money() const -> int { return money; }
 
   auto get_pos() const -> int { return pos; }
