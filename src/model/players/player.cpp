@@ -3,16 +3,9 @@
 #include "src/model/board.hpp"
 #include "src/model/players/token.hpp"
 
-// Creates a default non-playable player to represent no owners for tiles
-Player::Player()
-    : id{ -1 },
-      piece{ pieces.at(0) },
-      avatar{ fmt::format(piece.color, std::string{ piece.character }) } {}
-
 Player::Player(const int id)
     : id{ id },
-      piece{ pieces.at(id) },
-      avatar{ fmt::format(piece.color, std::string{ piece.character }) } {}
+      token{ std::make_shared<const Token>(id) } {}
 
 // Creates 0 to 4 players each with unique ids.
 // Ids are the order in which they are created starting from 0, ending at 3 for the last player.
@@ -27,8 +20,6 @@ auto Player::create_multiple(const int n) -> std::vector<Player> {
     Player player = Player(id);
     players.emplace_back(std::move(player));
   }
-
-  fmt::print("\n{}\n", players[0].piece.avatar);
 
   return players;
 };

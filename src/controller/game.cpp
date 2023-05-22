@@ -2,6 +2,7 @@
 
 #include "src/model/board.hpp"
 #include "src/model/players/player.hpp"
+#include "src/model/players/token.hpp"
 #include "src/view/view.hpp"
 
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
@@ -10,10 +11,10 @@ auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
   board->move_player_piece(*current_player);
   view->draw_board_players();
 
-  const std::string_view player = current_player->get_avatar();
+  const std::string_view piece = current_player->get_avatar();
   const std::string_view landed_tile = board->get_tile(current_player->get_pos())->get_name();
   std::string log =
-      fmt::format("Player {} rolled {} and landed on {}.", player, steps, landed_tile);
+      fmt::format("Player {} rolled {} and landed on {}.", piece, steps, landed_tile);
   return log;
 }
 
@@ -27,6 +28,7 @@ auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
   }
 
   const std::string_view next_player = current_player->get_avatar();
+
   std::string log =
       fmt::format("Player {} ended their turn. Now Player {} turn.", turn_ender, next_player);
   return log;
@@ -46,7 +48,7 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   if (tile->get_owner_id() != -1) {
     return fmt::format(
         "{} is already owned by Player {}. Cannot purchase.", tile->get_name(),
-        tile->get_owner_marker().avatar
+        tile->get_owner()->get_avatar()
     );
   }
 

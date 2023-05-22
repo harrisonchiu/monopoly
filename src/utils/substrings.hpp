@@ -95,4 +95,19 @@ consteval auto repeat_str(std::string_view str) -> std::array<char, N * Count> {
   return result;
 }
 
+template <typename T, std::size_t N, std::size_t M>
+consteval auto concat_arrays(const std::array<T, N> &array1, const std::array<T, N> &array2) {
+  std::array<T, N + M> result{};
+
+  for (std::size_t i = 0; i < N; ++i) {
+    result[i] = array1[i];
+  }
+
+  for (std::size_t i = 0; i < M; ++i) {
+    result[N + i] = array2[i];
+  }
+
+  return result;
+}
+
 #endif // SUBSTRINGS_HPP

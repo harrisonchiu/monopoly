@@ -26,16 +26,14 @@ private:
   bool is_ownable;
   OwnershipStatus ownership_status = OwnershipStatus::Unowned;
 
-  int owner_id = -1;
-  Piece owner_marker{};
-  std::shared_ptr<const Piece> owner_marker2{};
+  std::shared_ptr<const Token> owner = std::make_shared<const Token>();
 
 public:
   Tile(const json &tile_data, int id);
 
-  constexpr auto get_id() const -> int { return id; }
-  constexpr auto get_name() const -> std::string_view { return name; }
-  constexpr auto get_group() const -> std::string_view { return group; }
+  auto get_id() const -> int { return id; }
+  auto get_name() const -> std::string_view { return name; }
+  auto get_group() const -> std::string_view { return group; }
   auto get_color() const -> std::string_view { return color; }
   auto get_detail() const -> std::string_view { return detail; }
   void set_detail(std::string new_detail) { detail = std::move(new_detail); }
@@ -45,9 +43,9 @@ public:
   auto get_is_ownable() const -> bool { return is_ownable; }
   auto get_ownership_status() const -> OwnershipStatus { return ownership_status; }
 
+  auto get_owner() const -> const std::shared_ptr<const Token> & { return owner; }
+  auto get_owner_id() const -> int { return owner->get_id(); }
   void set_owner(const Player &player);
-  auto get_owner_id() const -> int { return owner_id; }
-  auto get_owner_marker() const -> const Piece & { return owner_marker; }
 
   // Special member functions defined for Rule of Five to get rid of warnings
   Tile(const Tile &) = delete; // Copy

@@ -1,5 +1,7 @@
 #include "src/model/tiles/tile.hpp"
 
+#include "src/utils/color.hpp"
+
 #include <limits>
 #include <string>
 
@@ -11,7 +13,4 @@ Tile::Tile(const json &tile_data, int id)
       cost{ tile_data.value("cost", std::numeric_limits<int>::max()) },
       is_ownable{ tile_data.contains("cost") } {}
 
-void Tile::set_owner(const Player &player) {
-  owner_id = player.get_id();
-  owner_marker2 = std::make_shared<Piece>(player.get_piece());
-}
+void Tile::set_owner(const Player &player) { owner = player.get_token(); }

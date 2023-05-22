@@ -1,8 +1,6 @@
 #ifndef ATTRIBUTE_HPP
 #define ATTRIBUTE_HPP
 
-#include "src/model/players/token.hpp"
-
 // Could use C++20 std::concepts to determine Tile child type
 // But it feels like extra overhead and unnecessary
 enum class TileType { Property, Event };
@@ -21,11 +19,6 @@ enum class OwnershipStatus {
   // Number of items in this enum except for this one. Used to determine size.
   // i.e. { Mortgaged, Unowned, Owned, COUNT = 3}
   COUNT = 8,
-};
-
-struct OwnershipMarker {
-  Piece piece;
-  std::string avatar;
 };
 
 #endif // ATTRIBUTE_HPP

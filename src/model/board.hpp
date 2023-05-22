@@ -131,6 +131,8 @@ public:
   static constexpr auto get_tile_length() -> int { return tile_length; }
   static constexpr auto get_number_of_tiles() -> int { return number_of_tiles; }
 
+  auto get_board_str() const -> std::string_view { return ascii_board; }
+
   static constexpr auto get_color_pos(int id) -> const Position & { return color_pos.at(id); }
   static constexpr auto get_detail_pos(int id) -> const Position & { return detail_pos.at(id); }
   static constexpr auto get_player_pos(int id) -> const Position & { return player_pos.at(id); }
@@ -139,13 +141,11 @@ public:
   auto get_detail_update_queue() -> update_queue & { return tile_detail_update_queue; }
   auto get_player_update_queue() -> update_queue & { return tile_player_update_queue; }
 
-  auto get_board_str() const -> std::string_view { return ascii_board; }
+  auto get_tile(int tile_id) const -> const std::shared_ptr<Tile> & { return board.at(tile_id); }
   auto get_tile_players(int tile_id) const -> const presence & { return tile_players.at(tile_id); }
 
   void place_player_pieces(const Player &player, int tile_start);
   void move_player_piece(Player &player);
-
-  auto get_tile(int tile_id) const -> const std::shared_ptr<Tile> & { return board.at(tile_id); }
 
   static constexpr auto get_size() -> Size {
     // This seems to have to be declared in the header??
