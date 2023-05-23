@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include <string>
+#include <string_view>
 
 class Tile {
   using json = nlohmann::json;

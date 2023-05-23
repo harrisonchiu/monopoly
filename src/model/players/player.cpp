@@ -3,6 +3,8 @@
 #include "src/model/board.hpp"
 #include "src/model/players/token.hpp"
 
+#include <vector>
+
 Player::Player(const int id)
     : id{ id },
       token{ std::make_shared<const Token>(id) } {}

@@ -5,6 +5,11 @@
 #include "src/model/players/token.hpp"
 #include "src/view/view.hpp"
 
+#include <fmt/core.h>
+
+#include <string>
+#include <string_view>
+
 auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
   constexpr int steps = 1;
   current_player->walk(steps);

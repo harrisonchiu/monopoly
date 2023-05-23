@@ -4,7 +4,7 @@
 #include "src/model/board.hpp"
 #include "src/view/components.hpp"
 
-#include <queue>
+#include <string_view>
 
 class View {
 private:

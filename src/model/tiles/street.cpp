@@ -4,7 +4,6 @@
 #include "src/model/board.hpp"
 
 #include <fmt/core.h>
-#include <nlohmann/json.hpp>
 
 #include <string>
 #include <string_view>

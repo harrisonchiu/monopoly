@@ -6,9 +6,8 @@
 #include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
-#include "data/json_validator.hpp"
+// #include "data/json_validator.hpp"
 
-#include <fmt/ranges.h>
 #include <nlohmann/json.hpp>
 
 #include <fstream>
@@ -20,7 +19,7 @@ auto main() -> int {
 
   json board_data = json::parse(file);
 
-  std::vector<std::string> errors = validation::validate_board_json(board_data);
+  // std::vector<std::string> errors = validation::validate_board_json(board_data);
 
   auto players = std::make_shared<std::vector<Player>>(Player::create_multiple(4));
   auto board = std::make_shared<Board>(board_data);

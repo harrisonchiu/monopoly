@@ -1,6 +1,9 @@
 #include "src/model/tiles/tile.hpp"
 
+#include "src/model/players/player.hpp"
 #include "src/utils/color.hpp"
+
+#include <fmt/core.h>
 
 #include <string>
 

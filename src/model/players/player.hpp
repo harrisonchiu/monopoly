@@ -3,6 +3,8 @@
 
 #include "src/model/players/token.hpp"
 
+#include <fmt/color.h>
+
 #include <string_view>
 #include <vector>
 

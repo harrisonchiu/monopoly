@@ -3,8 +3,11 @@
 #include "src/view/view.hpp"
 
 #include "src/model/board.hpp"
+#include "src/view/components.hpp"
 
 #include <fmt/ranges.h>
+
+#include <queue>
 
 View::View(std::shared_ptr<Board> board_ptr)
     : board{ std::move(board_ptr) } {}
