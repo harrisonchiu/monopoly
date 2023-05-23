@@ -11,7 +11,6 @@
 //  i.e. NO gaps Ex: fn([a, b, c, d], [0, 3, 2, 1]) -> [a, d, c, b]
 template <typename T, std::size_t Size>
 constexpr auto sort_by_order(std::array<T, Size> data, std::array<int, Size> order) {
-
   std::array<T, Size> sorted{};
   for (std::size_t i = 0; i < Size; ++i) {
     sorted[order[i]] = data[i];

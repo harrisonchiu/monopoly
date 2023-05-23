@@ -22,10 +22,10 @@ private:
 
   // Cannot be more than 4 digits because of tile length
   static constexpr int maximum_cost = 9999;
-  int cost = maximum_cost;
+  int cost;
+
   bool is_ownable;
   OwnershipStatus ownership_status = OwnershipStatus::Unowned;
-
   std::shared_ptr<const Token> owner = std::make_shared<const Token>();
 
 public:

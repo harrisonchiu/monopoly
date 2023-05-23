@@ -5,6 +5,7 @@
 #include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
 
+#include <fmt/ranges.h>
 #include <nlohmann/json.hpp>
 
 #include <fstream>
@@ -13,10 +14,10 @@ auto main() -> int {
   using json = nlohmann::json;
 
   std::ifstream file("data/classic_board.json"); // runtime lookup
-  json tile_data = json::parse(file);
+  json board_data = json::parse(file);
 
   auto players = std::make_shared<std::vector<Player>>(Player::create_multiple(4));
-  auto board = std::make_shared<Board>(tile_data);
+  auto board = std::make_shared<Board>(board_data);
   auto view = std::make_unique<View>(board);
 
   // Add players to the game

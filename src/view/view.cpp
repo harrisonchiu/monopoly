@@ -8,7 +8,7 @@
 
 // Disable linting warning, asking us to use reference to shared_ptr<>
 // Ignore it because we want to share ownership with View. Also very small performance difference
-View::View(std::shared_ptr<Board> board_ptr) // NOLINT(performance-unnecessary-value-param)
+View::View(std::shared_ptr<Board> board_ptr)
     : board{ std::move(board_ptr) } {}
 
 void View::move_to_top() { fmt::print("\x1b[{};{}H", container_pos.row, container_pos.col); }

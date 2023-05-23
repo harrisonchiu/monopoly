@@ -7,8 +7,10 @@ Player::Player(const int id)
     : id{ id },
       token{ std::make_shared<const Token>(id) } {}
 
-// Creates 0 to 4 players each with unique ids.
-// Ids are the order in which they are created starting from 0, ending at 3 for the last player.
+// Creates up to 4 players each with unique ids.
+// Ids are the order in which players are created starting from 0, ending at 3.
+// Ids MUST be int in range [0, 3], so we can easily identify it in std::vector<Player>
+//  and its associated @Piece
 auto Player::create_multiple(const int n) -> std::vector<Player> {
   std::vector<Player> players;
   players.reserve(max_players);

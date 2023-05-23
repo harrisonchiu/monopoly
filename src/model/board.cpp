@@ -15,22 +15,22 @@
 Board::Board(const json &board_data) {
   ascii_board = create_base_board(board_data);
 
-  for (int id = 0; id < number_of_tiles; ++id) {
-    const json &tile_data = board_data[id];
-
+  // @Tile ids MUST be int [0, 39] so we can easily refer to one in std::vector<Tile>
+  for (int tile_id = 0; auto &[key, tile_data] : board_data.items()) {
     // Create actual tiles to be manipulated
     if (tile_data["type"] == "Street") {
-      board.emplace_back(std::make_shared<Street>(tile_data, id));
+      board.emplace_back(std::make_shared<Street>(tile_data, tile_id));
     } else {
-      board.emplace_back(std::make_shared<Corner>(tile_data, id));
+      board.emplace_back(std::make_shared<Corner>(tile_data, tile_id));
     }
 
     // Color and detail are part of the tile itself, so store it in @Tile
     // Pieces (players) are placed on the board, so store it here
-    tile_players.at(id).fill(" ");
-    tile_color_update_queue.push(id);
-    tile_detail_update_queue.push(id);
-    tile_player_update_queue.push(id);
+    tile_players.at(tile_id).fill(" ");
+    tile_color_update_queue.push(tile_id);
+    tile_detail_update_queue.push(tile_id);
+    tile_player_update_queue.push(tile_id);
+    ++tile_id;
   }
 }
 

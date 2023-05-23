@@ -17,18 +17,16 @@ class Street : public Property {
 
 private:
   static constexpr std::size_t status_count = static_cast<std::size_t>(OwnershipStatus::COUNT);
-  static constexpr std::array<status_labels, status_count> labels = {
-    {
-     { OwnershipStatus::Mortgaged, "M" },
-     { OwnershipStatus::Unowned, "_" },
-     { OwnershipStatus::Owned, "X" },
-     { OwnershipStatus::Tier1, "1H" },
-     { OwnershipStatus::Tier2, "2H" },
-     { OwnershipStatus::Tier3, "3H" },
-     { OwnershipStatus::Tier4, "4H" },
-     { OwnershipStatus::Tier5, "HT" },
-     }
-  };
+  static constexpr std::array<status_labels, status_count> labels = { {
+      { OwnershipStatus::Mortgaged, "M" },
+      { OwnershipStatus::Unowned, "_" },
+      { OwnershipStatus::Owned, "X" },
+      { OwnershipStatus::Tier1, "1H" },
+      { OwnershipStatus::Tier2, "2H" },
+      { OwnershipStatus::Tier3, "3H" },
+      { OwnershipStatus::Tier4, "4H" },
+      { OwnershipStatus::Tier5, "HT" },
+  } };
   static constexpr auto ownership_labels =
       CompileTimeMap<OwnershipStatus, std::string_view, labels.size()>{ { labels } };
 

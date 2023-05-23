@@ -5,8 +5,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <string>
-
 class Corner : public Event {
   using json = nlohmann::json;
 
