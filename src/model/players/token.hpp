@@ -51,6 +51,8 @@ public:
         piece{ pieces.at(id) },
         avatar{ fmt::format(piece.color, piece.character) } {}
 
+  static constexpr auto get_default_id() -> int { return default_id; }
+
   auto get_id() const -> int { return id; }
   auto get_piece() const -> const Piece & { return piece; }
   auto get_color() const -> const fmt::text_style & { return piece.color; }

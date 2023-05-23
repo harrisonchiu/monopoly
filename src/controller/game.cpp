@@ -45,7 +45,7 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
     return fmt::format("{} is already owned by you. Cannot purchase.", tile->get_name());
   }
 
-  if (tile->get_owner_id() != -1) {
+  if (tile->get_owner_id() != Token::get_default_id()) {
     return fmt::format(
         "{} is already owned by Player {}. Cannot purchase.", tile->get_name(),
         tile->get_owner()->get_avatar()
