@@ -35,9 +35,9 @@ auto main() -> int {
 
   while (true) {
     auto command = Controller::parse_command(game.prompt());
-    ExitCodes exit_code = game.run_command(command);
+    ExitCode exit_code = game.run_command(command);
 
-    if (exit_code == ExitCodes::Exit) {
+    if (exit_code == ExitCode::Exit) {
       break;
     }
   }
