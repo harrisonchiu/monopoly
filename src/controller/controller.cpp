@@ -1,5 +1,6 @@
 #include "src/controller/controller.hpp"
 
+#include "src/controller/exit_codes.hpp"
 #include "src/model/board.hpp"
 #include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
@@ -20,11 +21,16 @@ Controller::Controller(
       view{ std::move(view_ptr) } {
 
   current_player = players->begin();
+
   commands["roll"] = &Controller::move_player;
   commands["r"] = &Controller::move_player;
   commands["end"] = &Controller::end_turn;
   commands["e"] = &Controller::end_turn;
   commands["buy"] = &Controller::buy_tile;
+  commands["b"] = &Controller::buy_tile;
+
+  debug_commands["exit"] = &Controller::exit;
+  debug_commands["x"] = &Controller::exit;
 }
 
 void Controller::visualize_game() {
@@ -87,19 +93,31 @@ auto Controller::parse_command(std::string_view command) -> args_list {
 //  Code: we use a map to link a keyword with its associated action (function). Much more
 //  clearer and extensible than many if/switch statements. Less duplicate code.
 //  Disadvantage: slower.
-void Controller::run_command(args_list &args) {
+auto Controller::run_command(args_list &args) -> ExitCodes {
   if (args.empty()) {
-    return;
+    return ExitCodes::Success;
   }
 
   if (auto it = commands.find(args[0]); it != commands.end()) {
     try {
       const std::string log = it->second(this, args);
       view->output(log);
+      return ExitCodes::Success;
     } catch (const std::exception &e) {
       view->output(e.what());
+      return ExitCodes::Failure;
+    }
+  } else if (auto it = debug_commands.find(args[0]); it != debug_commands.end()) {
+    try {
+      const ExitCodes exit_code = it->second(this, args);
+      view->output(static_cast<int>(exit_code));
+      return exit_code;
+    } catch (const std::exception &e) {
+      view->output(e.what());
+      return ExitCodes::Failure;
     }
   } else {
     view->clear_output();
+    return ExitCodes::Success;
   }
 }

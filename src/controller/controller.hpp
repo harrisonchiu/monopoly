@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
+#include "src/controller/exit_codes.hpp"
 #include "src/model/board.hpp"
 #include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
@@ -20,9 +21,11 @@ class Controller {
   //  the reference will be invalid.
   using args_list = std::vector<std::string>;
   using game_actions = std::function<std::string(Controller *, args_list &args)>;
+  using debug_actions = std::function<ExitCodes(Controller *, args_list &args)>;
 
 private:
   std::unordered_map<std::string_view, game_actions> commands;
+  std::unordered_map<std::string_view, debug_actions> debug_commands;
 
   std::shared_ptr<std::vector<Player>> players;
   std::shared_ptr<Board> board;
@@ -41,12 +44,17 @@ public:
 
   auto prompt() -> std::string;
   static auto parse_command(std::string_view command) -> args_list;
-  void run_command(args_list &args);
+  auto run_command(args_list &args) -> ExitCodes;
 
   // Game actions return string which are logs that tell the user any needed game details
   auto move_player(args_list &args) -> std::string;
   auto end_turn(args_list &args) -> std::string;
   auto buy_tile(args_list &args) -> std::string;
+
+  // Debug actions return enum values for details about its operation (e.g. success, failure)
+  // Similar to Linux exit codes
+  auto exit(args_list &args) -> ExitCodes;
+  auto redraw(args_list &args) -> ExitCodes;
 };
 
 #endif // CONTROLLER_HPP

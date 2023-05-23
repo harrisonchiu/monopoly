@@ -36,6 +36,7 @@ public:
 
   static void draw_prompt(std::string_view player);
   static void output(std::string_view log);
+  static void output(int exit_code);
   static void clear_output();
 };
 

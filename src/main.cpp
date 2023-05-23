@@ -1,6 +1,7 @@
 #define FMT_HEADER_ONLY
 
 #include "src/controller/controller.hpp"
+#include "src/controller/exit_codes.hpp"
 #include "src/model/board.hpp"
 #include "src/model/players/player.hpp"
 #include "src/view/view.hpp"
@@ -35,9 +36,9 @@ auto main() -> int {
 
   while (true) {
     auto command = Controller::parse_command(game.prompt());
-    game.run_command(command);
+    ExitCodes exit_code = game.run_command(command);
 
-    if (command.at(0) == "x") {
+    if (exit_code == ExitCodes::Exit) {
       break;
     }
   }

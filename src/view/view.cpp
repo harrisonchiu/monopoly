@@ -6,8 +6,6 @@
 
 #include <fmt/ranges.h>
 
-// Disable linting warning, asking us to use reference to shared_ptr<>
-// Ignore it because we want to share ownership with View. Also very small performance difference
 View::View(std::shared_ptr<Board> board_ptr)
     : board{ std::move(board_ptr) } {}
 
@@ -93,6 +91,10 @@ void View::draw_prompt(std::string_view player) {
 
 void View::output(std::string_view log) {
   fmt::print("\x1b[{};{}H\x1b[2K{}", console_pos.row + 1, console_pos.col, log);
+}
+
+void View::output(int exit_code) {
+  fmt::print("\x1b[{};{}H\x1b[2KExit Code: {}", console_pos.row + 1, console_pos.col, exit_code);
 }
 
 void View::clear_output() {
