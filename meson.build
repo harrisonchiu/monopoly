@@ -19,6 +19,10 @@ project_dep = [json_dep, fmt_dep, re2_dep]
 
 build_args = ['-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wcast-align']
 
+misc_src = [
+    'data/json_validator.cpp'
+]
+
 tiles_src = [
     'src/model/tiles/street.cpp',
     'src/model/tiles/corner.cpp',
@@ -34,7 +38,8 @@ src = [
     'src/view/view.cpp',
     'src/controller/controller.cpp',
     'src/controller/game.cpp',
-    tiles_src
+    tiles_src,
+    misc_src,
 ]
 
 executable(

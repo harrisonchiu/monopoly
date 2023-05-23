@@ -18,7 +18,7 @@ Board::Board(const json &board_data) {
   // @Tile ids MUST be int [0, 39] so we can easily refer to one in std::vector<Tile>
   for (int tile_id = 0; auto &[key, tile_data] : board_data.items()) {
     // Create actual tiles to be manipulated
-    if (tile_data["type"] == "Street") {
+    if (tile_data.at("type") == "Street") {
       board.emplace_back(std::make_shared<Street>(tile_data, tile_id));
     } else {
       board.emplace_back(std::make_shared<Corner>(tile_data, tile_id));
@@ -41,8 +41,8 @@ auto Board::create_base_board(const json &board_data) -> std::string {
   constexpr int top_row_end = 30;
 
   fmt::dynamic_format_arg_store<fmt::format_context> board_format_args;
-  for (int tile_id = 0; tile_id < number_of_tiles; ++tile_id) {
-    const std::string tile_name = board_data[tile_id]["display_name"];
+  for (int tile_id = 0; auto &[key, tile_data] : board_data.items()) {
+    const std::string &tile_name = tile_data.at("display_name");
 
     // Only the top and bottom row need to split the name into 2 parts
     if ((tile_id >= bot_row_start && tile_id <= bot_row_end) ||
@@ -60,6 +60,8 @@ auto Board::create_base_board(const json &board_data) -> std::string {
     } else {
       board_format_args.push_back(tile_name);
     }
+
+    ++tile_id;
   }
 
   // Named arguments must be done after positional arguments

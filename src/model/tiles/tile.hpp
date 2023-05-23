@@ -39,10 +39,11 @@ public:
   void set_detail(std::string new_detail) { detail = std::move(new_detail); }
   virtual void update_detail() = 0;
 
+  static constexpr auto get_maximum_cost() -> int { return maximum_cost; }
   auto get_cost() const -> int { return cost; }
+
   auto get_is_ownable() const -> bool { return is_ownable; }
   auto get_ownership_status() const -> OwnershipStatus { return ownership_status; }
-
   auto get_owner() const -> const std::shared_ptr<const Token> & { return owner; }
   auto get_owner_id() const -> int { return owner->get_id(); }
   void set_owner(const Player &player);
