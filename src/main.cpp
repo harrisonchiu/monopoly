@@ -15,7 +15,7 @@
 auto main() -> int {
   using json = nlohmann::json;
 
-  const std::ifstream file("data/classic_board.json"); // runtime lookup
+  std::ifstream file("data/classic_board.json"); // runtime lookup
 
   const json board_data = json::parse(file);
 
