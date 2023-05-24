@@ -32,8 +32,8 @@ public:
   void draw_board_details();
   void draw_board_players();
 
-  void draw_tile_id(int tile_id);
-  void draw_tile_detail(int tile_id);
+  void draw_tile_id(int tile_id) const;
+  void draw_tile_detail(int tile_id) const;
 
   static void draw_prompt(std::string_view player);
   static void output(std::string_view log);

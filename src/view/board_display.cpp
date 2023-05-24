@@ -57,13 +57,13 @@ void View::draw_board_players() {
   }
 }
 
-void View::draw_tile_id(const int tile_id) {
+void View::draw_tile_id(const int tile_id) const {
   const Position &pos = board->get_detail_pos(tile_id);
 
   fmt::print("\x1b[{};{}H{:^{}}", pos.row, pos.col, tile_id, board->get_tile_length());
 }
 
-void View::draw_tile_detail(const int tile_id) {
+void View::draw_tile_detail(const int tile_id) const {
   const Position &pos = board->get_detail_pos(tile_id);
 
   fmt::print("\x1b[{};{}H{}", pos.row, pos.col, board->get_tile(tile_id)->get_detail());

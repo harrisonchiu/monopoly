@@ -15,9 +15,9 @@
 auto main() -> int {
   using json = nlohmann::json;
 
-  std::ifstream file("data/classic_board.json"); // runtime lookup
+  const std::ifstream file("data/classic_board.json"); // runtime lookup
 
-  json board_data = json::parse(file);
+  const json board_data = json::parse(file);
 
   // std::vector<std::string> errors = validation::validate_board_json(board_data);
 
@@ -35,7 +35,7 @@ auto main() -> int {
 
   while (true) {
     auto command = Controller::parse_command(game.prompt());
-    ExitCode exit_code = game.run_command(command);
+    const ExitCode exit_code = game.run_command(command);
 
     if (exit_code == ExitCode::Exit) {
       break;
