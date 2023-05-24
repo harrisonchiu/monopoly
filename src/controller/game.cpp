@@ -42,7 +42,7 @@ auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
 // Disable linting because making the function static would change function type in the map
 // Some functions may not be able to be static, so generalize it into non-static
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-auto Controller::exit([[maybe_unused]] args_list &args) -> ExitCode { return ExitCode::Exit; }
+auto Controller::exit([[maybe_unused]] args_list &args) -> StatusCode { return StatusCode::Exit; }
 
 auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   const std::shared_ptr<Tile> &tile = board->get_tile(current_player->get_pos());

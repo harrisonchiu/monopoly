@@ -92,31 +92,31 @@ auto Controller::parse_command(std::string_view command) -> args_list {
 //  Code: we use a map to link a keyword with its associated action (function). Much more
 //  clearer and extensible than many if/switch statements. Less duplicate code.
 //  Disadvantage: slower.
-auto Controller::run_command(args_list &args) -> ExitCode {
+auto Controller::run_command(args_list &args) -> StatusCode {
   if (args.empty()) {
-    return ExitCode::Success;
+    return StatusCode::Success;
   }
 
   if (auto it = commands.find(args[0]); it != commands.end()) {
     try {
       const std::string log = it->second(this, args);
       view->output(log);
-      return ExitCode::Success;
+      return StatusCode::Success;
     } catch (const std::exception &e) {
       view->output(e.what());
-      return ExitCode::Failure;
+      return StatusCode::Failure;
     }
   } else if (auto it = debug_commands.find(args[0]); it != debug_commands.end()) {
     try {
-      const ExitCode exit_code = it->second(this, args);
+      const StatusCode exit_code = it->second(this, args);
       view->output(static_cast<int>(exit_code));
       return exit_code;
     } catch (const std::exception &e) {
       view->output(e.what());
-      return ExitCode::Failure;
+      return StatusCode::Failure;
     }
   } else {
     view->clear_output();
-    return ExitCode::Success;
+    return StatusCode::Success;
   }
 }
