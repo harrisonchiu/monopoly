@@ -55,7 +55,9 @@ private:
   std::vector<std::shared_ptr<Tile>> board;
   std::array<presence, number_of_tiles> tile_players{};
 
-  // The @Tiles that must be visually updated because some change happened to that tile
+  // The @Tiles that must be visually updated because some change happened to it
+  // One way notifier of tiles needing update: @Board -> @View
+  // @View should never add to these update queues
   update_queue tile_color_update_queue;
   update_queue tile_detail_update_queue;
   update_queue tile_player_update_queue;
@@ -137,10 +139,12 @@ public:
   static constexpr auto get_detail_pos(int id) -> const Position & { return detail_pos.at(id); }
   static constexpr auto get_player_pos(int id) -> const Position & { return player_pos.at(id); }
 
+  // @View should not use this to request an update; it should update itself directly
   auto get_color_update_queue() -> update_queue & { return tile_color_update_queue; }
   auto get_detail_update_queue() -> update_queue & { return tile_detail_update_queue; }
   auto get_player_update_queue() -> update_queue & { return tile_player_update_queue; }
 
+  auto get_all_tiles() const -> const std::vector<std::shared_ptr<Tile>> & { return board; }
   auto get_tile(int tile_id) const -> const std::shared_ptr<Tile> & { return board.at(tile_id); }
   auto get_tile_players(int tile_id) const -> const presence & { return tile_players.at(tile_id); }
 

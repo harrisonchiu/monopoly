@@ -52,26 +52,25 @@ auto Controller::prompt() -> std::string {
 
 // Given some command made up of words or enclosed by brackets, separated by whitespace,
 // returns a list of args so functions can take it and do the actions easily.
+// Any numbers enclosed inside a brackets `{}` counts as 1 arg
+// Otherwise, each token separated by whitespace is considered an individual arg
+// Example:
+//    1 arg: {23 a 19 $2}
+//    3 args: {1 2 3 4 5 6} arg_num_2 arg_num_3
 auto Controller::parse_command(std::string_view command) -> args_list {
   if (command.empty()) {
     return args_list{};
   }
 
-  // Any numbers enclosed inside a brackets `{}` counts as 1 arg
-  // Otherwise, each token separated by whitespace is considered an individual arg
-  // Example:
-  //    1 arg: {23 32 19 $2}
-  //    3 args: {1 2 3 4 5 6} arg_num_2 arg_num_3
   static const RE2 re(R"((\{([0-9$]+\s*)+\})|(\w+))");
   re2::StringPiece input(command);
   re2::StringPiece bracketed_arg;
   re2::StringPiece normal_arg;
   args_list args{};
 
-  // Seperate the command str into a list of arguments.
-  // Each arg after the regex pattern is a StringPiece that holds the result of a capture
-  // group. The 2nd capture group is each digit between `{}`. We do not care so put nullptr there.
-  // If the input does not match patter (e.g. only contains whitespace), returns an empty list
+  // Seperate the command str into a list of arguments. Empty list on no matches (e.g. only space)
+  // @StringPiece hold the result of a capture group. 2nd capture group is everything inside a
+  // bracket `{}` arg. We do not care, so put nullptr there.
   while (RE2::FindAndConsume(&input, re, &bracketed_arg, (void *)nullptr, &normal_arg)) {
     if (bracketed_arg != nullptr) {
       args.push_back(bracketed_arg.as_string());

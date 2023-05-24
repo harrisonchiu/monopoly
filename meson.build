@@ -23,23 +23,37 @@ misc_src = [
     'data/json_validator.cpp'
 ]
 
+controller_src = [
+    'src/controller/controller.cpp',
+    'src/controller/game.cpp',
+]
+
 tiles_src = [
-    'src/model/tiles/street.cpp',
     'src/model/tiles/corner.cpp',
-    'src/model/tiles/property.cpp',
     'src/model/tiles/event.cpp',
+    'src/model/tiles/property.cpp',
+    'src/model/tiles/street.cpp',
     'src/model/tiles/tile.cpp',
+]
+
+model_src = [
+    tiles_src,
+    'src/model/players/player.cpp',
+    'src/model/board_config.cpp',
+    'src/model/board.cpp',
+]
+
+view_src = [
+    'src/view/view.cpp',
+    'src/view/board_display.cpp',
 ]
 
 src = [
     'src/main.cpp',
-    'src/model/board.cpp',
-    'src/model/players/player.cpp',
-    'src/view/view.cpp',
-    'src/controller/controller.cpp',
-    'src/controller/game.cpp',
-    tiles_src,
     misc_src,
+    controller_src,
+    model_src,
+    view_src,
 ]
 
 executable(

@@ -66,10 +66,10 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   if (current_player->get_money() >= tile_cost) {
     current_player->withdraw(tile_cost);
     tile->set_owner(*current_player);
+    tile->update_detail();
   }
 
-  view->request_tile_detail_update(tile->get_id());
-  view->draw_board_details();
+  view->draw_tile_detail(tile->get_id());
 
   std::string log = fmt::format(
       "Player {} purchased {} for ${}. Balance remaining: ${}", current_player->get_avatar(),

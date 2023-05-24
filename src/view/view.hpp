@@ -29,10 +29,11 @@ public:
 
   void draw_board() const;
   void draw_board_colors();
-  void request_tile_color_update(int tile_id);
   void draw_board_details();
-  void request_tile_detail_update(int tile_id);
   void draw_board_players();
+
+  void draw_tile_id(int tile_id);
+  void draw_tile_detail(int tile_id);
 
   static void draw_prompt(std::string_view player);
   static void output(std::string_view log);

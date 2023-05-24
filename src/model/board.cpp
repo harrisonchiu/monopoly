@@ -27,6 +27,7 @@ Board::Board(const json &board_data) {
     // Color and detail are part of the tile itself, so store it in @Tile
     // Pieces (players) are placed on the board, so store it here
     tile_players.at(tile_id).fill(" ");
+
     tile_color_update_queue.push(tile_id);
     tile_detail_update_queue.push(tile_id);
     tile_player_update_queue.push(tile_id);
