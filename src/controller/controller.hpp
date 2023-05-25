@@ -50,6 +50,8 @@ public:
   auto move_player(args_list &args) -> std::string;
   auto end_turn(args_list &args) -> std::string;
   auto buy_tile(args_list &args) -> std::string;
+  auto view_toggle(args_list &args) -> std::string;
+  auto view_tile(args_list &args) -> std::string;
 
   // Debug actions return enum values for details about its operation (e.g. success, failure)
   auto exit(args_list &args) -> StatusCode;

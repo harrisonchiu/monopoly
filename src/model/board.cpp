@@ -66,15 +66,17 @@ auto Board::create_base_board(const json &board_data) -> std::string {
   }
 
   // Named arguments must be done after positional arguments
-  constexpr auto side_pad = repeat_str<1, tile_length * 2 + 1>(" ");
+  constexpr int name_length = tile_length * 2 + 1;
+  board_format_args.push_back(fmt::arg("NAMEPAD", name_length));
+
+  constexpr auto side_pad = repeat_str<1, name_length>(" ");
   board_format_args.push_back(
-      fmt::arg("INDENT", std::string_view(side_pad.begin(), side_pad.end()))
+      fmt::arg("COLUMNPADDING", std::string_view(side_pad.begin(), side_pad.end()))
   );
 
   constexpr auto center_pad = repeat_str<1, 33>(" ");
   board_format_args.push_back(fmt::arg(
-      "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
-      std::string_view(center_pad.begin(), center_pad.end())
+      "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", std::string_view(center_pad.begin(), center_pad.end())
   ));
 
   // 3 in repeat_str<> is the size of the string ▔. Unicode chars must be string

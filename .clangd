@@ -3,6 +3,7 @@ CompileFlags:
   Compiler: clang++
 
 InlayHints:
+  Enabled: No # Turn off everything
   Designators: No # Removes array indices
 
 Diagnostics:

@@ -13,6 +13,10 @@ ColumnLimit: 99
 # false makes folding blocks of brace initialized variables look better
 Cpp11BracedListStyle: false
 
+# false makes function arguments each on their own line
+BinPackArguments: false
+
+
 # Puts each initializer on its own line
 PackConstructorInitializers: Never
 

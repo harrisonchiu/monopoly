@@ -28,6 +28,8 @@ Controller::Controller(
   commands["e"] = &Controller::end_turn;
   commands["buy"] = &Controller::buy_tile;
   commands["b"] = &Controller::buy_tile;
+  commands["view"] = &Controller::view_tile;
+  commands["v"] = &Controller::view_tile;
 
   debug_commands["exit"] = &Controller::exit;
   debug_commands["x"] = &Controller::exit;
