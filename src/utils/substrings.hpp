@@ -4,8 +4,10 @@
 #include "src/view/components.hpp"
 
 #include <array>
+#include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 // N is size of array returned or the number of substring occurrences to get. If
 // N is less than or equal to the number of occurrences, the array will be the
@@ -92,6 +94,36 @@ consteval auto repeat_str(std::string_view str) -> std::array<char, N * Count> {
     std::copy(str_chars.begin(), str_chars.end(), it);
     std::advance(it, N);
   }
+  return result;
+}
+
+// Given a long string, split it into multiple smaller strings which are a maximum of @LineLength
+// chars long and does not cut words off halfway.
+// Will never be constexpr because of input and return type. Also because of our use cases.
+template <std::size_t LineLength, int MaxLines>
+auto split_str_into_lines(const std::string &str) -> std::vector<std::string> {
+  // Construct @MaxLines strings because we assume there exists some string at N index.
+  // We will use the empty strings when using this func output to format other strings.
+  std::vector<std::string> result(MaxLines);
+  std::istringstream iss(str);
+  std::string word;
+  std::string line;
+
+  while (iss >> word) {
+    if (line.empty()) {
+      line += word;
+    } else if (line.length() + 1 + word.length() <= LineLength) {
+      line += " " + word;
+    } else {
+      result.push_back(line);
+      line = word;
+    }
+  }
+
+  if (!line.empty()) {
+    result.push_back(line);
+  }
+
   return result;
 }
 

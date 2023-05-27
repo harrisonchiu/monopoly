@@ -3,7 +3,8 @@
         "name": "Go",
         "display_name": "GO",
         "type": "Corner",
-        "group": "Black"
+        "group": "Black",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Mediterranean Avenue",
@@ -16,7 +17,8 @@
         "name": "Community Chest 1",
         "display_name": "CHEST",
         "type": "Chest",
-        "group": "Salmon"
+        "group": "Salmon",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Baltic Avenue",
@@ -29,7 +31,8 @@
         "name": "Income Tax",
         "display_name": "INCOME TAX",
         "type": "Tax",
-        "group": "Purple"
+        "group": "Purple",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Reading Railroad",
@@ -49,7 +52,8 @@
         "name": "Chance 1",
         "display_name": "CHANCE?",
         "type": "Chance",
-        "group": "Spring"
+        "group": "Spring",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Vermont Avenue",
@@ -69,7 +73,8 @@
         "name": "Visiting Jail",
         "display_name": "VISIT JAIL",
         "type": "Corner",
-        "group": "Black"
+        "group": "Black",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "St. Charles Place",
@@ -117,7 +122,8 @@
         "name": "Community Chest 2",
         "display_name": "CHEST",
         "type": "Chest",
-        "group": "Salmon"
+        "group": "Salmon",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Tennessee Avenue",
@@ -137,7 +143,8 @@
         "name": "Free Parking",
         "display_name": "FREE PARK",
         "type": "Corner",
-        "group": "Black"
+        "group": "Black",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Kentucky Avenue",
@@ -150,7 +157,8 @@
         "name": "Chance 2",
         "display_name": "CHANCE?",
         "type": "Chance",
-        "group": "Spring"
+        "group": "Spring",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Indiana Avenue",
@@ -205,7 +213,8 @@
         "name": "Go To Jail",
         "display_name": "GOTO JAIL",
         "type": "Corner",
-        "group": "Black"
+        "group": "Black",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Pacific Avenue",
@@ -225,7 +234,8 @@
         "name": "Community Chest 3",
         "display_name": "CHEST",
         "type": "Chest",
-        "group": "Salmon"
+        "group": "Salmon",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Pennsylvania Avenue",
@@ -245,7 +255,8 @@
         "name": "Chance 3",
         "display_name": "CHANCE?",
         "type": "Chance",
-        "group": "Spring"
+        "group": "Spring",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Park Place",
@@ -258,7 +269,8 @@
         "name": "Luxury Tax",
         "display_name": "LUXURY TAX",
         "type": "Tax",
-        "group": "Purple"
+        "group": "Purple",
+        "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
         "name": "Boardwalk",
