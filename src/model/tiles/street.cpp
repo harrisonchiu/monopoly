@@ -17,7 +17,9 @@ Street::Street(const json &tile_data, const int id)
 
 auto Street::create_card(const json &tile_data) -> std::string {
   constexpr int card_width = 33;
-  const auto card_pos = fmt::arg("POSITION", "\x1b[{1}G");
+  constexpr const Position &pos = Board::get_center_pos(); // cards will always be shown here
+  const auto card_start = fmt::format("\x1b[{0};{1}H", pos.row, pos.col);
+  const auto card_pos = fmt::arg("POSITION", fmt::format("\x1b[{}G", pos.col));
 
   const std::string color_row = fmt::format(
       get_color().has_background() ? get_color() : fmt::bg(fmt::color::white),
@@ -47,7 +49,7 @@ auto Street::create_card(const json &tile_data) -> std::string {
       fmt::arg("HOTEL_COST", fmt::format("${}", tile_data["cost"].get<int>()))
   );
 
-  return fmt::format("{0}{1}{1}{1}{2}", "\x1b[{0};{1}H", color_row, card_details);
+  return fmt::format("{0}{1}{1}{1}{2}", card_start, color_row, card_details);
 }
 
 void Street::update_detail() {

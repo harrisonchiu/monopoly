@@ -105,9 +105,8 @@ auto Controller::view_tile(args_list &args) -> std::string {
   const int tile_id = std::stoi(args.at(1));
   if (std::ranges::any_of(Board::get_tile_ids(), [tile_id](int n) { return n == tile_id; })) {
     const auto &tile = board->get_tile(tile_id);
-    const Position pos = board->get_center_pos();
 
-    fmt::print(fmt::runtime(tile->get_card()), pos.row, pos.col);
+    fmt::print(fmt::runtime(tile->get_card()));
     return fmt::format("Showing {} tile card with its details.", tile->get_name());
   }
 

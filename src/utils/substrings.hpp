@@ -102,9 +102,7 @@ consteval auto repeat_str(std::string_view str) -> std::array<char, N * Count> {
 // Will never be constexpr because of input and return type. Also because of our use cases.
 template <std::size_t LineLength, int MaxLines>
 auto split_str_into_lines(const std::string &str) -> std::vector<std::string> {
-  // Construct @MaxLines strings because we assume there exists some string at N index.
-  // We will use the empty strings when using this func output to format other strings.
-  std::vector<std::string> result(MaxLines);
+  std::vector<std::string> result;
   std::istringstream iss(str);
   std::string word;
   std::string line;
@@ -115,13 +113,19 @@ auto split_str_into_lines(const std::string &str) -> std::vector<std::string> {
     } else if (line.length() + 1 + word.length() <= LineLength) {
       line += " " + word;
     } else {
-      result.push_back(line);
+      result.emplace_back(line);
       line = word;
     }
   }
 
   if (!line.empty()) {
-    result.push_back(line);
+    result.emplace_back(line);
+  }
+
+  // We assume there exists some string at N index because of how we use this to format strings.
+  // It is like a default value. So create empty strings to fit size requirement if needed.
+  while (result.size() < MaxLines) {
+    result.emplace_back("");
   }
 
   return result;

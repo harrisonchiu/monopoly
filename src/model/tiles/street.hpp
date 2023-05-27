@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include <array>
+#include <string>
 #include <string_view>
 
 class Street : public Property {

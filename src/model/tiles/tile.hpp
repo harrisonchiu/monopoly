@@ -70,12 +70,4 @@ public:
   Property(const json &tile_data, int id);
 };
 
-// Event abstract class
-class Event : public Tile {
-  using json = nlohmann::json;
-
-public:
-  Event(const json &tile_data, int id);
-};
-
 #endif // TILE_HPP

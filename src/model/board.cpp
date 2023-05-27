@@ -2,7 +2,7 @@
 
 #include "src/model/board.hpp"
 
-#include "src/model/tiles/corner.hpp"
+#include "src/model/tiles/event.hpp"
 #include "src/model/tiles/street.hpp"
 #include "src/utils/substrings.hpp"
 
@@ -12,16 +12,16 @@
 #include <string>
 #include <string_view>
 
-Board::Board(const json &board_data) {
-  ascii_board = create_base_board(board_data);
-
+Board::Board(const json &board_data)
+    : ascii_board{ create_base_board(board_data) } {
   // @Tile ids MUST be int [0, 39] so we can easily refer to one in std::vector<Tile>
   for (int tile_id = 0; auto &[key, tile_data] : board_data.items()) {
     // Create actual tiles to be manipulated
-    if (tile_data.at("type") == "Street") {
+    if (tile_data.at("type") == "Street" || tile_data.at("type") == "Railroad" ||
+        tile_data.at("type") == "Utility") {
       board.emplace_back(std::make_shared<Street>(tile_data, tile_id));
     } else {
-      board.emplace_back(std::make_shared<Corner>(tile_data, tile_id));
+      board.emplace_back(std::make_shared<Event>(tile_data, tile_id));
     }
 
     // Color and detail are part of the tile itself, so store it in @Tile

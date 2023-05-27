@@ -1,11 +1,14 @@
-#ifndef CORNER_HPP
-#define CORNER_HPP
+#ifndef EVENT_HPP
+#define EVENT_HPP
 
 #include "src/model/tiles/tile.hpp"
 
 #include <nlohmann/json.hpp>
 
-class Corner : public Event {
+#include <string>
+#include <string_view>
+
+class Event : public Tile {
   using json = nlohmann::json;
 
 private:
@@ -44,10 +47,10 @@ private:
   auto create_card(const json &tile_data) -> std::string;
 
 public:
-  Corner(const json &tile_data, int id);
+  Event(const json &tile_data, int id);
   void update_detail() override;
 
   auto get_card() const -> std::string_view override { return card; };
 };
 
-#endif // CORNER_HPP
+#endif // EVENT_HPP
