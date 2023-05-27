@@ -19,23 +19,24 @@ Street::Street(const json &tile_data, const int id)
 
 auto Street::create_card(const json &tile_data) -> std::string {
   constexpr int card_width = 33;
-  const std::string empty_card_width = std::string(card_width, ' ');
   const auto card_pos = fmt::arg("POSITION", "\x1b[{1}G");
-  const auto card_space = fmt::arg("EMPTY_ROW_CARD_WIDTH", empty_card_width);
 
-  static const std::string color_banner =
-      fmt::format(Color::get(get_group()), base_color_banner, card_pos, card_space);
+  const std::string color_row = fmt::format(
+      Color::get(get_group()),
+      base_color_row,
+      card_pos,
+      fmt::arg("EMPTY_ROW_CARD_WIDTH", std::string(card_width, ' '))
+  );
 
-  // Cannot be static for some reason? I think too many format() inside a format()
-  const auto white_card_black_text = fmt::fg(fmt::color::black) | fmt::bg(fmt::color::white);
   const std::string card_details = fmt::format(
-      white_card_black_text,
+      fmt::fg(fmt::color::black) | fmt::bg(fmt::color::white),
       base_card,
-      card_space,
       card_pos,
       fmt::arg("INDENT", "  "),
+      fmt::arg("EMPTY_ROW_CARD_WIDTH", std::string(card_width, ' ')),
       fmt::arg("NAME", tile_data["name"].get<std::string>()),
-      fmt::arg("PROPERTY_COST", fmt::format("${}", tile_data["cost"].get<int>())),
+      fmt::arg("TYPE", tile_data["type"].get<std::string>()),
+      fmt::arg("TILE_COST", fmt::format("${}", tile_data["cost"].get<int>())),
       fmt::arg("MORTGAGE_VALUE", fmt::format("${}", tile_data["cost"].get<int>())),
       fmt::arg("RENT_BASIC", fmt::format("${}", tile_data["cost"].get<int>())),
       fmt::arg("RENT_FULLSET", fmt::format("${}", tile_data["cost"].get<int>())),
@@ -48,7 +49,7 @@ auto Street::create_card(const json &tile_data) -> std::string {
       fmt::arg("HOTEL_COST", fmt::format("${}", tile_data["cost"].get<int>()))
   );
 
-  return fmt::format("{}{}{}", "\x1b[{0};{1}H", color_banner, card_details);
+  return fmt::format("{0}{1}{1}{1}{2}", "\x1b[{0};{1}H", color_row, card_details);
 }
 
 void Street::update_detail() {
@@ -59,8 +60,7 @@ void Street::update_detail() {
   // Cost is max 4 digits (i.e. cost <= 9999) in order to fit in the board's visuals
   const int max_cost_length = Board::get_tile_length() - static_cast<int>(label.length());
 
-  const std::string new_detail =
-      fmt::format("{}{:>{LENGTH}}", detail, cost, fmt::arg("LENGTH", max_cost_length));
+  const std::string new_detail = fmt::format("{0}{1:>{2}}", detail, cost, max_cost_length);
 
   set_detail(new_detail);
 }

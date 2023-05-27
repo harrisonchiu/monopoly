@@ -70,8 +70,11 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   view->draw_tile_detail(tile->get_id());
 
   std::string log = fmt::format(
-      "Player {} purchased {} for ${}. Balance remaining: ${}", current_player->get_avatar(),
-      tile_name, tile_cost, current_player->get_money()
+      "Player {} purchased {} for ${}. Balance remaining: ${}",
+      current_player->get_avatar(),
+      tile_name,
+      tile_cost,
+      current_player->get_money()
   );
   return log;
 }
@@ -82,27 +85,31 @@ auto Controller::view_toggle([[maybe_unused]] args_list &args) -> std::string {
   view_ids = !view_ids;
 
   if (view_ids) {
-    for (int tile_id = 0; tile_id < Board::get_number_of_tiles(); ++tile_id) {
+    for (int tile_id : Board::get_tile_ids()) {
       view->draw_tile_id(tile_id);
     }
-    return fmt::format("Showing tile IDs. IDs are used to specify a tile in commands.");
+    return fmt::format("Showing all tile IDs. IDs are used to uniquely specify a tile.");
   }
 
-  for (int tile_id = 0; tile_id < Board::get_number_of_tiles(); ++tile_id) {
+  for (int tile_id : Board::get_tile_ids()) {
     view->draw_tile_detail(tile_id);
   }
-  return fmt::format("Showing tile details: owner, property status, cost/rent");
+  return fmt::format("Showing all tile details: owner, property status, cost/rent");
 }
 
 auto Controller::view_tile(args_list &args) -> std::string {
   if (args.size() == 1) {
-    const auto &tile = board->get_tile(1);
-    const Position pos = board->get_center_pos();
-
-    fmt::print(fmt::runtime(tile->get_card()), pos.row, pos.col);
-
     return view_toggle(args);
   }
 
-  return fmt::format("Showing tile details: owner, property status, cost/rent");
+  const int tile_id = std::stoi(args.at(1));
+  if (std::ranges::any_of(Board::get_tile_ids(), [tile_id](int n) { return n == tile_id; })) {
+    const auto &tile = board->get_tile(tile_id);
+    const Position pos = board->get_center_pos();
+
+    fmt::print(fmt::runtime(tile->get_card()), pos.row, pos.col);
+    return fmt::format("Showing details of {}", tile->get_name());
+  }
+
+  return fmt::format("Invalid Argument: Given tile id does not exist");
 }

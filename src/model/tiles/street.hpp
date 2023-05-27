@@ -30,22 +30,19 @@ private:
   static constexpr auto ownership_labels =
       CompileTimeMap<OwnershipStatus, std::string_view, labels.size()>{ { labels } };
 
-  // Card must be separated into 2: color_banner and the details section
-  // They have different colors. If they are put as one, fmt escapes (\x1b[0m) the
-  // textstyle at the end of the arg, but that cancels any and all colors.
-  // Impossible to have 2 different colors (1 all encompassing, 1 as an arg) if styling
-  // using fmt::format(text_style, str, args)
-  static constexpr std::string_view base_color_banner{ R"""(
-{POSITION}{EMPTY_ROW_CARD_WIDTH}
-{POSITION}{EMPTY_ROW_CARD_WIDTH}
-{POSITION}{EMPTY_ROW_CARD_WIDTH})""" }; // No newline to keep this together with @base_card
+  // Color is the group that the tile is in. Existly solely for better appearances.
+  // Card must be separated into 2 different strings: color and details section
+  // They have different colors. Hard to have 1 encompassing style and some different styles in it.
+  // If put as one, fmt escapes (\x1b[0m) it which cancels all colors and styles.
+  static constexpr std::string_view base_color_row{ "\n{POSITION}{EMPTY_ROW_CARD_WIDTH}" };
 
   // Hard-coded values because its too hard to dynamically calculate width of different phrases
-  // Values assume that `INDENT` is 2 spaces and card width is 33 chars wide
+  // Values assume that `INDENT` is 2 spaces and card width is 33 chars wide, 18 rows
   static constexpr std::string_view base_card{ R"""(
 {POSITION}{NAME:^33}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
-{POSITION}{INDENT}Property cost: {PROPERTY_COST: >14}{INDENT}
+{POSITION}{TYPE:^33}
+{POSITION}{INDENT}Tile cost: {TILE_COST: >18}{INDENT}
 {POSITION}{INDENT}Mortgage value: {MORTGAGE_VALUE: >13}{INDENT}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{INDENT}Basic rent: {RENT_BASIC: >17}{INDENT}
@@ -58,7 +55,6 @@ private:
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{INDENT}House cost: {HOUSE_COST: >17}{INDENT}
 {POSITION}{INDENT}Hotel cost: {HOTEL_COST: >17}{INDENT}
-{POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 )""" };

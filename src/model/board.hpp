@@ -25,6 +25,7 @@ class Board {
 private:
   static constexpr int tile_length = 7; // Length in chars
   static constexpr int number_of_tiles = 40;
+  static constexpr auto tile_ids = std::views::iota(0, number_of_tiles);
 
   // Support only for clang 16.0.0+ :(, I am on clang 15.0.0 and too lazy
   // static constexpr auto tile_ids = std::views::iota(0, number_of_tiles);
@@ -89,8 +90,8 @@ private:
   |DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|DDDDDDD|
   |PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|PPPPPPP|
    ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-   {20:^7} {18:^7} {16:^7} {14:^7} {12:^7} {10:^7} {8:^7} {6:^7} {4:^7} {2:^7} {0:^7}      
-   {21:^7} {19:^7} {17:^7} {15:^7} {13:^7} {11:^7} {9:^7} {7:^7} {5:^7} {3:^7} {1:^7}      
+   {20:^7} {18:^7} {16:^7} {14:^7} {12:^7} {10:^7} {8:^7} {6:^7} {4:^7} {2:^7} {0:^7} 
+   {21:^7} {19:^7} {17:^7} {15:^7} {13:^7} {11:^7} {9:^7} {7:^7} {5:^7} {3:^7} {1:^7} 
 )""" };
 
   // Actual ids label each tile starting from GO (0) to the last tile (39)
@@ -131,6 +132,7 @@ public:
   explicit Board(const json &board_data);
   static constexpr auto get_tile_length() -> int { return tile_length; }
   static constexpr auto get_number_of_tiles() -> int { return number_of_tiles; }
+  static constexpr auto get_tile_ids() { return tile_ids; }
 
   auto get_board_str() const -> std::string_view { return ascii_board; }
 

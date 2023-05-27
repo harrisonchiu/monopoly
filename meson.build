@@ -8,6 +8,13 @@ project(
     ]
 )
 
+compiler = meson.get_compiler('cpp')
+if compiler.get_id() == 'clang' and compiler.version() < '16.0.0'
+    warning('Clang version < 16.0.0 does not support ranges, so it may not compile')
+elif compiler.get_id() == 'gcc'
+    warning('Not really tested on GCC. Use the most recent version and supports C++20')
+endif
+
 # Need to install Google's re2
 # git clone https://code.googlesource.com/re2 && cd re2
 # sudo make && sudo make test && sudo make testinstall

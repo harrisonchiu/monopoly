@@ -28,7 +28,7 @@ private:
   static constexpr int maximum_cost = 9999;
   int cost;
 
-  bool is_ownable;
+  bool is_ownable = false;
   OwnershipStatus ownership_status = OwnershipStatus::Unowned;
   std::shared_ptr<const Token> owner = std::make_shared<const Token>();
 
