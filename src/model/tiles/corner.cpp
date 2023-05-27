@@ -2,7 +2,6 @@
 #include "src/model/tiles/tile.hpp"
 
 #include "src/model/board.hpp"
-#include "src/utils/substrings.hpp"
 
 #include <fmt/format.h>
 
@@ -15,8 +14,7 @@ Corner::Corner(const json &tile_data, const int id)
 }
 
 void Corner::update_detail() {
-  static constexpr auto spaces = repeat_str<1, Board::get_tile_length()>(" ");
-  static const std::string detail = std::string(spaces.begin(), spaces.end());
+  const std::string detail = fmt::format("{:^{}}", " ", Board::get_tile_length());
   set_detail(detail);
 }
 

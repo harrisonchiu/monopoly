@@ -108,7 +108,7 @@ auto Controller::view_tile(args_list &args) -> std::string {
     const Position pos = board->get_center_pos();
 
     fmt::print(fmt::runtime(tile->get_card()), pos.row, pos.col);
-    return fmt::format("Showing details of {}", tile->get_name());
+    return fmt::format("Showing {} tile card with its details.", tile->get_name());
   }
 
   return fmt::format("Invalid Argument: Given tile id does not exist");
