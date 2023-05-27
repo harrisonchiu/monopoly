@@ -17,7 +17,7 @@ void View::draw_board_colors() {
     const Position &pos = board->get_color_pos(tile_id);
     const std::shared_ptr<Tile> &tile = board->get_tile(tile_id);
 
-    fmt::print("\x1b[{};{}H{}", pos.row, pos.col, tile->get_color());
+    fmt::print("\x1b[{};{}H{}", pos.row, pos.col, tile->get_box());
     color_update_queue.pop();
   }
 }

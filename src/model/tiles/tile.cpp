@@ -11,7 +11,8 @@ Tile::Tile(const json &tile_data, int id)
     : id{ id },
       name{ tile_data["name"].get<std::string>() },
       group{ tile_data["group"].get<std::string>() },
-      color{ fmt::format(Color::get(group), "▔▔▔▔▔▔▔") },
+      color{ Color::get(group) },
+      box{ fmt::format(color, "▔▔▔▔▔▔▔") },
       cost{ tile_data.value("cost", maximum_cost) },
       is_ownable{ tile_data.contains("cost") } {}
 

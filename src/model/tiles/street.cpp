@@ -3,8 +3,6 @@
 
 #include "src/model/board.hpp"
 
-#include "src/utils/color.hpp"
-
 #include <fmt/args.h>
 #include <fmt/color.h>
 
@@ -22,7 +20,7 @@ auto Street::create_card(const json &tile_data) -> std::string {
   const auto card_pos = fmt::arg("POSITION", "\x1b[{1}G");
 
   const std::string color_row = fmt::format(
-      Color::get(get_group()),
+      get_color().has_background() ? get_color() : fmt::bg(fmt::color::white),
       base_color_row,
       card_pos,
       fmt::arg("EMPTY_ROW_CARD_WIDTH", std::string(card_width, ' '))

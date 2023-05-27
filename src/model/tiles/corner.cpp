@@ -26,7 +26,7 @@ auto Corner::create_card([[maybe_unused]] const json &tile_data) -> std::string 
   const auto cost = tile_data.contains("cost") ? fmt::format("${}", tile_data["cost"]) : "NULL";
 
   const std::string color_row = fmt::format(
-      fmt::bg(fmt::color::white),
+      get_color().has_background() ? get_color() : fmt::bg(fmt::color::white),
       base_color_row,
       card_pos,
       fmt::arg("EMPTY_ROW_CARD_WIDTH", std::string(card_width, ' '))

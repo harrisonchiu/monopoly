@@ -19,10 +19,9 @@ private:
   int id;
   std::string name;
   std::string group;
-  std::string color;
+  fmt::text_style color;
+  std::string box;
   std::string detail;
-
-  fmt::text_style col;
 
   // Cannot be more than 4 digits because of tile length
   static constexpr int maximum_cost = 9999;
@@ -38,12 +37,12 @@ public:
   auto get_id() const -> int { return id; }
   auto get_name() const -> std::string_view { return name; }
   auto get_group() const -> std::string_view { return group; }
-  auto get_color() const -> std::string_view { return color; }
+  auto get_color() const -> const fmt::text_style & { return color; }
+  auto get_box() const -> std::string_view { return box; }
   auto get_detail() const -> std::string_view { return detail; }
   void set_detail(std::string new_detail) { detail = std::move(new_detail); }
   virtual void update_detail() = 0;
 
-  auto get_col() const -> const fmt::text_style & { return col; }
   virtual auto get_card() const -> std::string_view = 0;
 
   static constexpr auto get_maximum_cost() -> int { return maximum_cost; }
