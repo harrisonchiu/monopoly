@@ -19,6 +19,7 @@ enum class Action {
   Cards,
   Roll,
   Rent,
+  None,
 };
 
 struct Effect {

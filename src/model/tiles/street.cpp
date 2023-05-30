@@ -94,7 +94,7 @@ void Street::update_effect() {
   case OwnershipStatus::Tier4:
     current_rent = (4 < rent.size()) ? rent.at(4) : rent.back();
     break;
-  case OwnershipStatus::Tier5: // NOLINTNEXTLINE
+  case OwnershipStatus::Tier5: // NOLINTNEXTLINE magic numbers are understable here
     current_rent = (5 < rent.size()) ? rent.at(5) : rent.back();
     break;
   default:

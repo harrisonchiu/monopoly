@@ -4,6 +4,8 @@
         "display_name": "GO",
         "type": "Corner",
         "group": "Black",
+        "effectType": "money",
+        "effectValue": 200,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -25,6 +27,8 @@
         "display_name": "CHEST",
         "type": "Chest",
         "group": "Salmon",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -46,6 +50,8 @@
         "display_name": "INCOME TAX",
         "type": "Tax",
         "group": "Purple",
+        "effectType": "money",
+        "effectValue": -200,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -81,6 +87,8 @@
         "display_name": "CHANCE?",
         "type": "Chance",
         "group": "Spring",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -116,6 +124,7 @@
         "display_name": "VISIT JAIL",
         "type": "Corner",
         "group": "Black",
+        "effectType": "none",
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -207,6 +216,8 @@
         "display_name": "CHEST",
         "type": "Chest",
         "group": "Salmon",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -242,6 +253,7 @@
         "display_name": "FREE PARK",
         "type": "Corner",
         "group": "Black",
+        "effectType": "none",
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -263,6 +275,8 @@
         "display_name": "CHANCE?",
         "type": "Chance",
         "group": "Spring",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -368,6 +382,7 @@
         "display_name": "GOTO JAIL",
         "type": "Corner",
         "group": "Black",
+        "effectType": "none",
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -403,6 +418,8 @@
         "display_name": "CHEST",
         "type": "Chest",
         "group": "Salmon",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -438,6 +455,8 @@
         "display_name": "CHANCE?",
         "type": "Chance",
         "group": "Spring",
+        "effectType": "cards",
+        "effectValue": 1,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {
@@ -459,6 +478,8 @@
         "display_name": "LUXURY TAX",
         "type": "Tax",
         "group": "Purple",
+        "effectType": "money",
+        "effectValue": -100,
         "eventDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id interdum nulla. Donec viverra eros vitae sagittis convallis. Suspendisse potenti. Etiam tellus dui, tincidunt a feugiat eleifend, ultrices quis sapien. Donec arcu dolor, viverra sed hendrerit nec, rhoncus eget risus. Etiam at porta ex. Nullam nec bibendum mi."
     },
     {

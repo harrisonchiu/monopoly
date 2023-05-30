@@ -3,6 +3,8 @@
 
 #include "src/model/tiles/tile.hpp"
 
+#include "src/utils/map.hpp"
+
 #include <nlohmann/json.hpp>
 
 #include <string>
@@ -10,8 +12,22 @@
 
 class Event : public Tile {
   using json = nlohmann::json;
+  using user_label_actions = std::pair<std::string_view, Action>;
 
 private:
+  static constexpr std::array<user_label_actions, 7> action_pair = { {
+      { "move", Action::Move },
+      { "money", Action::Money },
+      { "jail", Action::Jail },
+      { "cards", Action::Cards },
+      { "roll", Action::Roll },
+      { "rent", Action::Rent },
+      { "none", Action::None },
+  } };
+
+  using action_map = CompileTimeMap<std::string_view, Action, action_pair.size()>;
+  static constexpr auto actions = action_map{ { action_pair } };
+
   // Color is the group that the tile is in. Existly solely for better appearances.
   // Card must be separated into 2 different strings: color and details section
   // They have different colors. Hard to have 1 encompassing style and some different styles in it.
@@ -56,6 +72,7 @@ public:
 
   auto get_effect() const -> const Effect & override { return effect; };
 
+  // TODO: when player purchases, it may change who the effect occurs for
   void update_effect() override{};
 };
 

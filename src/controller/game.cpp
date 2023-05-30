@@ -132,6 +132,7 @@ auto Controller::land(const std::shared_ptr<Tile> &tile) -> std::string {
   case Action::Cards:
   case Action::Roll:
   case Action::Move:
+  case Action::None:
   default:
     return "";
   }

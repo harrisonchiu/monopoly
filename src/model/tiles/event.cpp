@@ -12,7 +12,8 @@
 Event::Event(const json &tile_data, const int id)
     : Tile(tile_data, id),
       card{ create_card(tile_data) },
-      effect{ Effect{ Action::Money, 200 } } {
+      effect{ Effect{ actions.at(tile_data["effectType"].get<std::string>()),
+                      tile_data["effectValue"].get<int>() } } {
   update_detail();
   update_effect();
 }
