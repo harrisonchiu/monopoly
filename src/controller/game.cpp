@@ -43,7 +43,7 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   if (tile->get_owner_id() == current_player->get_id()) {
     return fmt::format("{} is already owned by you. Cannot purchase.", tile_name);
   }
-  if (tile->get_ownership_status() != OwnershipStatus::Unowned) {
+  if (tile->is_owned()) {
     return fmt::format("{} is owned by Player {}. Cannot purchase.", tile_name, tile_owner);
   }
 
@@ -52,8 +52,8 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
     current_player->withdraw(tile_cost);
     tile->set_owner(*current_player);
     tile->set_ownership_status(OwnershipStatus::Owned);
-    tile->update_detail();
     tile->update_effect();
+    tile->update_detail();
   }
 
   view->draw_tile_detail(tile->get_id());
@@ -145,8 +145,7 @@ auto Controller::give_money(const int amount) -> std::string {
 
 auto Controller::pay_rent(const std::shared_ptr<Tile> &tile) -> std::string {
   // Tile is owned by someone not by the current player
-  if (tile->get_ownership_status() != OwnershipStatus::Unowned &&
-      tile->get_owner_id() != current_player->get_id()) {
+  if (tile->is_owned() && tile->get_owner_id() != current_player->get_id()) {
     auto &owner = players->at(tile->get_owner_id());
     const auto &[action, rent_amount] = tile->get_effect();
     current_player->withdraw(rent_amount);

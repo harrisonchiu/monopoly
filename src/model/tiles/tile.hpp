@@ -68,6 +68,7 @@ public:
   auto get_owner() const -> const std::shared_ptr<const Token> & { return owner; }
   auto get_owner_id() const -> int { return owner->get_id(); }
   void set_owner(const Player &player);
+  auto is_owned() const -> bool;
 
   virtual auto get_effect() const -> const Effect & = 0;
   virtual void update_effect() = 0;

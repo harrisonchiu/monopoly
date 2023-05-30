@@ -59,7 +59,13 @@ auto Street::create_card(const json &tile_data) -> std::string {
 void Street::update_detail() {
   const std::string_view label = ownership_labels.at(get_ownership_status());
   const std::string detail = fmt::format(get_owner()->get_color(), label);
-  const std::string cost = fmt::format("${}", get_cost());
+
+  std::string cost;
+  if (is_owned()) {
+    cost = fmt::format("${}", current_rent);
+  } else {
+    cost = fmt::format("${}", get_cost());
+  }
 
   // Cost is max 4 digits (i.e. cost <= 9999) in order to fit in the board's visuals
   const int max_cost_length = Board::get_tile_length() - static_cast<int>(label.length());

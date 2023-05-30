@@ -1,6 +1,7 @@
 #include "src/model/tiles/tile.hpp"
 
 #include "src/model/players/player.hpp"
+#include "src/model/tiles/attributes.hpp"
 #include "src/utils/color.hpp"
 
 #include <fmt/core.h>
@@ -17,3 +18,5 @@ Tile::Tile(const json &tile_data, int id)
       is_ownable{ tile_data.contains("cost") } {}
 
 void Tile::set_owner(const Player &player) { owner = player.get_token(); }
+
+auto Tile::is_owned() const -> bool { return ownership_status != OwnershipStatus::Unowned; }

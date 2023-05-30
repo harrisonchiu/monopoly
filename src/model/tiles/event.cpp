@@ -8,12 +8,12 @@
 #include <fmt/color.h>
 
 #include <string>
+#include <string_view>
 
 Event::Event(const json &tile_data, const int id)
     : Tile(tile_data, id),
-      card{ create_card(tile_data) },
-      effect{ Effect{ actions.at(tile_data["effectType"].get<std::string>()),
-                      tile_data["effectValue"].get<int>() } } {
+      card{ create_card(tile_data) } {
+  initialize_effect(tile_data);
   update_detail();
   update_effect();
 }
@@ -64,4 +64,25 @@ auto Event::create_card(const json &tile_data) -> std::string {
 void Event::update_detail() {
   const std::string detail = fmt::format("{:^{}}", " ", Board::get_tile_length());
   set_detail(detail);
+}
+
+auto Event::initialize_effect(const json &tile_data) -> Effect {
+  static std::unordered_map<std::string, Action> actions{ {
+      { "move", Action::Move },
+      { "money", Action::Money },
+      { "jail", Action::Jail },
+      { "cards", Action::Cards },
+      { "roll", Action::Roll },
+      { "rent", Action::Rent },
+      { "none", Action::None },
+  } };
+
+  auto effect_type = actions.at(tile_data["effectType"].get<std::string>());
+  int effect_value{};
+
+  if (effect_type != Action::None) {
+    effect_value = tile_data["effectValue"].get<int>();
+  }
+
+  return Effect{ effect_type, effect_value };
 }
