@@ -6,13 +6,17 @@
 #include <fmt/args.h>
 #include <fmt/color.h>
 
+#include <ranges>
 #include <string>
 #include <string_view>
+#include <vector>
 
 Street::Street(const json &tile_data, const int id)
     : Property(tile_data, id),
-      card{ create_card(tile_data) } {
+      card{ create_card(tile_data) },
+      rent{ tile_data["rent"].get<std::vector<int>>() } {
   update_detail();
+  update_effect();
 }
 
 auto Street::create_card(const json &tile_data) -> std::string {
@@ -63,4 +67,40 @@ void Street::update_detail() {
   const std::string new_detail = fmt::format("{0}{1:>{2}}", detail, cost, max_cost_length);
 
   set_detail(new_detail);
+}
+
+void Street::update_effect() {
+  if (rent.empty()) {
+    return;
+  }
+
+  switch (get_ownership_status()) {
+  case OwnershipStatus::Mortgaged:
+  case OwnershipStatus::Unowned:
+    current_rent = 0;
+    break;
+  case OwnershipStatus::Owned:
+    current_rent = rent.at(0);
+    break;
+  case OwnershipStatus::Tier1:
+    current_rent = (1 < rent.size()) ? rent.at(1) : rent.back();
+    break;
+  case OwnershipStatus::Tier2:
+    current_rent = (2 < rent.size()) ? rent.at(2) : rent.back();
+    break;
+  case OwnershipStatus::Tier3:
+    current_rent = (3 < rent.size()) ? rent.at(3) : rent.back();
+    break;
+  case OwnershipStatus::Tier4:
+    current_rent = (4 < rent.size()) ? rent.at(4) : rent.back();
+    break;
+  case OwnershipStatus::Tier5: // NOLINTNEXTLINE
+    current_rent = (5 < rent.size()) ? rent.at(5) : rent.back();
+    break;
+  default:
+    current_rent = 0;
+    break;
+  }
+
+  effect = Effect{ Action::Rent, current_rent };
 }

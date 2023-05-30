@@ -11,7 +11,14 @@
         "display_name": "MEDIT AVE",
         "type": "Street",
         "group": "Brown",
-        "cost": 60
+        "cost": 60,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Community Chest 1",
@@ -25,7 +32,14 @@
         "display_name": "BALTIC AVE",
         "type": "Street",
         "group": "Brown",
-        "cost": 60
+        "cost": 60,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Income Tax",
@@ -39,14 +53,28 @@
         "display_name": "READING RR",
         "type": "Railroad",
         "group": "Gray",
-        "cost": 200
+        "cost": 200,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Oriental Avenue",
         "display_name": "ORNTL AVE",
         "type": "Street",
         "group": "Cyan",
-        "cost": 100
+        "cost": 100,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Chance 1",
@@ -60,14 +88,28 @@
         "display_name": "VERMONT AVE",
         "type": "Street",
         "group": "Cyan",
-        "cost": 100
+        "cost": 100,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Connecticut Avenue",
         "display_name": "CONNECT AVE",
         "type": "Street",
         "group": "Cyan",
-        "cost": 120
+        "cost": 120,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Visiting Jail",
@@ -81,42 +123,84 @@
         "display_name": "CHARLES PLACE",
         "type": "Street",
         "group": "Magenta",
-        "cost": 140
+        "cost": 140,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Electric Company",
         "display_name": "ELEC COMPANY",
         "type": "Utility",
         "group": "White",
-        "cost": 150
+        "cost": 150,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "States Avenue",
         "display_name": "STATES AVE",
         "type": "Street",
         "group": "Magenta",
-        "cost": 140
+        "cost": 140,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Virginia Avenue",
         "display_name": "VIRGNIA AVE",
         "type": "Street",
         "group": "Magenta",
-        "cost": 160
+        "cost": 160,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Pennsylvania Railroad",
         "display_name": "PENN RR",
         "type": "Railroad",
         "group": "Gray",
-        "cost": 200
+        "cost": 200,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "St. James Place",
         "display_name": "JAMES PLACE",
         "type": "Street",
         "group": "Orange",
-        "cost": 180
+        "cost": 180,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Community Chest 2",
@@ -130,14 +214,28 @@
         "display_name": "TENN AVE",
         "type": "Street",
         "group": "Orange",
-        "cost": 180
+        "cost": 180,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "New York Avenue",
         "display_name": "NEWYORK AVE",
         "type": "Street",
         "group": "Orange",
-        "cost": 200
+        "cost": 200,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Free Parking",
@@ -151,7 +249,14 @@
         "display_name": "KNTUCKY AVE",
         "type": "Street",
         "group": "Red",
-        "cost": 220
+        "cost": 220,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Chance 2",
@@ -165,49 +270,98 @@
         "display_name": "INDIANA AVE",
         "type": "Street",
         "group": "Red",
-        "cost": 220
+        "cost": 220,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Illinois Avenue",
         "display_name": "ILLNOIS AVE",
         "type": "Street",
         "group": "Red",
-        "cost": 240
+        "cost": 240,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "B. & O. Railroad",
         "display_name": "B&O RR",
         "type": "Railroad",
         "group": "Gray",
-        "cost": 200
+        "cost": 200,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Atlantic Avenue",
         "display_name": "ATLANTC AVE",
         "type": "Street",
         "group": "Yellow",
-        "cost": 260
+        "cost": 260,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Ventnor Avenue",
         "display_name": "VENTNOR AVE",
         "type": "Street",
         "group": "Yellow",
-        "cost": 260
+        "cost": 260,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Water Works",
         "display_name": "WATER WORKS",
         "type": "Utility",
         "group": "White",
-        "cost": 150
+        "cost": 150,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Marvin Gardens",
         "display_name": "MARVIN GARDENS",
         "type": "Street",
         "group": "Yellow",
-        "cost": 280
+        "cost": 280,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Go To Jail",
@@ -221,14 +375,28 @@
         "display_name": "PACIFIC AVE",
         "type": "Street",
         "group": "Green",
-        "cost": 300
+        "cost": 300,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "North Carolina Avenue",
         "display_name": "CAROLNA AVE",
         "type": "Street",
         "group": "Green",
-        "cost": 300
+        "cost": 300,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Community Chest 3",
@@ -242,14 +410,28 @@
         "display_name": "PENN AVE",
         "type": "Street",
         "group": "Green",
-        "cost": 320
+        "cost": 320,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Short Railroad",
         "display_name": "SHORT RR",
         "type": "Railroad",
         "group": "Gray",
-        "cost": 200
+        "cost": 200,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Chance 3",
@@ -263,7 +445,14 @@
         "display_name": "PARK PLACE",
         "type": "Street",
         "group": "Blue",
-        "cost": 350
+        "cost": 350,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     },
     {
         "name": "Luxury Tax",
@@ -277,6 +466,13 @@
         "display_name": "BRDWALK",
         "type": "Street",
         "group": "Blue",
-        "cost": 400
+        "cost": 400,
+        "rent": [
+            25,
+            50,
+            100,
+            200,
+            400
+        ]
     }
 ]

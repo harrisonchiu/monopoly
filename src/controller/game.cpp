@@ -2,7 +2,7 @@
 
 #include "src/model/board.hpp"
 #include "src/model/players/player.hpp"
-#include "src/model/players/token.hpp"
+#include "src/model/tiles/attributes.hpp"
 #include "src/model/tiles/tile.hpp"
 #include "src/view/view.hpp"
 
@@ -15,19 +15,6 @@
 // Some functions may not be able to be static, so generalize it into non-static
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 auto Controller::exit([[maybe_unused]] args_list &args) -> StatusCode { return StatusCode::Exit; }
-
-auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
-  constexpr int steps = 1;
-  current_player->walk(steps);
-  board->move_player_piece(*current_player);
-  view->draw_board_players();
-
-  const std::string_view piece = current_player->get_avatar();
-  const std::string_view landed_tile = board->get_tile(current_player->get_pos())->get_name();
-  std::string log =
-      fmt::format("Player {} rolled {} and landed on {}.", piece, steps, landed_tile);
-  return log;
-}
 
 auto Controller::end_turn([[maybe_unused]] args_list &args) -> std::string {
   const std::string_view turn_ender = current_player->get_avatar();
@@ -56,7 +43,7 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   if (tile->get_owner_id() == current_player->get_id()) {
     return fmt::format("{} is already owned by you. Cannot purchase.", tile_name);
   }
-  if (tile->get_owner_id() != Token::get_default_id()) {
+  if (tile->get_ownership_status() != OwnershipStatus::Unowned) {
     return fmt::format("{} is owned by Player {}. Cannot purchase.", tile_name, tile_owner);
   }
 
@@ -64,7 +51,9 @@ auto Controller::buy_tile([[maybe_unused]] args_list &args) -> std::string {
   if (current_player->get_money() >= tile_cost) {
     current_player->withdraw(tile_cost);
     tile->set_owner(*current_player);
+    tile->set_ownership_status(OwnershipStatus::Owned);
     tile->update_detail();
+    tile->update_effect();
   }
 
   view->draw_tile_detail(tile->get_id());
@@ -111,4 +100,57 @@ auto Controller::view_tile(args_list &args) -> std::string {
   }
 
   return fmt::format("Invalid Argument: Given tile id does not exist");
+}
+
+auto Controller::move_player([[maybe_unused]] args_list &args) -> std::string {
+  constexpr int steps = 1;
+  current_player->walk(steps);
+
+  const auto &tile = board->get_tile(current_player->get_pos());
+  const std::string tile_effect = land(tile);
+
+  board->move_player_piece(*current_player);
+  view->draw_board_players();
+
+  const std::string_view piece = current_player->get_avatar();
+  const std::string_view landed_tile = tile->get_name();
+  auto log = fmt::format(
+      "Player {} rolled {} and landed on {}. {}", piece, steps, landed_tile, tile_effect
+  );
+  return log;
+}
+
+auto Controller::land(const std::shared_ptr<Tile> &tile) -> std::string {
+  const auto &[action, value] = tile->get_effect();
+
+  switch (action) {
+  case Action::Money:
+    return give_money(value);
+  case Action::Rent:
+    return pay_rent(tile);
+  case Action::Jail:
+  case Action::Cards:
+  case Action::Roll:
+  case Action::Move:
+  default:
+    return "";
+  }
+}
+
+auto Controller::give_money(const int amount) -> std::string {
+  current_player->deposit(amount);
+  return fmt::format("Collected ${}.", amount);
+}
+
+auto Controller::pay_rent(const std::shared_ptr<Tile> &tile) -> std::string {
+  // Tile is owned by someone not by the current player
+  if (tile->get_ownership_status() != OwnershipStatus::Unowned &&
+      tile->get_owner_id() != current_player->get_id()) {
+    auto &owner = players->at(tile->get_owner_id());
+    const auto &[action, rent_amount] = tile->get_effect();
+    current_player->withdraw(rent_amount);
+    owner.deposit(rent_amount);
+    return fmt::format("Payed ${} in rent.", rent_amount);
+  }
+  return "";
 }

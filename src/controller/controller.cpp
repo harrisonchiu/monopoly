@@ -22,14 +22,14 @@ Controller::Controller(
 
   current_player = players->begin();
 
-  commands["roll"] = &Controller::move_player;
-  commands["r"] = &Controller::move_player;
-  commands["end"] = &Controller::end_turn;
-  commands["e"] = &Controller::end_turn;
-  commands["buy"] = &Controller::buy_tile;
-  commands["b"] = &Controller::buy_tile;
-  commands["view"] = &Controller::view_tile;
-  commands["v"] = &Controller::view_tile;
+  game_commands["roll"] = &Controller::move_player;
+  game_commands["r"] = &Controller::move_player;
+  game_commands["end"] = &Controller::end_turn;
+  game_commands["e"] = &Controller::end_turn;
+  game_commands["buy"] = &Controller::buy_tile;
+  game_commands["b"] = &Controller::buy_tile;
+  game_commands["view"] = &Controller::view_tile;
+  game_commands["v"] = &Controller::view_tile;
 
   debug_commands["exit"] = &Controller::exit;
   debug_commands["x"] = &Controller::exit;
@@ -99,7 +99,7 @@ auto Controller::run_command(args_list &args) -> StatusCode {
     return StatusCode::Success;
   }
 
-  if (auto it = commands.find(args[0]); it != commands.end()) {
+  if (auto it = game_commands.find(args[0]); it != game_commands.end()) {
     try {
       const std::string log = it->second(this, args);
       view->output(log);

@@ -17,8 +17,8 @@ class Street : public Property {
   using status_labels = std::pair<OwnershipStatus, std::string_view>;
 
 private:
-  static constexpr std::size_t status_count = static_cast<std::size_t>(OwnershipStatus::COUNT);
-  static constexpr std::array<status_labels, status_count> labels = { {
+  static constexpr std::size_t number_of_status = static_cast<std::size_t>(OwnershipStatus::COUNT);
+  static constexpr std::array<status_labels, number_of_status> labels = { {
       { OwnershipStatus::Mortgaged, "M" },
       { OwnershipStatus::Unowned, "_" },
       { OwnershipStatus::Owned, "X" },
@@ -28,8 +28,9 @@ private:
       { OwnershipStatus::Tier4, "4H" },
       { OwnershipStatus::Tier5, "HT" },
   } };
-  static constexpr auto ownership_labels =
-      CompileTimeMap<OwnershipStatus, std::string_view, labels.size()>{ { labels } };
+
+  using status_label_map = CompileTimeMap<OwnershipStatus, std::string_view, labels.size()>;
+  static constexpr auto ownership_labels = status_label_map{ { labels } };
 
   // Color is the group that the tile is in. Existly solely for better appearances.
   // Card must be separated into 2 different strings: color and details section
@@ -63,6 +64,11 @@ private:
 
   std::string card;
 
+  std::vector<int> rent;
+  int current_rent = 0;
+
+  Effect effect{};
+
   auto create_card(const json &tile_data) -> std::string;
 
 public:
@@ -70,6 +76,9 @@ public:
   void update_detail() override;
 
   auto get_card() const -> std::string_view override { return card; };
+
+  auto get_effect() const -> const Effect & override { return effect; };
+  void update_effect() override;
 };
 
 #endif // STREET_HPP

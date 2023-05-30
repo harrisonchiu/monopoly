@@ -12,6 +12,20 @@
 #include <string>
 #include <string_view>
 
+enum class Action {
+  Move,
+  Money,
+  Jail,
+  Cards,
+  Roll,
+  Rent,
+};
+
+struct Effect {
+  Action action;
+  int value;
+};
+
 class Tile {
   using json = nlohmann::json;
 
@@ -23,8 +37,7 @@ private:
   std::string box;
   std::string detail;
 
-  // Cannot be more than 4 digits because of tile length
-  static constexpr int maximum_cost = 9999;
+  static constexpr int maximum_cost = 9999; // max 4 digits because of tile length
   int cost;
 
   bool is_ownable = false;
@@ -50,9 +63,14 @@ public:
 
   auto get_is_ownable() const -> bool { return is_ownable; }
   auto get_ownership_status() const -> OwnershipStatus { return ownership_status; }
+  void set_ownership_status(OwnershipStatus status) { ownership_status = status; }
   auto get_owner() const -> const std::shared_ptr<const Token> & { return owner; }
   auto get_owner_id() const -> int { return owner->get_id(); }
   void set_owner(const Player &player);
+
+  virtual auto get_effect() const -> const Effect & = 0;
+  virtual void update_effect() = 0;
+  // virtual void interact() = 0;
 
   // Special member functions defined for Rule of Five to get rid of warnings
   Tile(const Tile &) = delete; // Copy

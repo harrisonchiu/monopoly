@@ -44,6 +44,8 @@ private:
 
   std::string card;
 
+  Effect effect;
+
   auto create_card(const json &tile_data) -> std::string;
 
 public:
@@ -51,6 +53,10 @@ public:
   void update_detail() override;
 
   auto get_card() const -> std::string_view override { return card; };
+
+  auto get_effect() const -> const Effect & override { return effect; };
+
+  void update_effect() override{};
 };
 
 #endif // EVENT_HPP

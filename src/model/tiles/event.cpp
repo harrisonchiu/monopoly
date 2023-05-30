@@ -11,13 +11,10 @@
 
 Event::Event(const json &tile_data, const int id)
     : Tile(tile_data, id),
-      card{ create_card(tile_data) } {
+      card{ create_card(tile_data) },
+      effect{ Effect{ Action::Money, 200 } } {
   update_detail();
-}
-
-void Event::update_detail() {
-  const std::string detail = fmt::format("{:^{}}", " ", Board::get_tile_length());
-  set_detail(detail);
+  update_effect();
 }
 
 auto Event::create_card(const json &tile_data) -> std::string {
@@ -61,4 +58,9 @@ auto Event::create_card(const json &tile_data) -> std::string {
   );
 
   return fmt::format("{0}{1}{1}{1}{2}", card_start, color_row, card_details);
+}
+
+void Event::update_detail() {
+  const std::string detail = fmt::format("{:^{}}", " ", Board::get_tile_length());
+  set_detail(detail);
 }
