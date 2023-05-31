@@ -19,7 +19,7 @@ private:
   static constexpr std::string_view base_color_row{ "\n{POSITION}{EMPTY_ROW_CARD_WIDTH}" };
 
   // Hard-coded values because its too hard to dynamically calculate width of different phrases
-  // Values assume that `INDENT` is 2 spaces and card width is 33 chars wide, 18 rows
+  // Values assume that `INDENT` is 2 spaces and card width is 33 chars wide, 20 rows
   static constexpr std::string_view base_card{ R"""(
 {POSITION}{NAME:^33}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
@@ -38,6 +38,7 @@ private:
 {POSITION}{INDENT}{DESCRIPTION_5:^29}{INDENT}
 {POSITION}{INDENT}{DESCRIPTION_6:^29}{INDENT}
 {POSITION}{INDENT}{DESCRIPTION_7:^29}{INDENT}
+{POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 {POSITION}{EMPTY_ROW_CARD_WIDTH}
 )""" };
