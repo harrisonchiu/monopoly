@@ -9,6 +9,7 @@
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 Street::Street(const json &tile_data, const int id)
@@ -57,7 +58,18 @@ auto Street::create_card(const json &tile_data) -> std::string {
 }
 
 void Street::update_detail() {
-  const std::string_view label = ownership_labels.at(get_ownership_status());
+  static const std::unordered_map<OwnershipStatus, std::string> status_labels{ {
+      { OwnershipStatus::Mortgaged, "M" },
+      { OwnershipStatus::Unowned, "_" },
+      { OwnershipStatus::Owned, "X" },
+      { OwnershipStatus::Tier1, "1H" },
+      { OwnershipStatus::Tier2, "2H" },
+      { OwnershipStatus::Tier3, "3H" },
+      { OwnershipStatus::Tier4, "4H" },
+      { OwnershipStatus::Tier5, "HT" },
+  } };
+
+  const std::string_view label = status_labels.at(get_ownership_status());
   const std::string detail = fmt::format(get_owner()->get_color(), label);
 
   std::string cost;

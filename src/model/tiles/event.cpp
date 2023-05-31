@@ -67,7 +67,7 @@ void Event::update_detail() {
 }
 
 auto Event::initialize_effect(const json &tile_data) -> Effect {
-  static std::unordered_map<std::string, Action> actions{ {
+  static const std::unordered_map<std::string, Action> actions{ {
       { "move", Action::Move },
       { "money", Action::Money },
       { "jail", Action::Jail },
